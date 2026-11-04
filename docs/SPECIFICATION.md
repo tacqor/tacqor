@@ -239,6 +239,8 @@ Integer and float literals as in §1.4. `[e1, …]` is a `list[T]` where `T` is 
 
 `parallel_sum(count, workers, m)` and `parallel_map(count, workers, m)` require `m : fn(i64) -> i64` and `1 ≤ workers ≤ 64`. They evaluate `m(i)` for every `0 ≤ i < count` on up to `workers` threads and return the exact sum (runtime error if it does not fit `i64`) or the list of results in index order. If `m` is a closure, all its captured values must be `i64`, `f64` or `bool` (compile-time error for a lambda literal, runtime error otherwise). The first error raised, in index order, propagates.
 
+`parallel_run(workers, t)` requires `t : fn(i64) -> ()` (a task returning nothing) and `1 ≤ workers ≤ 64`. It evaluates `t(k)` for every `0 ≤ k < workers`, each on its own thread with its own VM, and returns once all have returned (a task that loops forever makes the call block forever). It returns `workers`. If `t` is a closure, every captured value must be a scalar (`i64`, `f64`, `bool`) or a function value — any other captured heap value is a compile-time error for a lambda literal and a runtime error otherwise, because a shared task is read by every worker and the implementation's reference counting is not atomic. The shared task closure and the function values it captures are not freed for the remainder of the program. The first error raised by any task propagates after all tasks finish.
+
 ---
 
 ## 7. Statements
@@ -255,7 +257,7 @@ Integer and float literals as in §1.4. `[e1, …]` is a `list[T]` where `T` is 
 
 ## 8. Runtime errors
 
-A runtime error terminates the program with status 1 after writing `FILE:LINE:COLUMN: runtime error: MESSAGE` and, when the call depth exceeds one, a traceback of `in FUNCTION (line N)` lines, to standard error — unless it occurs inside `attempt`. The defined runtime errors are: integer overflow (`+ - * // -` and parallel sums), division or modulo by zero, invalid shift count, index out of bounds (list, string, argument), missing dictionary key, `unwrap`/`expect` on `None`/`Err`, `pop`/`min_of`/`max_of` on an empty list, `assert` failure, `fail(message)`, conversion failures (`int`, `float`, `chr`, `ord`, `from_bytes`, `fixed`), invalid worker count, invalid parallel capture, function nesting beyond 100,000 frames, value nesting beyond 2,000, resource limits (text 256 MB, list 256 M elements, stack 4 M values), and I/O failures reported by built-ins that do not return `Result`.
+A runtime error terminates the program with status 1 after writing `FILE:LINE:COLUMN: runtime error: MESSAGE` and, when the call depth exceeds one, a traceback of `in FUNCTION (line N)` lines, to standard error — unless it occurs inside `attempt`. The defined runtime errors are: integer overflow (`+ - * // -` and parallel sums), division or modulo by zero, invalid shift count, index out of bounds (list, string, argument), missing dictionary key, `unwrap`/`expect` on `None`/`Err`, `pop`/`min_of`/`max_of` on an empty list, `assert` failure, `fail(message)`, conversion failures (`int`, `float`, `chr`, `ord`, `from_bytes`, `fixed`), invalid worker count, invalid parallel capture (including a non-shareable `parallel_run` task capture), function nesting beyond 100,000 frames, value nesting beyond 2,000, resource limits (text 256 MB, list 256 M elements, stack 4 M values), and I/O failures reported by built-ins that do not return `Result`.
 
 `exit(code)` ends the program immediately with `code` (0–255) after flushing output.
 

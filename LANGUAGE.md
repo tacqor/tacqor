@@ -205,6 +205,18 @@ The complete list with signatures is in `STDLIB.md`. Highlights: `print`, `write
 
 `parallel_sum(count, workers, mapper)` maps a `fn(i64) -> i64` over `range(count)` on 1–64 threads and returns the exact sum; `parallel_map(count, workers, mapper)` returns every result as a `list[i64]`, in order. The mapper may be a named function or a closure, and the result never depends on the worker count. Because workers run truly in parallel, a closure mapper may only capture `i64`, `f64` and `bool` values (checked at compile time for lambdas and at runtime for other function values); read any larger data through the index, e.g. by computing it from `i` or by capturing a constant.
 
+`parallel_run(workers, task)` runs `task(worker_index)` on `workers` threads at once (1–64), each thread with its own VM and value stack, and returns once every task has returned — for a server accept-loop, that is never, so it blocks like a server should. It is the share-nothing counterpart to the two reductions above. The model is what Tacqor's non-atomic reference counting allows and no more: **each worker owns every object it allocates, and no object on the heap is ever touched by two threads at once.** Two rules follow and are enforced. The task may capture only scalars and function values — the compiler checks an inline `fn(...)` task, and a runtime check backs it up for a task bound to a name first; anything else is refused. And state shared *between* workers does not live in a captured value: it lives in a file, a database, or another process, where each worker coordinates its own reads and writes. Within those rules the speed-up is close to linear in the worker count for work that is not allocation-bound (object allocation and freeing share one lock). This is the primitive behind `http.serve_concurrent`:
+
+```python
+import std.http
+
+def handle(request: http.Request) -> http.Response:    # a plain function: no captures
+    return http.text(200, "hello " + request.path)
+
+def main():
+    http.serve_concurrent(8080, 8, handle)              # eight workers, share-nothing
+```
+
 ## 7. Errors and checking
 
 ### Recovering from runtime errors
@@ -262,4 +274,4 @@ Values are reference counted, so most objects are freed the moment they become u
 
 ## 13. Limits and non-features
 
-No inheritance: traits plus generics and closures cover the same ground without an object hierarchy. No `try`/`except`: use `Result` and `?`, and `attempt` at boundaries. Parallelism is data-parallel (`parallel_sum`, `parallel_map`) rather than shared-memory threads; the HTTP server handles one connection at a time. Strings are bytes; only `chars`, `char_count`, `chr`, `ord` are code-point aware. Call depth is limited to 100,000 frames (in native builds too, with a 512 MB stack); value nesting (lists inside lists...) is limited to 2,000 levels for printing and comparison.
+No inheritance: traits plus generics and closures cover the same ground without an object hierarchy. No `try`/`except`: use `Result` and `?`, and `attempt` at boundaries. Parallelism is share-nothing rather than shared-memory: `parallel_sum`/`parallel_map` for data-parallel work, `parallel_run` (and `http.serve_concurrent` on top of it) for request-parallel work, with state shared between threads through a file or a database, never a mutable value on the heap. Strings are bytes; only `chars`, `char_count`, `chr`, `ord` are code-point aware. Call depth is limited to 100,000 frames (in native builds too, with a 512 MB stack); value nesting (lists inside lists...) is limited to 2,000 levels for printing and comparison.

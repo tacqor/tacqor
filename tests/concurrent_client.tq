@@ -1,0 +1,31 @@
+import std.http
+import std.strings
+
+# Concurrency test client. parallel_map fires `count` requests across eight client lanes at
+# once; each lane asks for its own token and checks the server echoed exactly that token back.
+# The successes must total `count`. This exercises parallel_map (the client's threads) against
+# serve_concurrent (the server's pool) at the same time. Run as:
+#   tacqor run concurrent_client.tq -- PORT
+def check_one(port: i64, i: i64) -> i64:
+    let token = "tok" + str(i)
+    match http.get("http://127.0.0.1:" + str(port) + "/echo/" + token):
+        case Ok(response):
+            if strings.count(response.body, "\"token\":\"" + token + "\"") > 0:
+                return 1
+            return 0
+        case Err(_):
+            return 0
+
+def main():
+    let port = int(arg(0))
+    let count = 160
+    let outcomes = parallel_map(count, 8, fn(i: i64) => check_one(port, i))
+    var correct = 0
+    for v in outcomes:
+        correct = correct + v
+    print("requests=" + str(count) + " correct=" + str(correct))
+    if correct == count:
+        print("PASS")
+    else:
+        print("FAIL")
+        exit(1)

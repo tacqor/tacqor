@@ -202,6 +202,8 @@ Tacqor offers deterministic data parallelism rather than shared-memory threads. 
 
 The mapper is a named function or a closure; a closure may capture only `i64`, `f64` and `bool` values — checked at compile time for lambdas and at run time for other function values — so that no reference-counted object is ever touched by two threads. This is the reason reference counts can be non-atomic (§5) and why the model is safe by construction rather than by discipline. The cycle collector pauses while workers run. General shared-memory threads were left out: their cost (atomic counts everywhere, locks in every container, data races as a user-visible failure mode) is the opposite of goals 3 and 6.
 
+The same construction extends from data to requests. `parallel_run(workers, task)` runs `task(worker_index)` on a pool of up to 64 threads, each thread with its own VM and value stack; the task closure and its function captures are made immortal before the pool starts, so the one closure shared across threads is never reference-counted, and every object a worker allocates thereafter stays on that worker's own VM and is freed there. The task may capture only scalars and function values, enforced the same two ways as a mapper. On top of this the standard library provides `http.serve_concurrent(port, workers, handler)`: the workers accept connections on one shared listening socket and each handles a whole request — parse, dispatch, respond — on its own heap, so a slow handler no longer blocks the others the way the single-threaded `serve` does. State shared between requests is not a captured value; it lives in a file or a database, where each worker coordinates its own access. The measured speed-up on an eight-worker pool answering overlapping requests is close to the worker count; the remaining serialization is the single allocator lock, which a future release can shard per thread.
+
 ---
 
 ## 8. The error model
@@ -295,7 +297,7 @@ Python programmers find the syntax familiar and the types strict; Rust programme
 
 ## 14. Limits, stated plainly
 
-- No shared-memory threads; the HTTP server handles one connection at a time.
+- No shared-memory threads. Concurrency is share-nothing: `parallel_run` and `http.serve_concurrent` use a pool of workers that share nothing on the heap, with shared state in a file or a database. `http.serve` remains single-connection for when that is enough.
 - No inheritance; no exceptions (`attempt` only at boundaries).
 - Strings are bytes; only `chars`, `char_count`, `chr`, `ord` are code-point aware.
 - Dictionary keys are `i64` or `str` only.

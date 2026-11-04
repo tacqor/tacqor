@@ -4,6 +4,17 @@ All notable changes to Tacqor. Versions follow `MAJOR.MINOR.PATCH`: a minor rele
 
 ## Unreleased
 
+## 1.3.0 — 2026-11-04
+
+Concurrency release. Tacqor can now use more than one core for request handling, within the bounds its memory model allows.
+
+**Language**
+- `parallel_run(workers, task)` runs `task(worker_index)` on up to 64 OS threads at once, each thread with its own VM and value stack. It is the share-nothing counterpart to `parallel_sum`/`parallel_map`: a worker owns every object it allocates, so nothing on the heap is touched by two threads at once and the non-atomic reference counting stays sound. The task may capture only scalars and function values; the compiler enforces this for an inline task, and a runtime check backs it up when the task is bound to a name first. Any other shared state goes through a file or a database. See `docs/SPECIFICATION.md` §6.9 and `LANGUAGE.md`.
+
+**Standard library**
+- `http.serve_concurrent(port, workers, handler)` serves on a pool of worker threads, so one slow handler no longer blocks every other caller the way `http.serve` does. The handler must be a plain top-level function (no captures); shared state lives in a file or a database. `http.serve` and `http.serve_count` are unchanged for the single-threaded case.
+
+**Infrastructure**
 - The macOS build moves to its own workflow (`macos.yml`) so GitHub's refused macOS runners no longer mark CI or Release runs as failed; it still attaches a macOS binary to tagged releases when a runner is available.
 
 ## 1.2.1 — 2026-11-04

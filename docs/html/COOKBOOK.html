@@ -498,6 +498,28 @@ def main():
     let port = unwrap_or(parse_int(unwrap_or(env(&quot;PORT&quot;), &quot;8080&quot;)), 8080)
     print(f&quot;listening on {port}&quot;)
     http.serve(port, handler)</code></pre>
+<h3 id="serving-on-more-than-one-core">Serving on more than one
+core</h3>
+<p><code>http.serve</code> takes one connection at a time, so a single
+slow handler stalls everyone behind it.
+<code>http.serve_concurrent(port, workers, handler)</code> runs a pool
+of worker threads instead. The model is share-nothing: each worker
+handles a whole request on its own heap, the <code>handler</code> must
+be a plain top-level function (no captures), and anything shared between
+requests lives in a file or a database — not in a captured variable.</p>
+<pre class="text"><code>import std.http
+
+# A plain function — no captured variables — so it is safe to run on every worker at once.
+def handler(request: http.Request) -&gt; http.Response:
+    return http.text(200, &quot;handled &quot; + request.path)
+
+def main():
+    print(&quot;serving on 8080 with 8 workers&quot;)
+    http.serve_concurrent(8080, 8, handler)   # blocks, like serve()</code></pre>
+<p>To keep a running counter or cache across requests under this model,
+read and write it through a file (or a database) inside the handler, so
+each worker coordinates its own access rather than sharing a value on
+the heap.</p>
 <h3 id="calling-an-api">Calling an API</h3>
 <pre class="text"><code>import std.http
 import std.json
@@ -561,10 +583,10 @@ development, native builds for anything hot.
 <code>tacqor dump file.tq</code> shows the bytecode of a hot loop; fewer
 instructions per iteration means faster.</p>
 <h2 id="13-deployment">13. Deployment</h2>
-<div class="sourceCode" id="cb29"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build app.tq <span class="at">-o</span> app              <span class="co"># self-contained, VM embedded, no dependencies</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build <span class="at">--native</span> app.tq <span class="at">-o</span> app     <span class="co"># machine code (needs c++ when building)</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> app server:/opt/app/ <span class="kw">&amp;&amp;</span> <span class="fu">ssh</span> server /opt/app/app</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build app.tq <span class="at">-o</span> app              <span class="co"># self-contained, VM embedded, no dependencies</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build <span class="at">--native</span> app.tq <span class="at">-o</span> app     <span class="co"># machine code (needs c++ when building)</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> app server:/opt/app/ <span class="kw">&amp;&amp;</span> <span class="fu">ssh</span> server /opt/app/app</span></code></pre></div>
 <p>Set <code>PORT</code>-style configuration through
 <code>env(...)</code>, log with <code>eprint</code>, return non-zero
 through <code>exit(n)</code>, and keep handlers failure-tolerant with

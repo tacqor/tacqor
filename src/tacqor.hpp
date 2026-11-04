@@ -10,7 +10,7 @@
 
 namespace tacqor {
 
-constexpr std::string_view version = "1.2.1";
+constexpr std::string_view version = "1.3.0";
 constexpr std::size_t source_limit = 4'000'000;
 constexpr std::size_t bytecode_limit = 64'000'000;
 constexpr std::size_t value_limit = 65'536;        // locals per function, list literal size

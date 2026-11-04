@@ -446,6 +446,33 @@ inline Value make_closure(std::uint32_t function, std::vector<Value> captures) {
     return {Tag::function, closure};
 }
 
+// A parallel_run task is shared, read-only, by every worker thread, so it may capture only
+// values that need no cross-thread reference counting: scalars (never counted) and function
+// values (made immortal before the pool starts). Any other heap capture — a list, dict,
+// object, string, or variant — would have its non-atomic refcount touched by two threads at
+// once, so it is refused here. Share that kind of state through a file or a database instead.
+// The compiler enforces this for an inline lambda; this is the backstop for a task bound to a
+// name first (where the lambda's captures are no longer visible at the call site).
+inline void check_shareable(const Value& value) {
+    if (!value.heap()) return;
+    if (value.tag != Tag::function) {
+        throw std::runtime_error("a parallel_run task may only capture scalars and functions; share other state through a file or a database");
+    }
+    for (const auto& captured : static_cast<ClosureObj*>(value.o)->captures) check_shareable(captured);
+}
+
+// Mark a function value, and any function values it captures, immortal — so copies made on
+// other threads never touch a non-atomic refcount. parallel_run uses this after check_shareable
+// has confirmed the only heap captures are functions. Immortal objects are never freed, which
+// is the intended trade for a pool that lives for the life of the process.
+inline void immortalize_shared(const Value& value) {
+    if (!value.heap() || value.o->immortal) return;
+    value.o->immortal = true;
+    if (value.tag == Tag::function) {
+        for (const auto& captured : static_cast<ClosureObj*>(value.o)->captures) immortalize_shared(captured);
+    }
+}
+
 struct KeyHash {
     std::size_t operator()(const Value& v) const {
         if (v.tag == Tag::text) return static_cast<TextObj*>(v.o)->hash();

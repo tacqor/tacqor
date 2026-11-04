@@ -34,8 +34,11 @@ What is planned, in rough priority order, and what is deliberately not planned. 
 
 ## 2.0 — concurrency
 
-- **Structured concurrency**: tasks with scoped lifetimes and channels for message passing, with the type system ensuring values sent between tasks are either immutable or transferred. This keeps the non-atomic refcount design by never sharing a mutable object across threads — the same rule `parallel_map` enforces today, generalized.
-- A **concurrent HTTP server** in `std.http` built on it.
+Request-level concurrency landed in 1.3: `parallel_run` runs a share-nothing worker pool, and `http.serve_concurrent` serves HTTP on one. What is left for 2.0 is the richer model.
+
+- **Structured concurrency**: tasks with scoped lifetimes and channels for message passing, with the type system ensuring values sent between tasks are either immutable or transferred. This keeps the non-atomic refcount design by never sharing a mutable object across threads — the same rule `parallel_run` and `parallel_map` enforce today, generalized so workers can hand values to one another without going through a file.
+- **A sharded allocator** so the per-thread object lock stops being the one point of serialization under heavy allocation.
+- **Non-blocking I/O** so a worker can hold many connections at once rather than one at a time.
 
 ## Not planned
 

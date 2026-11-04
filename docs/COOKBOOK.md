@@ -432,6 +432,24 @@ def main():
     http.serve(port, handler)
 ```
 
+### Serving on more than one core
+
+`http.serve` takes one connection at a time, so a single slow handler stalls everyone behind it. `http.serve_concurrent(port, workers, handler)` runs a pool of worker threads instead. The model is share-nothing: each worker handles a whole request on its own heap, the `handler` must be a plain top-level function (no captures), and anything shared between requests lives in a file or a database — not in a captured variable.
+
+```text
+import std.http
+
+# A plain function — no captured variables — so it is safe to run on every worker at once.
+def handler(request: http.Request) -> http.Response:
+    return http.text(200, "handled " + request.path)
+
+def main():
+    print("serving on 8080 with 8 workers")
+    http.serve_concurrent(8080, 8, handler)   # blocks, like serve()
+```
+
+To keep a running counter or cache across requests under this model, read and write it through a file (or a database) inside the handler, so each worker coordinates its own access rather than sharing a value on the heap.
+
 ### Calling an API
 
 ```text
