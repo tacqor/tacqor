@@ -4,7 +4,7 @@ title: "Tacqor: A Statically Typed Language with Python's Syntax and Native Spee
 type: software
 authors:
   - name: "The Tacqor Authors"
-version: 1.2.0
+version: 1.2.1
 date-released: 2026-11-04
 license: MIT
 repository-code: "https://github.com/tacqor/tacqor"

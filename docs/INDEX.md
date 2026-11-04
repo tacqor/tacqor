@@ -53,7 +53,7 @@ Everything in the distribution, by audience. Start with the first table if you a
 - `examples/` — fourteen small programs (`tacqor run examples/NAME.tq`).
 - `tests/` — the differential suite (`make test`); `features*.tq` double as feature-complete sample programs for each release.
 - `std/` — the standard library, in Tacqor.
-- `editor/` — the VS Code extension source; `Tacqor_Live_Scanner_1.2.0.vsix` is the packaged extension.
+- `editor/` — the VS Code extension source; `Tacqor_Live_Scanner_1.2.1.vsix` is the packaged extension.
 - `benchmarks/` — the programs behind `PERFORMANCE.md` and `run.sh`.
 - `tools/` — `verify_docs.py` (compiles and runs every documentation snippet) and `build_html.py` (the HTML edition).
 - `install.sh`, `Makefile`, `build-windows.cmd` — installation and building from source.

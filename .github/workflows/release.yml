@@ -27,7 +27,7 @@ jobs:
       - name: Resolve tag
         id: meta
         run: echo "tag=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ steps.meta.outputs.tag }}
       - name: Build static binary
@@ -51,15 +51,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG=${{ steps.meta.outputs.tag }}
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Tacqor ${TAG#v}" --notes-from-tag
+          awk -v v="${TAG#v}" '/^## /{p = index($0, "## " v " ") == 1 || $0 == "## " v} p' CHANGELOG.md | tail -n +2 > /tmp/notes.md
+          printf '\n---\n**Downloads:** `tacqor-%s-linux-x64.tar.gz` (static binary), `Tacqor_%s_Standalone.zip` (binary, standard library, examples, docs, extension), `Tacqor_Live_Scanner_*.vsix` (VS Code), and macOS/Windows builds when their runners were available. `SHA256SUMS.txt` lists every file. Install: `curl -fsSL https://tacqor.github.io/tacqor/get.sh | sh`\n' "$TAG" "${TAG#v}" >> /tmp/notes.md
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Tacqor ${TAG#v}" --notes-file /tmp/notes.md
           gh release upload "$TAG" /tmp/out/* --repo "$GITHUB_REPOSITORY" --clobber
 
   macos-arm64:
     name: macOS arm64
     runs-on: macos-latest
     needs: linux-x64
+    continue-on-error: true
+    timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.linux-x64.outputs.tag }}
       - run: make CXXFLAGS="-O3"
@@ -78,7 +82,7 @@ jobs:
     needs: linux-x64
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.linux-x64.outputs.tag }}
       - uses: ilammy/msvc-dev-cmd@v1

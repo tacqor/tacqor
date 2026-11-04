@@ -111,7 +111,7 @@ Linux x64 one-liner once a release is published: `curl -fsSL https://tacqor.gith
 
 On Windows 11 use the Linux x64 build from an Ubuntu terminal in WSL. `build --native` needs a C++17 compiler on `PATH` (`c++`, or set `CXX`); without one, `build` still produces a self-contained executable with the embedded VM.
 
-**VS Code:** install `Tacqor_Live_Scanner_1.2.0.vsix` (Extensions: Install from VSIX...), open any `.tq` file, and see type errors and warnings in Problems as you type.
+**VS Code:** install `Tacqor_Live_Scanner_1.2.1.vsix` (Extensions: Install from VSIX...), open any `.tq` file, and see type errors and warnings in Problems as you type.
 
 ## Layout
 
@@ -143,7 +143,7 @@ tools/               doc tooling: verify_docs.py (compiles every snippet), build
 
 ## Build from source
 
-`make` (Linux/macOS, any C++17 compiler; add `CXXFLAGS="-O3 -static"` for a portable binary), then `make test`. `build-windows.cmd` targets the MSVC Developer Command Prompt; MSVC uses switch dispatch instead of threaded dispatch and is otherwise identical. The Linux x64 build and the full suite — every feature program through the VM, portable bytecode, embedded-VM executables, and native builds — were verified for this release, as was a pedantic Clang build of the portable switch-dispatch variant that MSVC uses; running `build-windows.cmd` on a Windows machine itself was not.
+`make` (Linux/macOS, any C++17 compiler; add `CXXFLAGS="-O3 -static"` for a portable binary), then `make test`. `build-windows.cmd` targets the MSVC Developer Command Prompt; MSVC uses switch dispatch instead of threaded dispatch and is otherwise identical. Continuous integration builds and tests every push on Linux (GCC and Clang, with and without sanitizers), macOS and Windows (MSVC via `build-windows.cmd`); the full suite — every feature program through the VM, portable bytecode, embedded-VM executables, and native builds — runs on each.
 
 ## History
 

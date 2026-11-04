@@ -2,7 +2,7 @@
   "name": "tacqor-language",
   "displayName": "Tacqor Live Scanner",
   "description": "Live diagnostics with the standalone Tacqor compiler.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "tacqor-local",
   "engines": {"vscode": "^1.85.0"},
   "main": "./extension.js",

@@ -26,7 +26,7 @@ test "$("$tool" run "$temp/total.tqb" -- "hello world")" = "$output"
 mkdir "$temp/isolated"
 mv "$temp/total" "$temp/isolated/total"
 test "$(cd "$temp/isolated"; /usr/bin/env -i PATH=/unavailable ./total "hello world")" = "$output"
-test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.2.0'
+test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.2.1'
 
 printf 'def main():\n    print(1 + True)\n' > "$temp/error.tq"
 if "$tool" diagnose "$temp/error.tq" > "$temp/findings.json"; then exit 1; fi

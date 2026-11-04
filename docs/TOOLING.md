@@ -112,7 +112,7 @@ JSON (`diagnose`): an array of objects `{"line", "column", "length", "severity" 
 
 ## 6. Editor integration
 
-The VS Code extension (`Tacqor_Live_Scanner_1.2.0.vsix`, source in `editor/`) registers the `tacqor` language for `.tq` files and, after each edit (debounced 180 ms), runs `tacqor diagnose --stdin <document path>` with the document text on stdin, mapping the JSON to VS Code diagnostics. It bundles a Linux x64 compiler and the standard library; the setting **Tacqor: Compiler Path** points it at another build, and **Tacqor: Restart Live Scanner** restarts it. Any editor that can run a command on save or change can use the same protocol.
+The VS Code extension (`Tacqor_Live_Scanner_1.2.1.vsix`, source in `editor/`) registers the `tacqor` language for `.tq` files and, after each edit (debounced 180 ms), runs `tacqor diagnose --stdin <document path>` with the document text on stdin, mapping the JSON to VS Code diagnostics. It bundles a Linux x64 compiler and the standard library; the setting **Tacqor: Compiler Path** points it at another build, and **Tacqor: Restart Live Scanner** restarts it. Any editor that can run a command on save or change can use the same protocol.
 
 ## 7. Files produced
 

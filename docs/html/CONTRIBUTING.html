@@ -328,9 +328,10 @@ always reached through the qualified form. Fixes #42.</code></pre>
 and every documentation snippet, a Clang build of the switch-dispatch
 variant with <code>-Werror</code>, the suite under AddressSanitizer and
 UndefinedBehaviorSanitizer, a macOS build with the suite, and an MSVC
-build with a smoke test (non-blocking until the Windows port is fully
-verified). A check that <code>src/embedded_runtime.inc</code> is up to
-date fails the build if the headers changed without regenerating it.</p>
+build with a smoke test on Windows (the macOS job is non-blocking
+because GitHub's hosted macOS runners are capacity-limited). A check
+that <code>src/embedded_runtime.inc</code> is up to date fails the build
+if the headers changed without regenerating it.</p>
 <p>Pushing a tag <code>vX.Y.Z</code> runs
 <code>.github/workflows/release.yml</code>, which builds the static
 Linux binary, the macOS and Windows binaries, the standalone package and

@@ -12,7 +12,7 @@ body:
     attributes:
       label: Tacqor version
       description: Output of `tacqor --version`
-      placeholder: Tacqor 1.2.0
+      placeholder: Tacqor 1.2.1
     validations:
       required: true
   - type: input

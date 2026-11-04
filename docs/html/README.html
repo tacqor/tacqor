@@ -450,7 +450,7 @@ unaffected.</li>
 <code>build</code> still produces a self-contained executable with the
 embedded VM.</p>
 <p><strong>VS Code:</strong> install
-<code>Tacqor_Live_Scanner_1.2.0.vsix</code> (Extensions: Install from
+<code>Tacqor_Live_Scanner_1.2.1.vsix</code> (Extensions: Install from
 VSIX...), open any <code>.tq</code> file, and see type errors and
 warnings in Problems as you type.</p>
 <h2 id="layout">Layout</h2>
@@ -516,12 +516,11 @@ snippet compiled and run on each push</td>
 <code>CXXFLAGS="-O3 -static"</code> for a portable binary), then
 <code>make test</code>. <code>build-windows.cmd</code> targets the MSVC
 Developer Command Prompt; MSVC uses switch dispatch instead of threaded
-dispatch and is otherwise identical. The Linux x64 build and the full
+dispatch and is otherwise identical. Continuous integration builds and
+tests every push on Linux (GCC and Clang, with and without sanitizers),
+macOS and Windows (MSVC via <code>build-windows.cmd</code>); the full
 suite — every feature program through the VM, portable bytecode,
-embedded-VM executables, and native builds — were verified for this
-release, as was a pedantic Clang build of the portable switch-dispatch
-variant that MSVC uses; running <code>build-windows.cmd</code> on a
-Windows machine itself was not.</p>
+embedded-VM executables, and native builds — runs on each.</p>
 <h2 id="history">History</h2>
 <p>0.4 was a preview with <code>i64</code>, <code>str</code>,
 <code>list[i64]</code> and <code>for</code>/<code>if</code>. 0.5 added
