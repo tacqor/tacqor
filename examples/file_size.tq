@@ -1,0 +1,7 @@
+def main():
+    if argc() == 1:
+        let path = arg(0)
+        print("Bytes in " + path + ":")
+        print(len(read_text(path)))
+    else:
+        print("Pass one file path.")

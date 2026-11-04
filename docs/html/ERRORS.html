@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — ERRORS</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-diagnostics-catalog"
+id="toc-tacqor-diagnostics-catalog">Tacqor Diagnostics Catalog</a>
+<ul>
+<li><a href="#1-lexical-and-syntax-errors"
+id="toc-1-lexical-and-syntax-errors">1. Lexical and syntax
+errors</a></li>
+<li><a href="#2-names-modules-and-declarations"
+id="toc-2-names-modules-and-declarations">2. Names, modules and
+declarations</a></li>
+<li><a href="#3-types" id="toc-3-types">3. Types</a></li>
+<li><a href="#4-control-flow-and-definite-returns"
+id="toc-4-control-flow-and-definite-returns">4. Control flow and
+definite returns</a></li>
+<li><a href="#5-generics-traits-and-closures"
+id="toc-5-generics-traits-and-closures">5. Generics, traits and
+closures</a></li>
+<li><a href="#6-warnings-tacqor-check-editor"
+id="toc-6-warnings-tacqor-check-editor">6. Warnings
+(<code>tacqor check</code>, editor)</a></li>
+<li><a href="#7-runtime-errors" id="toc-7-runtime-errors">7. Runtime
+errors</a></li>
+<li><a href="#8-tooling-errors" id="toc-8-tooling-errors">8. Tooling
+errors</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-diagnostics-catalog">Tacqor Diagnostics Catalog</h1>
+<p>Every message the compiler and runtime can produce, what it means,
+and how to fix it. Compile-time messages have the form
+<code>FILE:LINE:COLUMN: error: MESSAGE</code> followed by the source
+line and a caret; warnings use <code>warning [CODE]:</code>; runtime
+errors use <code>runtime error:</code> and a traceback.
+<code>tacqor diagnose</code> emits the same information as JSON.</p>
+<h2 id="1-lexical-and-syntax-errors">1. Lexical and syntax errors</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Meaning / fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>indent with spaces</code></td>
+<td>A tab or form feed starts a line. Use four spaces per level.</td>
+</tr>
+<tr class="even">
+<td><code>indentation must be a multiple of four spaces</code></td>
+<td>Re-indent; Tacqor does not accept 2-space indentation.</td>
+</tr>
+<tr class="odd">
+<td><code>inconsistent indentation</code></td>
+<td>A dedent landed on a level that was never opened. Align with an
+enclosing block.</td>
+</tr>
+<tr class="even">
+<td><code>unexpected character</code></td>
+<td>A byte outside the language's character set (non-ASCII identifiers,
+<code>$</code>, <code>@</code>, <code>;</code>…). Identifiers are ASCII;
+put Unicode in strings.</td>
+</tr>
+<tr class="odd">
+<td><code>unexpected character after a number</code></td>
+<td><code>12abc</code> or <code>1.</code> — separate the number from
+what follows; floats need digits after the point
+(<code>1.0</code>).</td>
+</tr>
+<tr class="even">
+<td><code>unterminated string</code>,
+<code>unterminated string inside f-string</code></td>
+<td>A string literal runs to the end of the line. Strings cannot span
+lines; use <code>+</code> or <code>\n</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>unknown string escape</code></td>
+<td>Only <code>\n \r \t \0 \" \\</code> (and <code>\{ \}</code> in
+f-strings) exist. Double the backslash for a literal one.</td>
+</tr>
+<tr class="even">
+<td><code>unterminated '{' in f-string</code>,
+<code>empty '{}' in f-string</code></td>
+<td>Balance the braces; use <code>{{</code> for a literal brace.</td>
+</tr>
+<tr class="odd">
+<td><code>source contains a null byte</code>,
+<code>source exceeds the size limit</code></td>
+<td>Binary or oversized input (4 MB limit).</td>
+</tr>
+<tr class="even">
+<td><code>incomplete expression</code></td>
+<td>Brackets or a trailing backslash left open at end of file.</td>
+</tr>
+<tr class="odd">
+<td><code>expected 'X'</code>, <code>expected a newline</code>,
+<code>expected an indented block</code>,
+<code>expected an identifier</code>, <code>expected a type</code>,
+<code>expected a statement</code></td>
+<td>The parser needed a specific token. The caret points at what it
+found instead. A statement must be a binding, assignment, call, or
+control-flow keyword; a bare expression is not a statement (except in
+the REPL).</td>
+</tr>
+<tr class="even">
+<td><code>expected 'def', 'struct', 'trait', 'const', or 'import'</code></td>
+<td>Only declarations are allowed at the top level; code goes inside
+<code>def main():</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>reserved identifier 'X'</code></td>
+<td>You used a keyword as a name (<code>list</code>, <code>str</code>,
+<code>fn</code>, <code>match</code>...). Rename.</td>
+</tr>
+<tr class="even">
+<td><code>expected a decimal integer without leading zeroes</code></td>
+<td><code>007</code> is not allowed; octal does not exist. Write
+<code>7</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>integer literal is outside the i64 range</code></td>
+<td>Beyond ±9.22×10¹⁸. Use <code>f64</code> or split the value.</td>
+</tr>
+<tr class="even">
+<td><code>invalid float literal</code></td>
+<td>Malformed exponent or digits.</td>
+</tr>
+<tr class="odd">
+<td><code>parenthesize 'not' here</code></td>
+<td><code>a &lt; not b</code> is ambiguous; write
+<code>a &lt; (not b)</code>.</td>
+</tr>
+<tr class="even">
+<td><code>use 'and' to combine comparisons</code></td>
+<td><code>a &lt; b &lt; c</code> does not chain; write
+<code>a &lt; b and b &lt; c</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>cannot assign to this expression</code></td>
+<td>Only names, <code>x[i]</code> and <code>x.field</code> are
+assignable.</td>
+</tr>
+<tr class="even">
+<td><code>a method's first parameter must be self</code></td>
+<td>Methods inside a struct start with <code>self</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>a trait body lists method signatures: def name(self, ...) -&gt; type</code></td>
+<td>Traits contain signatures only, no bodies.</td>
+</tr>
+<tr class="even">
+<td><code>a trait needs at least one method</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>program nesting exceeds the compiler limit</code>,
+<code>expression exceeds the compiler limit</code></td>
+<td>More than 96 nested blocks/brackets or 96 operators in one
+expression. Split the code.</td>
+</tr>
+<tr class="even">
+<td><code>unexpected end of source</code></td>
+<td>The file ended inside a construct.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-names-modules-and-declarations">2. Names, modules and
+declarations</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Meaning / fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>unknown binding 'X'</code></td>
+<td>No local, constant or function of that name is in scope. Check
+spelling and that the variable is declared before use and in an
+enclosing block.</td>
+</tr>
+<tr class="even">
+<td><code>unknown function 'X'</code>,
+<code>unknown method or function 'X'</code>,
+<code>unknown generic function 'X'</code></td>
+<td>Not a built-in, not declared in this module. Imported functions need
+the module prefix: <code>lists.map</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>unknown type 'X'</code></td>
+<td>Misspelled type, or a struct from another module without its prefix
+(<code>geo.Point</code>).</td>
+</tr>
+<tr class="even">
+<td><code>unknown module 'X'; import it first</code></td>
+<td><code>X.something</code> where <code>X</code> is not an import
+alias.</td>
+</tr>
+<tr class="odd">
+<td><code>module 'a/b.tq' not found; looked in: …</code></td>
+<td>The import could not be resolved; the message lists every path
+tried. Check the file name, the <code>packages/</code> folder,
+<code>TACQOR_HOME</code>/<code>TACQOR_PATH</code>, or run
+<code>tacqor install</code>.</td>
+</tr>
+<tr class="even">
+<td><code>circular import of 'X'</code></td>
+<td>A imports B imports A. Move shared code into a third module.</td>
+</tr>
+<tr class="odd">
+<td><code>could not read module file …</code>,
+<code>could not read module: …</code></td>
+<td>The file exists but is unreadable or too large.</td>
+</tr>
+<tr class="even">
+<td><code>duplicate function/struct/trait method/field/method/import alias/name 'X'</code></td>
+<td>Two declarations with one name in a module (or two imports with one
+alias — use <code>as</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>'X' is already bound in this scope</code></td>
+<td>A <code>let</code>/<code>var</code>/loop variable repeats a name
+visible in an enclosing block. Rename or reuse with assignment
+(<code>var</code>).</td>
+</tr>
+<tr class="even">
+<td><code>'X' is captured from the enclosing function and cannot be redeclared here</code></td>
+<td>A lambda mentions <code>X</code> from outside <em>and</em> declares
+its own <code>X</code>. Rename one of them.</td>
+</tr>
+<tr class="odd">
+<td><code>missing def main():</code>,
+<code>entry point must be def main():</code></td>
+<td>The root file needs <code>def main():</code> with no parameters and
+no result (<code>check</code> and <code>test</code> do not require
+it).</td>
+</tr>
+<tr class="even">
+<td><code>cannot call main</code>,
+<code>main cannot be used as a value</code></td>
+<td><code>main</code> is the entry point only.</td>
+</tr>
+<tr class="odd">
+<td><code>a const must be an integer, float, bool, or string literal</code></td>
+<td>Constants are literals (optionally negated) or other constants, not
+expressions.</td>
+</tr>
+<tr class="even">
+<td><code>'self' is only valid as a method parameter</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-types">3. Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Meaning / fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>expected T, found U</code></td>
+<td>The most common error: a value of type <code>U</code> where
+<code>T</code> is required — argument, return, assignment, list element,
+annotation. Convert explicitly or fix the type. A struct is accepted
+where one of its traits is expected; nothing else converts
+implicitly.</td>
+</tr>
+<tr class="even">
+<td><code>cannot mix i64 and f64; use float(x) or int(x)</code></td>
+<td>Arithmetic needs both operands of one numeric type.</td>
+</tr>
+<tr class="odd">
+<td><code>arithmetic expects i64 or f64, found T</code></td>
+<td><code>+ - * /</code> on strings (except <code>str + str</code>),
+bools, lists...</td>
+</tr>
+<tr class="even">
+<td><code>i64 uses '//' for division; use float(a) / float(b) for an f64 result</code>
+/ <code>f64 uses '/' for division…</code> / <code>i64 uses '//='</code>
+/ <code>f64 uses '/='</code></td>
+<td>Integer division is <code>//</code>, float division
+<code>/</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>str supports only '+'</code> / <code>'+='</code></td>
+<td>Strings concatenate; use <code>repeat</code>, <code>replace</code>,
+etc. for other operations.</td>
+</tr>
+<tr class="even">
+<td><code>order comparisons apply to i64, f64, and str</code></td>
+<td><code>&lt;</code> on other types; compare a field or key
+instead.</td>
+</tr>
+<tr class="odd">
+<td><code>'in' expects a list, dict, or str on the right</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>indexing expects a list, dict, or str</code>,
+<code>slicing expects a list or str</code>,
+<code>only list and dict elements can be assigned</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>field access expects a struct value, found T</code>,
+<code>field assignment expects a struct value</code></td>
+<td>Trait-typed values have no fields; use a method, or keep the
+concrete type.</td>
+</tr>
+<tr class="even">
+<td><code>'S' has no field 'f'</code>,
+<code>'S' has no method 'm'</code>,
+<code>trait 'T' has no method 'm'</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>an empty list needs a type, for example: let items: list[i64] = []</code>
+/ <code>an empty dict needs a type…</code></td>
+<td><code>[]</code>/<code>{}</code> with no context; add an
+annotation.</td>
+</tr>
+<tr class="even">
+<td><code>the type of None is unknown here…</code>,
+<code>the error type of Ok is unknown here…</code>,
+<code>the value type of Err is unknown here…</code></td>
+<td>Give the full <code>Option</code>/<code>Result</code> type through
+an annotation, a parameter type or the function's return type.</td>
+</tr>
+<tr class="odd">
+<td><code>Some/Ok/Err takes one argument</code>,
+<code>None takes no arguments</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>dict keys must be i64 or str</code></td>
+<td>Other key types are not supported; use <code>str(x)</code> or a
+different structure.</td>
+</tr>
+<tr class="odd">
+<td><code>this call does not return a value</code></td>
+<td>A procedure used as an expression. Make it return something or call
+it as a statement.</td>
+</tr>
+<tr class="even">
+<td><code>'f' expects N argument(s)</code>,
+<code>'S' expects N field value(s)</code>,
+<code>'T.m' expects N argument(s)</code></td>
+<td>Arity mismatch. Struct constructors take one value per field in
+order.</td>
+</tr>
+<tr class="odd">
+<td><code>'X' is not a function</code></td>
+<td>A local of non-function type called with <code>()</code>.</td>
+</tr>
+<tr class="even">
+<td><code>len expects str, list, or dict</code>,
+<code>expected a list, found T</code>,
+<code>expected a dict, found T</code>,
+<code>expected i64 or f64, found T</code>,
+<code>int expects f64, str, or bool</code>,
+<code>float expects i64, f64, or str</code>,
+<code>min and max expect i64, f64, or str</code>,
+<code>sort expects a list of i64, f64, str, or bool</code>,
+<code>sum expects a list of i64 or f64</code>,
+<code>min_of expects a list of i64, f64, or str</code>,
+<code>clear expects a list or dict</code>,
+<code>unwrap expects an Option or Result</code>,
+<code>unwrap_or…</code>,
+<code>expect expects an Option or Result</code>,
+<code>expected an Option, found T</code>,
+<code>expected a Result, found T</code></td>
+<td>A built-in received the wrong type; see <code>STDLIB.md</code> for
+signatures.</td>
+</tr>
+<tr class="odd">
+<td><code>too many list elements</code>,
+<code>too many dict entries</code>,
+<code>too many local bindings</code>,
+<code>too many distinct types</code></td>
+<td>65,536 limits.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-control-flow-and-definite-returns">4. Control flow and
+definite returns</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Meaning / fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>a path reaches the end without returning a value</code></td>
+<td>Some path through a value-returning function has no
+<code>return</code>. Add one (often in an <code>else</code> or after a
+loop). <code>exit</code>, <code>fail</code>, exhaustive
+<code>match</code> with all arms exiting, and <code>while True:</code>
+without <code>break</code> count as exits.</td>
+</tr>
+<tr class="even">
+<td><code>a path reaches the end of the lambda without returning a value</code></td>
+<td>Same, for a block-bodied lambda with <code>-&gt; T</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>unreachable statement</code></td>
+<td>Code after <code>return</code>, <code>break</code>,
+<code>continue</code> or an exit. Remove it or fix the control
+flow.</td>
+</tr>
+<tr class="even">
+<td><code>'f' does not return a value</code></td>
+<td><code>return x</code> in a procedure. Add <code>-&gt; T</code> or
+drop the value.</td>
+</tr>
+<tr class="odd">
+<td><code>'f' must return T</code></td>
+<td>Bare <code>return</code> in a value-returning function.</td>
+</tr>
+<tr class="even">
+<td><code>'break'/'continue' is only valid inside a loop</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>match needs at least one case</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>match must handle both cases or end with 'case _'</code></td>
+<td>An <code>Option</code>/<code>Result</code> match is missing an
+arm.</td>
+</tr>
+<tr class="odd">
+<td><code>match on a plain value must end with 'case _'</code></td>
+<td>Literal matches need a default arm.</td>
+</tr>
+<tr class="even">
+<td><code>this pattern needs an Option, but the value is T</code> (or
+<code>a Result</code>)</td>
+<td><code>Some</code>/<code>None</code> on a <code>Result</code> or vice
+versa.</td>
+</tr>
+<tr class="odd">
+<td><code>duplicate case</code></td>
+<td>The same
+<code>Some</code>/<code>None</code>/<code>Ok</code>/<code>Err</code> arm
+twice.</td>
+</tr>
+<tr class="even">
+<td><code>this case is unreachable after 'case _'</code></td>
+<td>Move the default last.</td>
+</tr>
+<tr class="odd">
+<td><code>match works on Option, Result, i64, f64, bool, and str values</code></td>
+<td>Match on something else (a struct, a list): use
+<code>if</code>.</td>
+</tr>
+<tr class="even">
+<td><code>'X' is immutable; declare it with var</code></td>
+<td>Assignment to a <code>let</code> binding.</td>
+</tr>
+<tr class="odd">
+<td><code>'X' is captured by value and cannot be assigned inside the lambda</code></td>
+<td>Lambdas copy captured values; mutate a captured container or return
+a value instead.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-generics-traits-and-closures">5. Generics, traits and
+closures</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Meaning / fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>cannot infer type parameter 'T'; write f[...](...)</code></td>
+<td>No argument determines <code>T</code> (e.g. an empty list). Give
+explicit type arguments.</td>
+</tr>
+<tr class="even">
+<td><code>type parameter 'T' is both A and B</code></td>
+<td>Conflicting inference; the arguments disagree.</td>
+</tr>
+<tr class="odd">
+<td><code>cannot match T against the declared parameter type</code></td>
+<td>Unification failed (argument shape differs from the parameter).</td>
+</tr>
+<tr class="even">
+<td><code>function arity mismatch: expected N parameter(s)</code>,
+<code>expected a function without a result</code></td>
+<td>A lambda passed where a <code>fn</code> type with a different shape
+is expected.</td>
+</tr>
+<tr class="odd">
+<td><code>'f' is not generic</code>,
+<code>'f' takes N type argument(s)</code>,
+<code>'T' is a trait and takes no type arguments</code>,
+<code>type parameter 'T' takes no arguments</code>,
+<code>list takes one type argument</code>,
+<code>dict takes two type arguments</code></td>
+<td>Wrong number of <code>[...]</code> arguments.</td>
+</tr>
+<tr class="even">
+<td><code>'f' is generic; instantiate it explicitly, for example f[i64]</code></td>
+<td>A generic function used as a value.</td>
+</tr>
+<tr class="odd">
+<td><code>type argument T for 'P' does not implement Trait</code></td>
+<td>A bound <code>[P: Trait]</code> is not satisfied.</td>
+</tr>
+<tr class="even">
+<td><code>a type parameter bound must be a trait</code></td>
+<td><code>[T: SomeStruct]</code> is not allowed.</td>
+</tr>
+<tr class="odd">
+<td><code>'S' does not implement Trait.method</code></td>
+<td>The struct lists the trait but lacks a method.</td>
+</tr>
+<tr class="even">
+<td><code>'S.m' has signature A but Trait requires B</code></td>
+<td>The method exists with a different signature; match the trait
+exactly.</td>
+</tr>
+<tr class="odd">
+<td><code>'X' is not a trait</code></td>
+<td>Something other than a trait in a struct's parenthesized list (there
+is no inheritance).</td>
+</tr>
+<tr class="even">
+<td><code>methods cannot have their own type parameters</code></td>
+<td>Make the struct generic instead.</td>
+</tr>
+<tr class="odd">
+<td><code>attempt expects a function value that takes no arguments, found T</code>,
+<code>'attempt' expects 1 argument: a fn() -&gt; T</code></td>
+<td>Wrap the call: <code>attempt(fn() =&gt; risky(x))</code>.</td>
+</tr>
+<tr class="even">
+<td><code>parallel mapper must be a fn(i64) -&gt; i64, found T</code>,
+<code>parallel mapper must have signature fn(i64) -&gt; i64</code>,
+<code>parallel mapper must name a function</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>a parallel mapper may only capture i64, f64, or bool values (captured T)</code></td>
+<td>The lambda captures a list/dict/struct/str; compute from the index
+or capture only numbers.</td>
+</tr>
+<tr class="even">
+<td><code>'?' expects an Option or Result, found T</code>,
+<code>'?' needs the enclosing function to return an Option/a Result, but it returns T</code>,
+<code>'?' error type E does not match the function's F</code></td>
+<td><code>?</code> propagates the same kind of failure as the enclosing
+function returns.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-warnings-tacqor-check-editor">6. Warnings
+(<code>tacqor check</code>, editor)</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>zero-divisor</code></td>
+<td>The divisor is a constant 0 — will fail at run time if reached.</td>
+</tr>
+<tr class="even">
+<td><code>integer-overflow</code></td>
+<td>Constant operands overflow <code>i64</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>index-out-of-bounds</code></td>
+<td>The index is provably outside a list whose length is known and
+cannot change.</td>
+</tr>
+<tr class="even">
+<td><code>empty-range</code></td>
+<td><code>range(a, b)</code> with provably <code>b ≤ a</code> — the loop
+never runs.</td>
+</tr>
+<tr class="odd">
+<td><code>failing-assert</code></td>
+<td>The condition is provably <code>False</code>.</td>
+</tr>
+<tr class="even">
+<td><code>invalid-shift</code></td>
+<td>A constant shift count outside 0–63.</td>
+</tr>
+<tr class="odd">
+<td><code>invalid-workers</code></td>
+<td>A constant worker count outside 1–64.</td>
+</tr>
+</tbody>
+</table>
+<p>Warnings never stop compilation; they are reported where the code
+would fail if executed. The editor extension shows them inline.</p>
+<h2 id="7-runtime-errors">7. Runtime errors</h2>
+<p>Format: <code>FILE:LINE:COLUMN: runtime error: MESSAGE</code>, then
+<code>  in FUNCTION (line N)</code> per frame (innermost first), exit
+status 1 — or <code>Err(MESSAGE)</code> inside <code>attempt</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>i64 overflow in +</code> / <code>-</code> / <code>*</code> /
+<code>//</code>, <code>i64 overflow in parallel_sum result</code></td>
+<td>Checked arithmetic. Use <code>f64</code>, restructure, or check
+bounds first.</td>
+</tr>
+<tr class="even">
+<td><code>division by zero</code>, <code>modulo by zero</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>shift count must be between 0 and 63</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>list index out of bounds</code>,
+<code>string index out of bounds</code>,
+<code>argument index out of bounds</code></td>
+<td>Check <code>len</code> first or use slicing (which clamps).</td>
+</tr>
+<tr class="odd">
+<td><code>missing dictionary key "k"</code></td>
+<td>Use <code>lookup(d, k)</code> (returns <code>Option</code>) or
+<code>k in d</code>.</td>
+</tr>
+<tr class="even">
+<td><code>unwrap on None</code>, <code>unwrap on Err: …</code>,
+<code>expect</code> messages</td>
+<td>Match instead of unwrapping, or use <code>unwrap_or</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>pop from an empty list</code>,
+<code>min_of of an empty list</code>,
+<code>max_of of an empty list</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>assertion failed</code></td>
+<td>An <code>assert</code> was false.</td>
+</tr>
+<tr class="odd">
+<td>any text</td>
+<td><code>fail(message)</code> or
+<code>expect(value, message)</code>.</td>
+</tr>
+<tr class="even">
+<td><code>cannot convert "x" to i64</code> / <code>to f64</code>,
+<code>float is outside the i64 range</code>,
+<code>cannot convert nan to i64</code></td>
+<td><code>int</code>/<code>float</code>/<code>floor</code>/<code>ceil</code>/<code>round</code>
+on bad input; use <code>parse_int</code>/<code>parse_float</code> for
+untrusted text.</td>
+</tr>
+<tr class="odd">
+<td><code>chr expects a Unicode scalar value</code>,
+<code>ord expects a non-empty string</code>,
+<code>ord expects valid UTF-8</code>,
+<code>from_bytes expects values from 0 to 255</code>,
+<code>fixed expects 0 to 40 digits</code>,
+<code>repeat expects a non-negative count</code>,
+<code>split expects a non-empty separator</code>,
+<code>random_int expects low &lt;= high</code>,
+<code>exit expects a code from 0 to 255</code></td>
+<td>Argument validation in built-ins.</td>
+</tr>
+<tr class="even">
+<td><code>expected a regular file: p</code>,
+<code>could not open file: p</code>,
+<code>could not open file for writing: p</code>,
+<code>could not write file: p</code>,
+<code>could not list directory: p</code>,
+<code>could not run: cmd</code>,
+<code>input could not be read</code></td>
+<td>I/O failures. Wrap in <code>attempt</code> or check with
+<code>file_exists</code> first.</td>
+</tr>
+<tr class="odd">
+<td><code>parallel_sum needs 1 to 64 workers</code>,
+<code>parallel_map needs 1 to 64 workers</code>,
+<code>a parallel mapper may only capture i64, f64, or bool values</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>function value called with the wrong number of arguments</code>,
+<code>attempt expects a function that takes no arguments</code></td>
+<td>A closure's arity did not match (only possible through bytecode
+edits).</td>
+</tr>
+<tr class="odd">
+<td><code>value does not implement Trait</code></td>
+<td>A trait call on an object whose struct lacks the vtable (only
+possible through bytecode edits).</td>
+</tr>
+<tr class="even">
+<td><code>function nesting exceeds the runtime limit</code></td>
+<td>Recursion deeper than 100,000 frames. Convert to a loop.</td>
+</tr>
+<tr class="odd">
+<td><code>value nesting exceeds the runtime limit</code></td>
+<td>Printing or comparing data nested more than 2,000 levels.</td>
+</tr>
+<tr class="even">
+<td><code>value stack limit exceeded</code>,
+<code>expression stack limit exceeded</code></td>
+<td>4 M values live at once in the VM (e.g. an enormous list literal
+built on the stack).</td>
+</tr>
+<tr class="odd">
+<td><code>text exceeds the size limit</code>,
+<code>list exceeds the size limit</code>,
+<code>input exceeds the size limit</code>,
+<code>message too large</code></td>
+<td>256 MB limits; <code>std.http</code> limits requests to 8 MB.</td>
+</tr>
+<tr class="even">
+<td><code>invalid file path</code></td>
+<td>A path containing a null byte.</td>
+</tr>
+<tr class="odd">
+<td><code>invalid bytecode …</code></td>
+<td>A corrupted or foreign <code>.tqb</code>/executable payload; the
+verifier rejected it. Recompile from source.</td>
+</tr>
+<tr class="even">
+<td><code>the native build needs a working C++17 compiler (set CXX or TACQOR_CXX); command failed: …</code></td>
+<td><code>build --native</code> could not run the C++ compiler. Install
+one or use <code>build</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-tooling-errors">8. Tooling errors</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Message</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>could not open input</code></td>
+<td>The file given to the command does not exist.</td>
+</tr>
+<tr class="even">
+<td><code>portable bytecode output must use the .tqb extension</code></td>
+<td><code>compile -o</code> needs a <code>.tqb</code> name.</td>
+</tr>
+<tr class="odd">
+<td><code>output points to the source or Tacqor executable</code></td>
+<td>Refusing to overwrite the input or the toolchain.</td>
+</tr>
+<tr class="even">
+<td><code>'X' already exists</code> (<code>new</code>),
+<code>packages/X already exists</code>,
+<code>'X' is neither a folder nor a git URL</code>,
+<code>git clone failed for …</code></td>
+<td>Package and project commands.</td>
+</tr>
+<tr class="odd">
+<td><code>usage: …</code> (exit 2)</td>
+<td>Wrong command-line shape; <code>tacqor --help</code> lists the
+commands.</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

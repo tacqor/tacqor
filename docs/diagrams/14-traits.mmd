@@ -1,0 +1,17 @@
+flowchart LR
+    subgraph C["Compile time"]
+        TD["trait Shape:<br/>area() -> f64 · name() -> str"]
+        SD["struct Circle(Shape)"]
+        SD --> CF["Conformance check:<br/>every trait method present<br/>with the exact signature"]
+        CF --> VT["vtable for Circle:<br/>Shape → [Circle.area, Circle.name]"]
+    end
+    subgraph R["Run time"]
+        V["value of type Shape<br/>(really a Circle object)"] --> CT["call_trait Shape.area"]
+        CT --> LK["look up vtable of<br/>the object's struct"]
+        LK --> FNC["Circle.area(self)"]
+    end
+    subgraph N["Native build"]
+        DS["dispatch0_0(self, ...)<br/>switch (struct id)<br/>case Circle: f_Circle_area(...)"]
+    end
+    VT -.-> LK
+    VT -.-> DS

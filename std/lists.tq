@@ -1,0 +1,149 @@
+# Standard library: generic list helpers. Import with `import std.lists`.
+
+struct Pair[A, B]:
+    first: A
+    second: B
+
+def map[T, U](items: list[T], f: fn(T) -> U) -> list[U]:
+    var out: list[U] = []
+    for item in items:
+        push(out, f(item))
+    return out
+
+def filter[T](items: list[T], keep: fn(T) -> bool) -> list[T]:
+    var out: list[T] = []
+    for item in items:
+        if keep(item):
+            push(out, item)
+    return out
+
+def reduce[T, A](items: list[T], initial: A, step: fn(A, T) -> A) -> A:
+    var acc = initial
+    for item in items:
+        acc = step(acc, item)
+    return acc
+
+def any[T](items: list[T], test: fn(T) -> bool) -> bool:
+    for item in items:
+        if test(item):
+            return True
+    return False
+
+def all[T](items: list[T], test: fn(T) -> bool) -> bool:
+    for item in items:
+        if not test(item):
+            return False
+    return True
+
+def zip[A, B](left: list[A], right: list[B]) -> list[Pair[A, B]]:
+    var out: list[Pair[A, B]] = []
+    for i in range(min(len(left), len(right))):
+        push(out, Pair(left[i], right[i]))
+    return out
+
+def find_first[T](items: list[T], test: fn(T) -> bool) -> Option[T]:
+    for item in items:
+        if test(item):
+            return Some(item)
+    return None
+
+def position[T](items: list[T], test: fn(T) -> bool) -> Option[i64]:
+    for i in range(len(items)):
+        if test(items[i]):
+            return Some(i)
+    return None
+
+def count_if[T](items: list[T], test: fn(T) -> bool) -> i64:
+    var n = 0
+    for item in items:
+        if test(item):
+            n += 1
+    return n
+
+def take[T](items: list[T], n: i64) -> list[T]:
+    return items[:n]
+
+def drop[T](items: list[T], n: i64) -> list[T]:
+    return items[n:]
+
+def flatten[T](nested: list[list[T]]) -> list[T]:
+    var out: list[T] = []
+    for inner in nested:
+        extend(out, inner)
+    return out
+
+def unique[T](items: list[T]) -> list[T]:
+    var out: list[T] = []
+    for item in items:
+        if not (item in out):
+            push(out, item)
+    return out
+
+def range_list(start: i64, stop: i64) -> list[i64]:
+    var out: list[i64] = []
+    for i in range(start, stop):
+        push(out, i)
+    return out
+
+def sorted_by[T](items: list[T], key: fn(T) -> i64) -> list[T]:
+    # Stable merge sort by an integer key: O(n log n).
+    var out: list[T] = []
+    var keys: list[i64] = []
+    for item in items:
+        push(out, item)
+        push(keys, key(item))
+    merge_sort(out, keys, 0, len(out))
+    return out
+
+def merge_sort[T](items: list[T], keys: list[i64], low: i64, high: i64):
+    if high - low < 2:
+        return
+    let mid = (low + high) // 2
+    merge_sort(items, keys, low, mid)
+    merge_sort(items, keys, mid, high)
+    var merged_items: list[T] = []
+    var merged_keys: list[i64] = []
+    var i = low
+    var j = mid
+    while i < mid and j < high:
+        if keys[j] < keys[i]:
+            push(merged_items, items[j])
+            push(merged_keys, keys[j])
+            j += 1
+        else:
+            push(merged_items, items[i])
+            push(merged_keys, keys[i])
+            i += 1
+    while i < mid:
+        push(merged_items, items[i])
+        push(merged_keys, keys[i])
+        i += 1
+    while j < high:
+        push(merged_items, items[j])
+        push(merged_keys, keys[j])
+        j += 1
+    for k in range(len(merged_items)):
+        items[low + k] = merged_items[k]
+        keys[low + k] = merged_keys[k]
+
+def max_by[T](items: list[T], key: fn(T) -> i64) -> Option[T]:
+    if len(items) == 0:
+        return None
+    var best = items[0]
+    var best_key = key(best)
+    for item in items:
+        let k = key(item)
+        if k > best_key:
+            best = item
+            best_key = k
+    return Some(best)
+
+def each[T](items: list[T], action: fn(T)):
+    for item in items:
+        action(item)
+
+def enumerate[T](items: list[T]) -> list[Pair[i64, T]]:
+    var out: list[Pair[i64, T]] = []
+    for i in range(len(items)):
+        push(out, Pair(i, items[i]))
+    return out

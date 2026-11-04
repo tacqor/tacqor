@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — TOOLING</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-tooling-reference"
+id="toc-tacqor-tooling-reference">Tacqor Tooling Reference</a>
+<ul>
+<li><a href="#1-installation" id="toc-1-installation">1.
+Installation</a></li>
+<li><a href="#2-commands" id="toc-2-commands">2. Commands</a></li>
+<li><a href="#3-environment-variables"
+id="toc-3-environment-variables">3. Environment variables</a></li>
+<li><a href="#4-exit-codes" id="toc-4-exit-codes">4. Exit codes</a></li>
+<li><a href="#5-diagnostics-format" id="toc-5-diagnostics-format">5.
+Diagnostics format</a></li>
+<li><a href="#6-editor-integration" id="toc-6-editor-integration">6.
+Editor integration</a></li>
+<li><a href="#7-files-produced" id="toc-7-files-produced">7. Files
+produced</a></li>
+<li><a href="#8-build-from-source" id="toc-8-build-from-source">8. Build
+from source</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-tooling-reference">Tacqor Tooling Reference</h1>
+<p>The <code>tacqor</code> executable is the whole toolchain. This
+document covers every command, flag, environment variable, exit code,
+file produced, and the editor protocol.</p>
+<h2 id="1-installation">1. Installation</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sh</span> install.sh                    <span class="co"># /usr/local if writable, else ~/.local; prints the PATH line to add</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sh</span> install.sh <span class="at">--prefix</span> DIR       <span class="co"># DIR/bin/tacqor + DIR/lib/tacqor/std</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sh</span> install.sh <span class="at">--uninstall</span> [--prefix DIR]</span></code></pre></div>
+<p>Without installing, use <code>./linux-x64/tacqor</code> from the
+distribution folder; it finds <code>std/</code> next to itself. Build
+from source with <code>make</code> (any C++17 compiler;
+<code>CXXFLAGS="-O3 -static"</code> for a portable binary) and
+<code>make test</code>.</p>
+<h2 id="2-commands">2. Commands</h2>
+<h3
+id="tacqor-filetq-arg---tacqor-run-filetq----arg-"><code>tacqor FILE.tq [ARG …]</code>
+· <code>tacqor run FILE.tq [-- ARG …]</code></h3>
+<p>Compile the file and its imports in memory and run it in the VM.
+Arguments after the file (or after <code>--</code>) are the program's
+<code>args()</code>. <code>.tqb</code> bytecode files run the same way.
+Exit status: the program's (<code>exit(n)</code>), 1 on a runtime error,
+1 on a compile error, 2 for usage errors.</p>
+<p>A file whose first line is <code>#!/usr/bin/env tacqor</code> is
+executable once <code>tacqor</code> is on <code>PATH</code>.</p>
+<h3 id="tacqor-test-filetq"><code>tacqor test FILE.tq</code></h3>
+<p>Compile without requiring <code>main</code>, run every
+<code>def test_*()</code> procedure in the root module in definition
+order, print <code>PASS name</code> /
+<code>FAIL name: line N: message</code>, a summary, and exit 1 if any
+failed. Tests may import the module under test; its <code>main</code> is
+ignored.</p>
+<h3 id="tacqor-check-filetq"><code>tacqor check FILE.tq</code></h3>
+<p>Compile only. Prints warnings as
+<code>FILE:LINE:COLUMN: warning [CODE]: MESSAGE</code> to stderr and
+<code>FILE: OK</code> on success; errors print the source line with a
+caret. Exit 0 if it compiles (warnings included), 1 otherwise. Does not
+require <code>main</code>.</p>
+<h3
+id="tacqor-diagnose-filetq--tacqor-diagnose---stdin-filetq"><code>tacqor diagnose FILE.tq</code>
+· <code>tacqor diagnose --stdin [FILE.tq]</code></h3>
+<p>Like <code>check</code> but prints one JSON array for editors. With
+<code>--stdin</code> the source is read from standard input; the
+optional path is used only to resolve relative imports (the file need
+not exist). Exit 0 with no errors, 1 with errors.</p>
+<h3
+id="tacqor-dump-filetq--filetqb"><code>tacqor dump FILE.tq | FILE.tqb</code></h3>
+<p>Print traits, structs and every function's bytecode (after
+optimization) with type names, operands and source lines. See
+<code>BYTECODE.md</code>.</p>
+<h3
+id="tacqor-compile-filetq--o-filetqb"><code>tacqor compile FILE.tq -o FILE.tqb</code></h3>
+<p>Write portable bytecode. The output name must end in
+<code>.tqb</code>. Any 1.2 runtime runs it with
+<code>tacqor run FILE.tqb</code>.</p>
+<h3
+id="tacqor-build-filetq--o-exe"><code>tacqor build FILE.tq -o EXE</code></h3>
+<p>Write a self-contained executable: a copy of the <code>tacqor</code>
+binary with the bytecode appended. It runs on any machine where the
+binary runs; no standard library files are needed at run time (modules
+are compiled in). On Windows <code>.exe</code> is appended when no
+extension is given.</p>
+<h3
+id="tacqor-build---native-filetq--o-exe"><code>tacqor build --native FILE.tq -o EXE</code></h3>
+<p>Generate C++ for the program and compile it with the system C++
+compiler at <code>-O3</code>. The compiler is <code>$TACQOR_CXX</code>,
+else <code>$CXX</code>, else <code>c++</code> (<code>cl</code> on
+Windows); it must support C++17. The intermediate <code>.cpp</code> is
+written next to the output and removed afterwards. Native executables
+are dynamically linked against the C++ standard library of the machine
+that built them.</p>
+<h3
+id="tacqor-emit-filetq--o-filecpp"><code>tacqor emit FILE.tq -o FILE.cpp</code></h3>
+<p>Write the C++ that <code>build --native</code> would compile
+(self-contained: the runtime is embedded). Useful for inspection, for
+cross-compiling, or for integrating with another build system:
+<code>c++ -std=c++17 -O3 -pthread FILE.cpp -o app</code>.</p>
+<h3 id="tacqor-new-name"><code>tacqor new NAME</code></h3>
+<p>Create <code>NAME/</code> with <code>main.tq</code> (a small program
+using the standard library), <code>tests.tq</code> (a test importing
+it), and <code>README.md</code>. Fails if the folder exists.</p>
+<h3 id="tacqor-repl"><code>tacqor repl</code></h3>
+<p>Interactive scratchpad. Enter definitions (<code>def</code>,
+<code>struct</code>, <code>trait</code>, <code>import</code>,
+<code>const</code>) or statements; a lone expression is printed; a line
+ending in <code>:</code> opens a block closed by an empty line.
+Commands: <code>:show</code>, <code>:reset</code>,
+<code>:quit</code>/<code>:q</code>, <code>:help</code>. The session is
+recompiled and re-run after each entry with only new output shown, so
+side effects repeat. Compile and runtime errors are printed without
+ending the session; <code>exit(...)</code> does end it.</p>
+<h3
+id="tacqor-add-source-name--tacqor-install--tacqor-remove-name"><code>tacqor add SOURCE [NAME]</code>
+· <code>tacqor install</code> · <code>tacqor remove NAME</code></h3>
+<p>Package management in the current directory. <code>add</code> copies
+a folder or <code>git clone --depth 1</code>s a URL (anything containing
+<code>://</code>, starting with <code>git@</code>, or ending in
+<code>.git</code>) into <code>packages/NAME</code> (default name: the
+last path component without <code>.git</code>), strips its
+<code>.git</code>, and records <code>NAME SOURCE</code> in
+<code>tacqor.pkg</code>. <code>install</code> fetches every manifest
+entry whose folder is missing. <code>remove</code> deletes the folder
+and the entry. Import a package with <code>import NAME</code> (→
+<code>packages/NAME/lib.tq</code>) or <code>import NAME.module</code> (→
+<code>packages/NAME/module.tq</code>).</p>
+<h3 id="tacqor---version--tacqor---help"><code>tacqor --version</code> ·
+<code>tacqor --help</code></h3>
+<h2 id="3-environment-variables">3. Environment variables</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>TACQOR_HOME</code></td>
+<td>Directory containing <code>std/</code>; checked first when resolving
+the standard library.</td>
+</tr>
+<tr class="even">
+<td><code>TACQOR_PATH</code></td>
+<td>Colon-separated extra module roots, searched after
+<code>std</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>TACQOR_CXX</code>, <code>CXX</code></td>
+<td>C++ compiler command for <code>build --native</code>
+(<code>TACQOR_CXX</code> wins).</td>
+</tr>
+<tr class="even">
+<td><code>HOME</code></td>
+<td><code>~/.tacqor/std</code> is one of the standard library
+locations.</td>
+</tr>
+</tbody>
+</table>
+<p>Standard library search order: <code>$TACQOR_HOME/std</code>,
+<code>&lt;binary dir&gt;/std</code>,
+<code>&lt;binary dir&gt;/../std</code>,
+<code>&lt;binary dir&gt;/../../std</code>,
+<code>&lt;binary dir&gt;/../lib/tacqor/std</code>,
+<code>~/.tacqor/std</code>, <code>/usr/local/lib/tacqor/std</code>. The
+first existing directory wins.</p>
+<p>Module search order for <code>import a.b</code>: importing file's
+directory → <code>&lt;root program dir&gt;/packages</code> →
+<code>&lt;cwd&gt;/packages</code> → the directory containing
+<code>std/</code> (so <code>import std.lists</code> resolves to
+<code>&lt;that dir&gt;/std/lists.tq</code>) → each
+<code>TACQOR_PATH</code> entry. At each of the first four roots the
+compiler tries <code>a/b.tq</code> then <code>a/b/lib.tq</code>;
+<code>TACQOR_PATH</code> entries are tried as <code>a/b.tq</code> only.
+The first regular file wins; a module is loaded once even when imported
+under several paths.</p>
+<h2 id="4-exit-codes">4. Exit codes</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>Success (or all tests passed)</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Compile error, runtime error, failed tests, or
+<code>exit(1)</code></td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>Usage error (bad command line), or <code>exit(2)</code></td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td><code>exit(n)</code> from the program (0–255)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-diagnostics-format">5. Diagnostics format</h2>
+<p>Text (stderr):</p>
+<pre class="text"><code>app.tq:12:18: error: expected i64, found str
+        let x: i64 = &quot;oops&quot;
+                     ^~~~~~
+app.tq:20:9: warning [empty-range]: this loop has no iterations
+std/json.tq:7:1: error: ...            # errors in modules name the module file
+app.tq:33:5: runtime error: list index out of bounds
+  in inner (line 33)
+  in outer (line 40)
+  in main (line 48)</code></pre>
+<p>JSON (<code>diagnose</code>): an array of objects
+<code>{"line", "column", "length", "severity" (1 error, 2 warning), "code", "message"}</code>.
+Warnings carry their warning code (see <code>ERRORS.md</code>); a
+compile error has code <code>compile-error</code>, and unreadable or
+oversized input (over one million bytes) yields a single
+<code>invalid-input</code> error. Errors inside imported modules are
+reported at line 1 of the root file with <code>in MODULE:LINE:</code>
+prefixed to the message; warnings from imported modules are not
+reported. At most one error object is produced per run because the
+compiler stops at the first error.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;line&quot;</span><span class="fu">:</span><span class="dv">12</span><span class="fu">,</span><span class="dt">&quot;column&quot;</span><span class="fu">:</span><span class="dv">18</span><span class="fu">,</span><span class="dt">&quot;length&quot;</span><span class="fu">:</span><span class="dv">6</span><span class="fu">,</span><span class="dt">&quot;severity&quot;</span><span class="fu">:</span><span class="dv">1</span><span class="fu">,</span><span class="dt">&quot;code&quot;</span><span class="fu">:</span><span class="st">&quot;compile-error&quot;</span><span class="fu">,</span><span class="dt">&quot;message&quot;</span><span class="fu">:</span><span class="st">&quot;expected i64, found str&quot;</span><span class="fu">}</span><span class="ot">]</span></span></code></pre></div>
+<h2 id="6-editor-integration">6. Editor integration</h2>
+<p>The VS Code extension (<code>Tacqor_Live_Scanner_1.2.0.vsix</code>,
+source in <code>editor/</code>) registers the <code>tacqor</code>
+language for <code>.tq</code> files and, after each edit (debounced 180
+ms), runs <code>tacqor diagnose --stdin &lt;document path&gt;</code>
+with the document text on stdin, mapping the JSON to VS Code
+diagnostics. It bundles a Linux x64 compiler and the standard library;
+the setting <strong>Tacqor: Compiler Path</strong> points it at another
+build, and <strong>Tacqor: Restart Live Scanner</strong> restarts it.
+Any editor that can run a command on save or change can use the same
+protocol.</p>
+<h2 id="7-files-produced">7. Files produced</h2>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Produced by</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>*.tqb</code></td>
+<td><code>compile</code></td>
+<td>versioned bytecode, verified on load</td>
+</tr>
+<tr class="even">
+<td>executable</td>
+<td><code>build</code>, <code>build --native</code></td>
+<td>written to a temporary name and renamed into place; never overwrites
+the source or the toolchain</td>
+</tr>
+<tr class="odd">
+<td><code>*.cpp</code></td>
+<td><code>emit</code></td>
+<td>self-contained C++17</td>
+</tr>
+<tr class="even">
+<td><code>packages/</code>, <code>tacqor.pkg</code></td>
+<td><code>add</code>, <code>install</code>, <code>remove</code></td>
+<td>commit <code>tacqor.pkg</code>; <code>packages/</code> can be
+regenerated</td>
+</tr>
+<tr class="odd">
+<td><code>NAME/main.tq</code>, <code>tests.tq</code>,
+<code>README.md</code></td>
+<td><code>new</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-build-from-source">8. Build from source</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>                                   <span class="co"># ./tacqor</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test                              <span class="co"># runs tests/smoke.sh</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> CXXFLAGS=<span class="st">&quot;-O3 -static&quot;</span>            <span class="co"># portable Linux binary (static glibc: DNS caveat in README)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">g++</span> <span class="at">-std</span><span class="op">=</span>c++17 <span class="at">-O1</span> <span class="at">-g</span> <span class="at">-fsanitize</span><span class="op">=</span>address,undefined <span class="at">-pthread</span> src/<span class="pp">*</span>.cpp <span class="at">-o</span> tacqor-asan   <span class="co"># sanitized build</span></span></code></pre></div>
+<p><code>src/embedded_runtime.inc</code> is regenerated by
+<code>make</code> whenever <code>tacqor.hpp</code> or
+<code>values.hpp</code> changes and is committed so that
+<code>build-windows.cmd</code> (MSVC) needs no generator.
+<code>-DTACQOR_NO_THREADED</code> selects the portable
+<code>switch</code> dispatch loop.</p>
+</body>
+</html>

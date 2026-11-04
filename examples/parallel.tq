@@ -1,0 +1,7 @@
+def square(n: i64) -> i64:
+    return n * n
+
+
+def main():
+    let total = parallel_sum(1000, 4, square)
+    print(total)

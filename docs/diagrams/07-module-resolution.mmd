@@ -1,0 +1,15 @@
+flowchart TB
+    S["import a.b  (alias b)"] --> C1{"<dir of importing file>/a/b.tq<br/>or a/b/lib.tq ?"}
+    C1 -->|found| L[Load once, cache by canonical path]
+    C1 -->|no| C2{"<root program dir>/packages/a/b.tq<br/>or packages/a/b/lib.tq ?"}
+    C2 -->|found| L
+    C2 -->|no| C3{"<cwd>/packages/... ?"}
+    C3 -->|found| L
+    C3 -->|no| C4{"std library dir<br/>TACQOR_HOME/std · next to binary ·<br/>../lib/tacqor/std · ~/.tacqor/std ?"}
+    C4 -->|found| L
+    C4 -->|no| C5{"each entry of TACQOR_PATH ?"}
+    C5 -->|found| L
+    C5 -->|no| ERR["error: module not found<br/>(lists every path tried)"]
+    L --> CY{already loading?}
+    CY -->|yes| ERR2[error: circular import]
+    CY -->|no| OK[Module available as alias]

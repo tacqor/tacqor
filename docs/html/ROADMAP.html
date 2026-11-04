@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — ROADMAP</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#roadmap" id="toc-roadmap">Roadmap</a>
+<ul>
+<li><a href="#13--developer-experience"
+id="toc-13--developer-experience">1.3 — developer experience</a></li>
+<li><a href="#14--types" id="toc-14--types">1.4 — types</a></li>
+<li><a href="#15--runtime-and-performance"
+id="toc-15--runtime-and-performance">1.5 — runtime and
+performance</a></li>
+<li><a href="#16--ecosystem" id="toc-16--ecosystem">1.6 —
+ecosystem</a></li>
+<li><a href="#20--concurrency" id="toc-20--concurrency">2.0 —
+concurrency</a></li>
+<li><a href="#not-planned" id="toc-not-planned">Not planned</a></li>
+<li><a href="#how-priorities-are-set"
+id="toc-how-priorities-are-set">How priorities are set</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="roadmap">Roadmap</h1>
+<p>What is planned, in rough priority order, and what is deliberately
+not planned. Nothing here changes the meaning of a program that compiles
+today. Items move to <code>CHANGELOG.md</code> when they ship.</p>
+<h2 id="13--developer-experience">1.3 — developer experience</h2>
+<ul>
+<li><strong>Language server (LSP).</strong> <code>tacqor diagnose</code>
+already provides diagnostics; an LSP server would add go-to-definition,
+hover types, completion and rename, reusing the compiler's symbol
+tables. Editors other than VS Code would get full support for free.</li>
+<li><strong>Formatter.</strong> <code>tacqor fmt</code> implementing
+<code>docs/STYLE.md</code>, round-tripping comments.</li>
+<li><strong>Debugger.</strong> Breakpoints, stepping and variable
+inspection in the VM, driven over a simple text protocol so editors can
+integrate it; a source-line map already exists in the bytecode.</li>
+<li><strong>Test runner improvements.</strong> Filtering by name, timing
+per test, <code>--fail-fast</code>, discovering <code>test_*.tq</code>
+files in a folder.</li>
+<li><strong>Multi-line REPL editing and history.</strong></li>
+</ul>
+<h2 id="14--types">1.4 — types</h2>
+<ul>
+<li><strong>User-defined enums</strong> with payloads
+(<code>enum Shape: Circle(f64) | Rect(f64, f64)</code>) and
+<code>match</code> over them; <code>Option</code> and
+<code>Result</code> become ordinary enums. This is the most requested
+gap by Rust programmers.</li>
+<li><strong>Tuples</strong> <code>(i64, str)</code> with destructuring
+in <code>let</code> and <code>match</code>.</li>
+<li><strong>Trait default methods</strong> and traits over built-in
+types (<code>impl Shape for i64</code>-style), so generic code can be
+bounded on things like ordering.</li>
+<li><strong>Pattern matching on struct fields</strong> and nested
+patterns.</li>
+<li><strong>Narrower integer and byte types</strong> only if enums and
+tuples do not cover the binary-protocol use cases; the preference is to
+keep <code>i64</code> and <code>f64</code> as the only numeric
+types.</li>
+</ul>
+<h2 id="15--runtime-and-performance">1.5 — runtime and performance</h2>
+<ul>
+<li><strong>Native backend:</strong> hoist list data pointers and
+lengths out of loops; specialize <code>dict[str, V]</code>; inline small
+functions across module boundaries; <code>-O2</code> option for faster
+builds.</li>
+<li><strong>VM:</strong> inline caching for closure and trait calls; a
+register-based redesign is being evaluated against the native backend's
+gains before committing to it.</li>
+<li><strong>Collector:</strong> generational tracking so long-lived
+objects are not rescanned each cycle.</li>
+<li><strong>Strings:</strong> small-string optimization and shared
+substrings for slicing.</li>
+</ul>
+<h2 id="16--ecosystem">1.6 — ecosystem</h2>
+<ul>
+<li><strong>Foreign function interface</strong> for calling C from
+native builds (<code>extern def</code> declarations, scalar and string
+arguments), and a VM path through <code>dlopen</code> for the same
+declarations.</li>
+<li><strong>Package index.</strong> A simple registry file format
+(<code>name → git URL + commit</code>) that <code>tacqor add</code> can
+resolve, with lockfile semantics (<code>tacqor.lock</code>) and checksum
+verification.</li>
+<li><strong>Standard library growth:</strong> <code>std.csv</code>,
+<code>std.time</code> (calendar formatting), <code>std.path</code>,
+<code>std.regex</code> (a small backtracking-free engine),
+<code>std.args</code> (command-line parsing), <code>std.random</code>
+distributions, <code>std.http</code> TLS via the platform's
+library.</li>
+<li><strong>Windows and macOS binaries</strong> in the release, built
+and tested in CI; ARM64 Linux.</li>
+</ul>
+<h2 id="20--concurrency">2.0 — concurrency</h2>
+<ul>
+<li><strong>Structured concurrency</strong>: tasks with scoped lifetimes
+and channels for message passing, with the type system ensuring values
+sent between tasks are either immutable or transferred. This keeps the
+non-atomic refcount design by never sharing a mutable object across
+threads — the same rule <code>parallel_map</code> enforces today,
+generalized.</li>
+<li>A <strong>concurrent HTTP server</strong> in <code>std.http</code>
+built on it.</li>
+</ul>
+<h2 id="not-planned">Not planned</h2>
+<ul>
+<li><strong>Inheritance.</strong> Traits, generics and composition cover
+the use cases; see <code>docs/FAQ.md</code>.</li>
+<li><strong>Exceptions.</strong> <code>Result</code>, <code>?</code> and
+<code>attempt</code> are the error model.</li>
+<li><strong>Implicit conversions, operator overloading, macros.</strong>
+Each adds non-local reasoning to every line of code that uses it.</li>
+<li><strong>Null.</strong> <code>Option</code> is the only
+representation of absence.</li>
+<li><strong>Unsafe blocks or raw pointers.</strong> The FFI will be the
+only unchecked boundary and will be explicit at the declaration.</li>
+<li><strong>A garbage collector that replaces reference
+counting.</strong> Deterministic destruction is a feature.</li>
+</ul>
+<h2 id="how-priorities-are-set">How priorities are set</h2>
+<p>Issues tagged <code>proposal</code> are discussed in the open; the
+maintainers pick what ships in the next minor release by weighing user
+demand against the complexity added to the language and the
+implementation (<code>docs/WHITEPAPER.md</code> §2). Contributions are
+welcome on anything above — see <code>CONTRIBUTING.md</code>.</p>
+</body>
+</html>

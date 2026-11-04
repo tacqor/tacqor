@@ -1,0 +1,10 @@
+flowchart TB
+    BC[(Verified bytecode)] --> SIM["Abstract interpretation<br/>type of every stack slot and local<br/>at every instruction"]
+    SIM --> GEN["Typed C++ generation<br/>i64 → int64_t register<br/>f64 → double · bool → bool<br/>everything else → Value"]
+    GEN --> FN["One C++ function per Tacqor function<br/>labels + goto for jumps<br/>DepthGuard, line tracking, try/catch → traceback"]
+    GEN --> TH["Thunks: uniform signature<br/>for closure calls"]
+    GEN --> DS["Dispatchers: switch on struct id<br/>for trait method calls"]
+    GEN --> RT["Embedded runtime header<br/>values.hpp (lists, dicts, GC, builtins, sockets)"]
+    FN & TH & DS & RT --> SRCF[".cpp file"]
+    SRCF --> CC["c++ -std=c++17 -O3 -pthread<br/>(CXX / TACQOR_CXX)"]
+    CC --> EXE["Native executable<br/>main runs on a 512 MB stack thread"]

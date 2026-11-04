@@ -1,0 +1,16 @@
+# Used by tests/smoke.sh: serves two requests on the given port, then exits.
+import std.http
+
+def handler(request: http.Request) -> http.Response:
+    if request.path == "/boom":
+        fail("deliberate")
+    return http.text(200, request.method + " " + request.path + " " + request.body)
+
+def main():
+    let port = unwrap(parse_int(arg(0)))
+    match http.serve_count(port, 3, handler):
+        case Ok(done):
+            print("served")
+        case Err(problem):
+            eprint(problem)
+            exit(1)

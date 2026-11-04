@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — CONTRIBUTING</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#contributing-to-tacqor"
+id="toc-contributing-to-tacqor">Contributing to Tacqor</a>
+<ul>
+<li><a href="#1-ground-rules" id="toc-1-ground-rules">1. Ground
+rules</a></li>
+<li><a href="#2-getting-set-up" id="toc-2-getting-set-up">2. Getting set
+up</a></li>
+<li><a href="#3-where-things-are" id="toc-3-where-things-are">3. Where
+things are</a></li>
+<li><a href="#4-making-a-change" id="toc-4-making-a-change">4. Making a
+change</a></li>
+<li><a href="#5-code-style" id="toc-5-code-style">5. Code style</a></li>
+<li><a href="#6-commit-messages" id="toc-6-commit-messages">6. Commit
+messages</a></li>
+<li><a href="#7-review" id="toc-7-review">7. Review</a></li>
+<li><a href="#8-reporting-bugs" id="toc-8-reporting-bugs">8. Reporting
+bugs</a></li>
+<li><a href="#9-license" id="toc-9-license">9. License</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="contributing-to-tacqor">Contributing to Tacqor</h1>
+<p>Thank you for considering a contribution. This document explains how
+the project is organized, how to build and test it, what a good change
+looks like, and how changes are reviewed.</p>
+<h2 id="1-ground-rules">1. Ground rules</h2>
+<ul>
+<li><strong>Programs that compile today must compile tomorrow.</strong>
+Language changes are additive. A change that alters the meaning of an
+existing program needs a very strong reason and a major version.</li>
+<li><strong>Every backend must agree.</strong> The VM, portable
+bytecode, embedded executables and native builds must produce
+byte-identical output for every program. A feature is not done until
+<code>tests/smoke.sh</code> passes through all four.</li>
+<li><strong>Every failure is a diagnostic.</strong> No input — source,
+bytecode, network data — may crash the toolchain. New code paths that
+can fail must throw <code>Error</code> (compile time) or
+<code>std::runtime_error</code> (run time) with a message that names the
+problem.</li>
+<li><strong>Keep the language small.</strong> A new feature should
+remove more complexity from user programs than it adds to the language.
+The whitepaper's design principles (<code>docs/WHITEPAPER.md</code> §2)
+are the test.</li>
+</ul>
+<h2 id="2-getting-set-up">2. Getting set up</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span>                      <span class="co"># builds ./tacqor with the system C++17 compiler</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test                 <span class="co"># runs tests/smoke.sh against ./tacqor</span></span></code></pre></div>
+<p>Useful variants:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> CXXFLAGS=<span class="st">&quot;-O1 -g -fsanitize=address,undefined&quot;</span>      <span class="co"># sanitized build for debugging</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> CXXFLAGS=<span class="st">&quot;-O3 -DTACQOR_NO_THREADED&quot;</span>               <span class="co"># the switch-dispatch VM that MSVC uses</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">TACQOR_HOME</span><span class="op">=</span><span class="va">$PWD</span> <span class="ex">./tacqor</span> run examples/primes.tq     <span class="co"># run with the in-tree standard library</span></span></code></pre></div>
+<p>Documentation tooling (needs <code>pandoc</code> and Python 3):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-I</span> tools/verify_docs.py . ./tacqor docs/COOKBOOK.md docs/FROM_PYTHON.md docs/FROM_RUST.md   <span class="co"># compiles/runs every snippet</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-I</span> tools/build_html.py . docs/html                                                           <span class="co"># regenerates the HTML edition</span></span></code></pre></div>
+<p><code>src/embedded_runtime.inc</code> is generated by
+<code>make</code> from <code>tacqor.hpp</code> and
+<code>values.hpp</code>; never edit it by hand, and commit the
+regenerated file whenever those headers change (the Windows build script
+does not regenerate it).</p>
+<h2 id="3-where-things-are">3. Where things are</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Area</th>
+<th>File</th>
+<th>Doc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shared data model (types, ops, builtins enum, Program)</td>
+<td><code>src/tacqor.hpp</code></td>
+<td><code>docs/ARCHITECTURE.md</code> §2</td>
+</tr>
+<tr class="even">
+<td>Lexer, parser, type checker, code generator, optimizer</td>
+<td><code>src/compiler.cpp</code></td>
+<td>§3</td>
+</tr>
+<tr class="odd">
+<td>Runtime values, containers, collector, builtins, sockets</td>
+<td><code>src/values.hpp</code></td>
+<td>§4</td>
+</tr>
+<tr class="even">
+<td>VM</td>
+<td><code>src/runtime.cpp</code></td>
+<td>§5</td>
+</tr>
+<tr class="odd">
+<td>Bytecode encode/decode/verify, embedded executables</td>
+<td><code>src/artifact.cpp</code></td>
+<td><code>docs/BYTECODE.md</code></td>
+</tr>
+<tr class="even">
+<td>Native backend (bytecode → C++)</td>
+<td><code>src/native.cpp</code></td>
+<td><code>docs/ARCHITECTURE.md</code> §8</td>
+</tr>
+<tr class="odd">
+<td>CLI, REPL, packages, diagnostics</td>
+<td><code>src/main.cpp</code></td>
+<td><code>docs/TOOLING.md</code></td>
+</tr>
+<tr class="even">
+<td>Standard library</td>
+<td><code>std/*.tq</code></td>
+<td><code>STDLIB.md</code></td>
+</tr>
+<tr class="odd">
+<td>Tests</td>
+<td><code>tests/</code></td>
+<td><code>docs/ARCHITECTURE.md</code> §11</td>
+</tr>
+<tr class="even">
+<td>Editor extension</td>
+<td><code>editor/</code></td>
+<td><code>docs/TOOLING.md</code> §6</td>
+</tr>
+</tbody>
+</table>
+<p><code>docs/ARCHITECTURE.md</code> §12 has step-by-step recipes for
+the common changes: adding a builtin, adding an opcode, adding a type
+kind, adding a standard module.</p>
+<h2 id="4-making-a-change">4. Making a change</h2>
+<ol type="1">
+<li><strong>Open an issue first</strong> for anything beyond a bug fix
+or a documentation correction. Describe the problem, not just the
+solution; include a program that shows it.</li>
+<li><strong>Branch</strong> from <code>main</code>.</li>
+<li><strong>Write the test before the fix.</strong> Language features go
+into <code>tests/features_&lt;version&gt;.tq</code> with the expected
+output appended to the matching <code>.expected</code> file; CLI,
+error-message and tooling behaviour go into <code>tests/smoke.sh</code>;
+library functions get a <code>def test_*()</code> in
+<code>tests/unit_tests.tq</code>.</li>
+<li><strong>Implement</strong> following the recipes in
+<code>docs/ARCHITECTURE.md</code> §12. A new builtin or op has a
+checklist of places to touch; the <code>static_assert</code> in
+<code>values.hpp</code> catches a missing arity entry, and
+<code>tests/smoke.sh</code> has a check that every op has a name in
+<code>tacqor dump</code>.</li>
+<li><strong>Run everything</strong>: <code>make test</code>, then the
+sanitized build
+(<code>make CXXFLAGS="-O1 -g -fsanitize=address,undefined" &amp;&amp; make test</code>),
+then <code>sh benchmarks/run.sh</code> if you touched the VM, the native
+backend or the runtime (performance regressions are bugs).</li>
+<li><strong>Update the docs</strong> in the same change:
+<code>LANGUAGE.md</code>/<code>STDLIB.md</code> for anything
+user-visible, <code>docs/SPECIFICATION.md</code> for semantics,
+<code>docs/BYTECODE.md</code> for opcodes, <code>docs/ERRORS.md</code>
+for new messages, <code>CHANGELOG.md</code> always.</li>
+<li><strong>Open a pull request</strong> with: what changed, why, how it
+was tested, and a before/after program when behaviour changed.</li>
+</ol>
+<h2 id="5-code-style">5. Code style</h2>
+<p><strong>C++</strong></p>
+<ul>
+<li>C++17, no exceptions for control flow except the
+<code>Error</code>/<code>ExitRequest</code> types already used; no
+RTTI-dependent code; no platform-specific code outside the clearly
+marked socket and process sections.</li>
+<li>Four-space indentation, braces on the same line,
+<code>snake_case</code> for functions and variables,
+<code>PascalCase</code> for types, <code>constexpr</code> over
+macros.</li>
+<li>Prefer <code>std::string_view</code>, <code>std::vector</code> and
+indices over raw pointers. Every container access on data that came from
+outside (bytecode, network, source) is bounds-checked.</li>
+<li>Comment <em>why</em>, not <em>what</em>. A comment that restates the
+next line is removed in review.</li>
+<li>Warnings are errors in spirit: the build must be clean with
+<code>-Wall -Wextra -Wpedantic</code>.</li>
+</ul>
+<p><strong>Tacqor (standard library and tests)</strong></p>
+<ul>
+<li>Follow <code>docs/STYLE.md</code>. Library functions take the
+collection first (<code>lists.map(items, f)</code>), the same convention
+as the builtins, which makes <code>items.push(x)</code> and
+<code>lists.map(items, f)</code> read alike (method-call syntax resolves
+builtins and same-module functions; imported functions are always called
+qualified).</li>
+<li>Every public library function has a test in
+<code>tests/unit_tests.tq</code> and a row in
+<code>STDLIB.md</code>.</li>
+</ul>
+<h2 id="6-commit-messages">6. Commit messages</h2>
+<p>One change per commit. First line under 72 characters, imperative
+mood, prefixed by area: <code>compiler:</code>, <code>vm:</code>,
+<code>native:</code>, <code>runtime:</code>, <code>std:</code>,
+<code>cli:</code>, <code>docs:</code>, <code>tests:</code>. The body
+explains the why and names the issue.</p>
+<pre class="text"><code>compiler: allow locals to shadow module names
+
+A `let lists = ...` inside a function that imports std.lists failed with
+&quot;name is a module&quot;. Shadowing is harmless because module members are
+always reached through the qualified form. Fixes #42.</code></pre>
+<h2 id="7-review">7. Review</h2>
+<p>A maintainer reviews every pull request for: correctness across all
+four backends, diagnostics for every new failure path, documentation,
+test coverage, and fit with the design principles. Reviews are about the
+code, not the author; comments are expected to be specific and
+actionable. Two approvals are needed for language changes, one for
+everything else.</p>
+<h2 id="8-reporting-bugs">8. Reporting bugs</h2>
+<p>Include the Tacqor version (<code>tacqor --version</code>), the
+platform, the smallest program that reproduces the problem, the exact
+command, and the full output. A crash (not a diagnostic) in any tool is
+always a bug worth reporting even without a minimal program.
+Security-relevant bugs go through <code>SECURITY.md</code>, not the
+public tracker.</p>
+<h2 id="9-license">9. License</h2>
+<p>By contributing you agree that your contribution is licensed under
+the project's license (<code>LICENSE</code>).</p>
+</body>
+</html>

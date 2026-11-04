@@ -1,0 +1,27 @@
+# Standard library: assertions for `tacqor test`. Import with `import std.testing`.
+
+def assert_eq[T](actual: T, expected: T):
+    if actual != expected:
+        fail(f"expected {expected} but got {actual}")
+
+def assert_ne[T](actual: T, other: T):
+    if actual == other:
+        fail(f"expected a value different from {other}")
+
+def assert_true(condition: bool, message: str):
+    if not condition:
+        fail(message)
+
+def assert_some[T](value: Option[T]) -> T:
+    match value:
+        case Some(inner):
+            return inner
+        case None:
+            fail("expected Some, got None")
+
+def assert_ok[T, E](value: Result[T, E]) -> T:
+    match value:
+        case Ok(inner):
+            return inner
+        case Err(error):
+            fail(f"expected Ok, got Err({error})")

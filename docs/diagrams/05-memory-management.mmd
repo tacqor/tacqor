@@ -1,0 +1,17 @@
+flowchart TB
+    subgraph RC["Reference counting (every value)"]
+        A[copy a Value] --> B[refs + 1]
+        C[drop a Value] --> Dd[refs − 1]
+        Dd --> Z{refs == 0?}
+        Z -->|yes| DEL["queue for deletion<br/>(iterative drain: no deep recursion)"]
+        Z -->|no| K[keep]
+    end
+    subgraph GC["Cycle collector (containers only)"]
+        T["track(): lists of Values, dicts,<br/>structs, closures, variants"] --> TH{"allocations since last run<br/>> threshold?<br/>main thread, not in parallel"}
+        TH -->|yes| S1["1 · gc_refs = refs for all tracked"]
+        S1 --> S2["2 · for each child reference<br/>inside the tracked set: gc_refs − 1"]
+        S2 --> S3["3 · gc_refs > 0 ⇒ root<br/>mark everything reachable from roots"]
+        S3 --> S4["4 · unmarked = garbage cycles:<br/>hold, clear children, release"]
+        S4 --> S5["threshold = max(200k, 2 × live)"]
+    end
+    RC -.->|cycles never reach 0| GC

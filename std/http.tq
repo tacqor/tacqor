@@ -1,0 +1,264 @@
+# Standard library: a small HTTP/1.1 server and client written in Tacqor on the tcp_* built-ins.
+#
+#   import std.http
+#   def handler(request: http.Request) -> http.Response:
+#       return http.text(200, "hello " + request.path)
+#   def main():
+#       http.serve(8080, handler)        # blocks; one request at a time
+#
+#   match http.get("http://example.com/"):
+#       case Ok(response): print(response.body)
+#       case Err(problem): print(problem)
+
+const MAX_REQUEST = 8_000_000
+const CHUNK = 65536
+
+struct Request:
+    method: str
+    path: str
+    query: str
+    headers: dict[str, str]
+    body: str
+
+    def header(self, name: str) -> Option[str]:
+        return lookup(self.headers, lower(name))
+
+struct Response:
+    status: i64
+    headers: dict[str, str]
+    body: str
+
+    def header(self, name: str) -> Option[str]:
+        return lookup(self.headers, lower(name))
+
+def status_text(code: i64) -> str:
+    match code:
+        case 200:
+            return "OK"
+        case 201:
+            return "Created"
+        case 204:
+            return "No Content"
+        case 301:
+            return "Moved Permanently"
+        case 302:
+            return "Found"
+        case 304:
+            return "Not Modified"
+        case 400:
+            return "Bad Request"
+        case 401:
+            return "Unauthorized"
+        case 403:
+            return "Forbidden"
+        case 404:
+            return "Not Found"
+        case 405:
+            return "Method Not Allowed"
+        case 500:
+            return "Internal Server Error"
+        case _:
+            return "Status"
+
+def response(status: i64, content_type: str, body: str) -> Response:
+    var headers: dict[str, str] = {}
+    headers["content-type"] = content_type
+    return Response(status, headers, body)
+
+def text(status: i64, body: str) -> Response:
+    return response(status, "text/plain; charset=utf-8", body)
+
+def html(status: i64, body: str) -> Response:
+    return response(status, "text/html; charset=utf-8", body)
+
+def json(status: i64, body: str) -> Response:
+    return response(status, "application/json", body)
+
+def not_found() -> Response:
+    return text(404, "not found")
+
+# --- wire format -------------------------------------------------------------
+
+def split_head(raw: str) -> Option[i64]:
+    let at = find(raw, "\r\n\r\n")
+    if at < 0:
+        return None
+    return Some(at)
+
+def parse_headers(lines: list[str], headers: dict[str, str]):
+    for line in lines:
+        let colon = find(line, ":")
+        if colon > 0:
+            headers[lower(strip(line[:colon]))] = strip(line[colon + 1:])
+
+def parse_request(raw: str) -> Option[Request]:
+    let head_end = split_head(raw)?
+    let head = raw[:head_end]
+    let lines = split(head, "\r\n")
+    if len(lines) == 0:
+        return None
+    let parts = split(lines[0], " ")
+    if len(parts) < 2:
+        return None
+    var headers: dict[str, str] = {}
+    parse_headers(lines[1:], headers)
+    var path = parts[1]
+    var query = ""
+    let mark = find(path, "?")
+    if mark >= 0:
+        query = path[mark + 1:]
+        path = path[:mark]
+    return Some(Request(upper(parts[0]), path, query, headers, raw[head_end + 4:]))
+
+def content_length(headers: dict[str, str]) -> i64:
+    match lookup(headers, "content-length"):
+        case Some(value):
+            return unwrap_or(parse_int(value), 0)
+        case None:
+            return 0
+
+def encode_response(r: Response) -> str:
+    var out = f"HTTP/1.1 {r.status} {status_text(r.status)}\r\n"
+    out += f"content-length: {len(r.body)}\r\n"
+    out += "connection: close\r\n"
+    for key in keys(r.headers):
+        out += key + ": " + r.headers[key] + "\r\n"
+    return out + "\r\n" + r.body
+
+# Reads one complete HTTP message (headers plus content-length body) from a socket.
+def read_message(socket: i64) -> Result[str, str]:
+    var raw = ""
+    var head_end = -1
+    var needed = 0
+    while True:
+        let chunk = tcp_read(socket, CHUNK)?
+        if chunk == "":
+            break
+        raw += chunk
+        if len(raw) > MAX_REQUEST:
+            return Err("message too large")
+        if head_end < 0:
+            match split_head(raw):
+                case Some(at):
+                    head_end = at
+                    var headers: dict[str, str] = {}
+                    parse_headers(split(raw[:at], "\r\n")[1:], headers)
+                    needed = at + 4 + content_length(headers)
+                case None:
+                    continue
+        if head_end >= 0 and len(raw) >= needed:
+            break
+    return Ok(raw)
+
+# --- server ------------------------------------------------------------------
+
+def handle(client: i64, handler: fn(Request) -> Response):
+    var reply = text(400, "bad request")
+    match read_message(client):
+        case Ok(raw):
+            match parse_request(raw):
+                case Some(incoming):
+                    let call = fn() => handler(incoming)
+                    match attempt(call):
+                        case Ok(produced):
+                            reply = produced
+                        case Err(problem):
+                            eprint("handler failed: " + problem)
+                            reply = text(500, "internal server error")
+                case None:
+                    reply = text(400, "bad request")
+        case Err(problem):
+            reply = text(400, problem)
+    tcp_write(client, encode_response(reply))
+    tcp_close(client)
+
+# Serves forever (one connection at a time). Returns only when listening fails.
+def serve(port: i64, handler: fn(Request) -> Response) -> Result[bool, str]:
+    let server = tcp_listen(port)?
+    while True:
+        match tcp_accept(server):
+            case Ok(client):
+                handle(client, handler)
+            case Err(problem):
+                eprint("accept failed: " + problem)
+
+# Serves exactly `count` requests, then stops (handy for tests and one-shot tools).
+def serve_count(port: i64, count: i64, handler: fn(Request) -> Response) -> Result[bool, str]:
+    let server = tcp_listen(port)?
+    for i in range(count):
+        let client = tcp_accept(server)?
+        handle(client, handler)
+    tcp_close(server)
+    return Ok(True)
+
+# --- client ------------------------------------------------------------------
+
+struct Url:
+    host: str
+    port: i64
+    path: str
+
+def parse_url(url: str) -> Result[Url, str]:
+    var rest = url
+    match strings_strip_prefix(rest, "http://"):
+        case Some(after):
+            rest = after
+        case None:
+            return Err("only http:// URLs are supported")
+    var path = "/"
+    let slash = find(rest, "/")
+    if slash >= 0:
+        path = rest[slash:]
+        rest = rest[:slash]
+    var port = 80
+    let colon = find(rest, ":")
+    if colon >= 0:
+        match parse_int(rest[colon + 1:]):
+            case Some(p):
+                port = p
+            case None:
+                return Err("invalid port in " + url)
+        rest = rest[:colon]
+    if rest == "":
+        return Err("missing host in " + url)
+    return Ok(Url(rest, port, path))
+
+def strings_strip_prefix(text: str, prefix: str) -> Option[str]:
+    if starts_with(text, prefix):
+        return Some(text[len(prefix):])
+    return None
+
+def parse_response(raw: str) -> Result[Response, str]:
+    match split_head(raw):
+        case Some(at):
+            let lines = split(raw[:at], "\r\n")
+            let parts = split(lines[0], " ")
+            if len(parts) < 2:
+                return Err("malformed status line")
+            var headers: dict[str, str] = {}
+            parse_headers(lines[1:], headers)
+            match parse_int(parts[1]):
+                case Some(status):
+                    return Ok(Response(status, headers, raw[at + 4:]))
+                case None:
+                    return Err("malformed status code")
+        case None:
+            return Err("incomplete response")
+
+def request(method: str, url: str, body: str) -> Result[Response, str]:
+    let target = parse_url(url)?
+    let socket = tcp_connect(target.host, target.port)?
+    var message = f"{method} {target.path} HTTP/1.1\r\nhost: {target.host}\r\nconnection: close\r\n"
+    if body != "":
+        message += f"content-length: {len(body)}\r\n"
+    message += "\r\n" + body
+    tcp_write(socket, message)?
+    let raw = read_message(socket)?
+    tcp_close(socket)
+    return parse_response(raw)
+
+def get(url: str) -> Result[Response, str]:
+    return request("GET", url, "")
+
+def post(url: str, body: str) -> Result[Response, str]:
+    return request("POST", url, body)

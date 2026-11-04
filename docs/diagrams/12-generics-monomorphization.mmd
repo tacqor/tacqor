@@ -1,0 +1,7 @@
+flowchart LR
+    DEF["def map[T, U](items: list[T], f: fn(T) -> U) -> list[U]"] --> C1["map([1, 2], fn(x: i64) => str(x))"]
+    DEF --> C2["map(names, fn(s: str) => len(s))"]
+    C1 -->|unify: T=i64, U=str| M1["map[i64, str]<br/>compiled once, typed int64 registers natively"]
+    C2 -->|unify: T=str, U=i64| M2["map[str, i64]<br/>separate function"]
+    C1 -.->|same types again| M1
+    B["bounds: [T: Shape]"] --> CHK["checked at each instantiation;<br/>inside the body, T is concrete ⇒ static calls"]

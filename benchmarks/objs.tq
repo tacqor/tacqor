@@ -1,0 +1,9 @@
+struct P:
+    x: i64
+    y: i64
+def main():
+    var total = 0
+    for i in range(3000000):
+        let p = P(i, i + 1)
+        total += p.x + p.y
+    print(total)

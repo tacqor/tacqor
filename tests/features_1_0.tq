@@ -1,0 +1,200 @@
+# Exercises every 1.0 feature: modules, generics, closures, Option/Result, match, ?, methods, f-strings,
+# constants, the standard library, and JSON. Output is compared with tests/features_1_0.expected on every backend.
+
+import geometry
+import geometry as geo
+import std.lists
+import std.strings
+import std.math
+import std.testing
+import std.collections
+import std.json
+
+struct Counter:
+    count: i64
+
+    def bump(self) -> i64:
+        self.count += 1
+        return self.count
+
+def map_to[T, U](items: list[T], f: fn(T) -> U) -> list[U]:
+    var out: list[U] = []
+    for item in items:
+        push(out, f(item))
+    return out
+
+def first_even(items: list[i64]) -> Option[i64]:
+    for item in items:
+        if item % 2 == 0:
+            return Some(item)
+    return None
+
+def safe_div(a: i64, b: i64) -> Result[i64, str]:
+    if b == 0:
+        return Err("division by zero")
+    return Ok(a // b)
+
+def average(items: list[i64]) -> Result[i64, str]:
+    let n = len(items)
+    let total = sum(items)
+    let mean = safe_div(total, n)?
+    return Ok(mean)
+
+def compose[A, B, C](f: fn(A) -> B, g: fn(B) -> C) -> fn(A) -> C:
+    return fn(x: A) -> C => g(f(x))
+
+def main():
+    core_checks()
+    std_checks()
+    json_checks()
+
+def core_checks():
+    # modules and constants
+    print(geometry.PI)
+    print(geo.UNIT)
+    let c = geometry.Circle(2.0)
+    print(c.area())
+    c.grow(1.0)
+    print(c.radius)
+    print(len(geometry.circles([1.0, 2.0, 3.0])))
+
+    # generic structs with methods
+    let p = geometry.Pair(1, "one")
+    print(p.describe())
+    print(p.swap().describe())
+    let q = geometry.Pair[str, bool]("yes", True)
+    print(q)
+
+    # closures capture by value; containers are shared
+    let base = 10
+    let add_base = fn(x: i64) -> i64 => x + base
+    print(add_base(5))
+    let doubled = map_to([1, 2, 3], fn(x: i64) => x * 2)
+    print(doubled)
+    let labels = map_to(doubled, fn(x: i64) => f"<{x}>")
+    print(join(labels, ""))
+    let inc_then_square = compose(fn(x: i64) => x + 1, fn(x: i64) => x * x)
+    print(inc_then_square(4))
+    var total = 0
+    let bucket: list[i64] = []
+    let collect = fn(x: i64):
+        push(bucket, x)
+    collect(7)
+    collect(8)
+    print(bucket)
+    let named = add_base
+    print(named(1) == add_base(1))
+
+    # std library generics
+    print(lists.filter([1, 2, 3, 4, 5, 6], fn(x: i64) => x % 3 == 0))
+    print(lists.reduce([1, 2, 3, 4], 0, fn(acc: i64, x: i64) => acc + x))
+    print(lists.any([1, 2, 3], fn(x: i64) => x > 2))
+    print(lists.all([1, 2, 3], fn(x: i64) => x > 2))
+    print(lists.zip([1, 2], ["a", "b"]))
+
+    # Option / Result / match / ?
+    match first_even([1, 3, 4, 5]):
+        case Some(value):
+            print(f"first even: {value}")
+        case None:
+            print("no even numbers")
+    match first_even([1, 3]):
+        case Some(value):
+            print(value)
+        case None:
+            print("none found")
+    match safe_div(7, 0):
+        case Ok(v):
+            print(v)
+        case Err(message):
+            print("error: " + message)
+    print(average([2, 4, 6]))
+    print(average([]))
+    print(unwrap(safe_div(9, 3)))
+    print(unwrap_or(first_even([1]), -1))
+    print(is_some(first_even([2])))
+    let maybe: Option[str] = lookup({"a": "x"}, "a")
+    print(maybe)
+    print(parse_int("42"))
+    print(parse_int("nope"))
+    match "green":
+        case "red":
+            print("stop")
+        case "green":
+            print("go")
+        case _:
+            print("?")
+    let n = 3
+    match n:
+        case 1:
+            print("one")
+        case 3:
+            print("three")
+        case _:
+            print("many")
+
+    # methods and f-strings
+    let counter = Counter(0)
+    counter.bump()
+    print(f"count={counter.bump()} pi~{round(geometry.PI * 100.0)} {{literal}}")
+    print("done".upper())
+    print([3, 1, 2].len())
+
+
+def std_checks():
+    print(lists.find_first([1, 4, 6], fn(x: i64) => x % 2 == 0))
+    print(lists.unique(["a", "b", "a"]))
+    print(lists.sorted_by(["ccc", "a", "bb"], fn(s: str) => len(s)))
+    print(lists.flatten([[1, 2], [3]]))
+    print(lists.enumerate(["x", "y"]))
+    print(strings.pad_left("7", 3, "0"))
+    print(strings.words("  the quick  fox "))
+    print(strings.count("banana", "an"))
+    print(strings.capitalize("hello"))
+    print(strings.reverse_text("héllo"))
+    print(strings.is_digit("123") and not strings.is_digit("12a"))
+    print(math.gcd(12, 18))
+    print(math.factorial(5))
+    print(math.factorial(25))
+    print(math.isqrt(99))
+    print(math.is_prime(97))
+    print(math.mean([1.0, 2.0, 3.0]))
+    let s = collections.new_stack[i64]()
+    s.push(1)
+    s.push(2)
+    print(s.pop())
+    print(s.size())
+    let q = collections.new_queue[str]()
+    q.push("a")
+    q.push("b")
+    print(q.pop())
+    print(q.size())
+    let c = collections.new_counter()
+    c.add("x")
+    c.add("y")
+    c.add("x")
+    print(c.most_common())
+    print(c.get("zzz"))
+    testing.assert_eq(1 + 1, 2)
+    print(testing.assert_some(lists.find_first([3], fn(x: i64) => True)))
+    testing.assert_eq(math.lcm(4, 6), 12)
+    print("std ok")
+
+
+def json_checks():
+    let text = "{\"name\": \"Ada\", \"age\": 36, \"tags\": [\"math\", \"code\"], \"ok\": true, \"pi\": 3.14, \"none\": null, \"u\": \"\\u00e9\"}"
+    match json.parse(text):
+        case Ok(doc):
+            print(json.encode(doc))
+            print(unwrap(unwrap(doc.get("name")).as_text()))
+            print(unwrap(unwrap(doc.get("age")).as_int()) + 1)
+            print(unwrap(unwrap(unwrap(doc.get("tags")).at(1)).as_text()))
+            print(doc.get("missing"))
+        case Err(message):
+            print("parse error: " + message)
+    print(json.parse("[1, 2,"))
+    print(json.parse("{\"a\": tru}"))
+    let built = json.object()
+    json.set(built, "list", json.array([json.integer(1), json.string("x\"y")]))
+    json.set(built, "flag", json.boolean(False))
+    print(json.encode(built))

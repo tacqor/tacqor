@@ -1,0 +1,12 @@
+def sum(values: list[i64]) -> i64:
+    var total = 0
+    for index in range(len(values)):
+        total = total + values[index]
+    return total
+
+def main():
+    let scores = [12, 18, 30]
+    print("Total:")
+    print(sum(scores))
+    if argc() > 0:
+        print("Argument: " + arg(0))

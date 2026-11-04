@@ -1,0 +1,116 @@
+# Exercises the 1.1 features: traits with dynamic dispatch and generic bounds, cross-module traits,
+# closures as parallel mappers, parallel_map, hex/fixed formatting, and the cycle collector.
+import geometry
+
+trait Shape:
+    def area(self) -> f64
+    def name(self) -> str
+
+trait Scalable:
+    def scale(self, factor: f64)
+
+struct Circle(Shape, Scalable):
+    radius: f64
+
+    def area(self) -> f64:
+        return 3.141592653589793 * self.radius * self.radius
+
+    def name(self) -> str:
+        return "circle"
+
+    def scale(self, factor: f64):
+        self.radius *= factor
+
+struct Square(Shape):
+    side: f64
+
+    def area(self) -> f64:
+        return self.side * self.side
+
+    def name(self) -> str:
+        return "square"
+
+struct Box[T](Shape):
+    inner: T
+    size: f64
+
+    def area(self) -> f64:
+        return self.size
+
+    def name(self) -> str:
+        return f"box of {self.inner}"
+
+def total_area[T: Shape](shapes: list[T]) -> f64:
+    var total = 0.0
+    for s in shapes:
+        total += s.area()
+    return total
+
+def describe(s: Shape) -> str:
+    return f"{s.name()}: {fixed(s.area(), 2)}"
+
+def largest(shapes: list[Shape]) -> Option[Shape]:
+    var best: Option[Shape] = None
+    var best_area = -1.0
+    for s in shapes:
+        if s.area() > best_area:
+            best_area = s.area()
+            best = Some(s)
+    return best
+
+def trait_checks():
+    let shapes: list[Shape] = [Circle(1.0), Square(3.0), Box("gift", 2.5)]
+    for s in shapes:
+        print(describe(s))
+    print(fixed(total_area(shapes), 3))
+    print(fixed(total_area([Square(1.0), Square(2.0)]), 1))
+    match largest(shapes):
+        case Some(s):
+            print("largest: " + s.name())
+        case None:
+            print("none")
+    let c = Circle(2.0)
+    let as_shape: Shape = c
+    c.scale(0.5)
+    print(as_shape.area() == c.area())
+    print(shapes[0] == Circle(1.0))
+    print(to_hex(255) + " " + str(from_hex("ff")) + " " + str(from_hex("zz")))
+
+    # parallel with closures and parallel_map
+    let k = 3
+    print(parallel_sum(1000, 4, fn(i: i64) => i * k))
+    print(parallel_map(10, 3, fn(i: i64) => i * i))
+    let square = fn(i: i64) => i * i
+    print(parallel_sum(100, 8, square))
+
+
+struct Badge(geometry.Named):
+    owner: str
+
+    def label(self) -> str:
+        return "badge:" + self.owner
+
+def labels(items: list[geometry.Named]) -> list[str]:
+    var out: list[str] = []
+    for item in items:
+        push(out, item.label())
+    return out
+
+struct Node:
+    value: i64
+    next: Option[Node]
+
+def cycle_checks():
+    let before = gc_count()
+    for i in range(10):
+        let a = Node(i, None)
+        let b = Node(i, Some(a))
+        a.next = Some(b)
+    let freed = gc_collect()
+    print(freed >= 18)
+    print(gc_count() - before <= 8)
+
+def main():
+    trait_checks()
+    print(labels([geometry.Tag("x"), Badge("ada")]))
+    cycle_checks()

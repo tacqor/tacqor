@@ -1,0 +1,12 @@
+flowchart LR
+    CALL["parallel_sum(count, workers, mapper)<br/>parallel_map(...)"] --> CHK["mapper captures only<br/>i64 / f64 / bool<br/>(compile-time for lambdas,<br/>runtime otherwise)"]
+    CHK --> SPLIT["Split range(count) into<br/>min(count, workers) contiguous jobs"]
+    SPLIT --> W1["worker VM 1<br/>own value stack"]
+    SPLIT --> W2["worker VM 2"]
+    SPLIT --> WN["worker VM n"]
+    W1 --> J["join · rethrow first error<br/>in index order"]
+    W2 --> J
+    WN --> J
+    J --> SUM["sum: exact 128-bit accumulation<br/>then checked narrowing"]
+    J --> MAP["map: list[i64] in index order"]
+    GC["cycle collector paused<br/>while workers run"] -.-> SPLIT

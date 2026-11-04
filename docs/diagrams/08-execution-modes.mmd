@@ -1,0 +1,8 @@
+flowchart LR
+    P[program.tq] --> A["tacqor run / tacqor program.tq<br/>compile in memory → VM"]
+    P --> B["tacqor compile → program.tqb<br/>portable bytecode, needs a 1.x runtime"]
+    P --> C["tacqor build → executable<br/>VM + bytecode appended, zero dependencies"]
+    P --> D["tacqor build --native → executable<br/>machine code, needs c++ at build time only"]
+    P --> E["tacqor test<br/>runs every def test_*()"]
+    P --> F["tacqor check / diagnose<br/>no execution"]
+    A & B & C & D --> SAME["Identical semantics and checks<br/>(verified by the test suite on every path)"]

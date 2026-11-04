@@ -1,0 +1,297 @@
+# Standard library: JSON, written in Tacqor. Import with `import std.json`.
+#
+#   let doc = json.parse(text)?            # Result[Json, str]
+#   let name = json.get(doc, "name")       # Option[Json]
+#   print(json.encode(doc))
+
+const NULL = "null"
+const BOOL = "bool"
+const NUMBER = "number"
+const STRING = "string"
+const ARRAY = "array"
+const OBJECT = "object"
+
+struct Json:
+    kind: str
+    flag: bool
+    number: f64
+    text: str
+    items: list[Json]
+    keys: list[str]
+
+    def get(self, key: str) -> Option[Json]:
+        if self.kind != OBJECT:
+            return None
+        for i in range(len(self.keys)):
+            if self.keys[i] == key:
+                return Some(self.items[i])
+        return None
+
+    def at(self, index: i64) -> Option[Json]:
+        if self.kind != ARRAY or index < 0 or index >= len(self.items):
+            return None
+        return Some(self.items[index])
+
+    def as_text(self) -> Option[str]:
+        if self.kind == STRING:
+            return Some(self.text)
+        return None
+
+    def as_number(self) -> Option[f64]:
+        if self.kind == NUMBER:
+            return Some(self.number)
+        return None
+
+    def as_int(self) -> Option[i64]:
+        if self.kind == NUMBER:
+            return Some(int(self.number))
+        return None
+
+    def as_bool(self) -> Option[bool]:
+        if self.kind == BOOL:
+            return Some(self.flag)
+        return None
+
+def null() -> Json:
+    var items: list[Json] = []
+    var keys: list[str] = []
+    return Json(NULL, False, 0.0, "", items, keys)
+
+def boolean(value: bool) -> Json:
+    let j = null()
+    j.kind = BOOL
+    j.flag = value
+    return j
+
+def number(value: f64) -> Json:
+    let j = null()
+    j.kind = NUMBER
+    j.number = value
+    return j
+
+def integer(value: i64) -> Json:
+    return number(float(value))
+
+def string(value: str) -> Json:
+    let j = null()
+    j.kind = STRING
+    j.text = value
+    return j
+
+def array(items: list[Json]) -> Json:
+    let j = null()
+    j.kind = ARRAY
+    j.items = items
+    return j
+
+def object() -> Json:
+    let j = null()
+    j.kind = OBJECT
+    return j
+
+def set(obj: Json, key: str, value: Json):
+    assert obj.kind == OBJECT
+    for i in range(len(obj.keys)):
+        if obj.keys[i] == key:
+            obj.items[i] = value
+            return
+    push(obj.keys, key)
+    push(obj.items, value)
+
+def get(doc: Json, key: str) -> Option[Json]:
+    return doc.get(key)
+
+# --- encoding ---------------------------------------------------------------
+
+def quote(text: str) -> str:
+    var out = "\""
+    for ch in chars(text):
+        if ch == "\"":
+            out += "\\\""
+        elif ch == "\\":
+            out += "\\\\"
+        elif ch == "\n":
+            out += "\\n"
+        elif ch == "\r":
+            out += "\\r"
+        elif ch == "\t":
+            out += "\\t"
+        else:
+            out += ch
+    return out + "\""
+
+def encode(doc: Json) -> str:
+    if doc.kind == NULL:
+        return "null"
+    if doc.kind == BOOL:
+        if doc.flag:
+            return "true"
+        return "false"
+    if doc.kind == NUMBER:
+        if doc.number == float(int(doc.number)) and abs(doc.number) < 1e15:
+            return str(int(doc.number))
+        return str(doc.number)
+    if doc.kind == STRING:
+        return quote(doc.text)
+    if doc.kind == ARRAY:
+        var parts: list[str] = []
+        for item in doc.items:
+            push(parts, encode(item))
+        return "[" + join(parts, ",") + "]"
+    var parts: list[str] = []
+    for i in range(len(doc.keys)):
+        push(parts, quote(doc.keys[i]) + ":" + encode(doc.items[i]))
+    return "{" + join(parts, ",") + "}"
+
+# --- parsing ----------------------------------------------------------------
+
+struct Parser:
+    text: str
+    pos: i64
+
+    def peek(self) -> str:
+        if self.pos >= len(self.text):
+            return ""
+        return self.text[self.pos]
+
+    def skip_space(self):
+        while self.pos < len(self.text):
+            let ch = self.text[self.pos]
+            if ch == " " or ch == "\n" or ch == "\t" or ch == "\r":
+                self.pos += 1
+            else:
+                break
+
+    def expect(self, ch: str) -> Result[bool, str]:
+        self.skip_space()
+        if self.peek() != ch:
+            return Err(f"expected '{ch}' at offset {self.pos}")
+        self.pos += 1
+        return Ok(True)
+
+    def literal(self, word: str, value: Json) -> Result[Json, str]:
+        if self.text[self.pos:self.pos + len(word)] != word:
+            return Err(f"invalid literal at offset {self.pos}")
+        self.pos += len(word)
+        return Ok(value)
+
+    def parse_string(self) -> Result[str, str]:
+        self.pos += 1
+        var out = ""
+        while True:
+            if self.pos >= len(self.text):
+                return Err("unterminated string")
+            let ch = self.text[self.pos]
+            self.pos += 1
+            if ch == "\"":
+                return Ok(out)
+            if ch == "\\":
+                if self.pos >= len(self.text):
+                    return Err("unterminated escape")
+                let esc = self.text[self.pos]
+                self.pos += 1
+                if esc == "n":
+                    out += "\n"
+                elif esc == "t":
+                    out += "\t"
+                elif esc == "r":
+                    out += "\r"
+                elif esc == "u":
+                    let digits = self.text[self.pos:self.pos + 4]
+                    match hex_value(digits):
+                        case Some(code):
+                            out += chr(code)
+                        case None:
+                            return Err("invalid \\u escape")
+                    self.pos += 4
+                else:
+                    out += esc
+            else:
+                out += ch
+
+    def parse_number(self) -> Result[Json, str]:
+        let start = self.pos
+        while self.pos < len(self.text):
+            let ch = self.text[self.pos]
+            if (ch >= "0" and ch <= "9") or ch == "-" or ch == "+" or ch == "." or ch == "e" or ch == "E":
+                self.pos += 1
+            else:
+                break
+        match parse_float(self.text[start:self.pos]):
+            case Some(value):
+                return Ok(number(value))
+            case None:
+                return Err(f"invalid number at offset {start}")
+
+    def parse_value(self) -> Result[Json, str]:
+        self.skip_space()
+        let ch = self.peek()
+        if ch == "":
+            return Err("unexpected end of input")
+        if ch == "{":
+            self.pos += 1
+            let obj = object()
+            self.skip_space()
+            if self.peek() == "}":
+                self.pos += 1
+                return Ok(obj)
+            while True:
+                self.skip_space()
+                if self.peek() != "\"":
+                    return Err(f"expected a key at offset {self.pos}")
+                let key = self.parse_string()?
+                self.expect(":")?
+                let value = self.parse_value()?
+                set(obj, key, value)
+                self.skip_space()
+                if self.peek() == ",":
+                    self.pos += 1
+                    continue
+                self.expect("}")?
+                return Ok(obj)
+        if ch == "[":
+            self.pos += 1
+            var items: list[Json] = []
+            self.skip_space()
+            if self.peek() == "]":
+                self.pos += 1
+                return Ok(array(items))
+            while True:
+                push(items, self.parse_value()?)
+                self.skip_space()
+                if self.peek() == ",":
+                    self.pos += 1
+                    continue
+                self.expect("]")?
+                return Ok(array(items))
+        if ch == "\"":
+            return Ok(string(self.parse_string()?))
+        if ch == "t":
+            return self.literal("true", boolean(True))
+        if ch == "f":
+            return self.literal("false", boolean(False))
+        if ch == "n":
+            return self.literal("null", null())
+        return self.parse_number()
+
+def hex_value(text: str) -> Option[i64]:
+    if len(text) != 4:
+        return None
+    var value = 0
+    for ch in chars(lower(text)):
+        value *= 16
+        if ch >= "0" and ch <= "9":
+            value += ord(ch) - ord("0")
+        elif ch >= "a" and ch <= "f":
+            value += ord(ch) - ord("a") + 10
+        else:
+            return None
+    return Some(value)
+
+def parse(text: str) -> Result[Json, str]:
+    let parser = Parser(text, 0)
+    let value = parser.parse_value()?
+    parser.skip_space()
+    if parser.pos != len(text):
+        return Err(f"unexpected trailing text at offset {parser.pos}")
+    return Ok(value)

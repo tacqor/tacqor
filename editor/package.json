@@ -1,0 +1,28 @@
+{
+  "name": "tacqor-language",
+  "displayName": "Tacqor Live Scanner",
+  "description": "Live diagnostics with the standalone Tacqor compiler.",
+  "version": "1.2.0",
+  "publisher": "tacqor-local",
+  "engines": {"vscode": "^1.85.0"},
+  "main": "./extension.js",
+  "activationEvents": ["onLanguage:tacqor", "onCommand:tacqor.restartScanner"],
+  "extensionKind": ["workspace"],
+  "capabilities": {"untrustedWorkspaces": {"supported": false}},
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [{"id": "tacqor", "aliases": ["Tacqor"], "extensions": [".tq"]}],
+    "commands": [{"command": "tacqor.restartScanner", "title": "Tacqor: Restart Live Scanner"}],
+    "configuration": {
+      "title": "Tacqor",
+      "properties": {
+        "tacqor.compilerPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Path to the standalone Tacqor compiler. Linux x64 uses the bundled compiler by default."
+        }
+      }
+    }
+  }
+}

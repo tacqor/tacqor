@@ -1,0 +1,7 @@
+import std.http
+
+def main():
+    let base = "http://127.0.0.1:" + arg(0)
+    print(unwrap(http.get(base + "/hello?x=1")).body)
+    print(unwrap(http.post(base + "/items", "payload")).body)
+    print(unwrap(http.get(base + "/boom")).status)

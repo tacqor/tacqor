@@ -1,0 +1,5 @@
+import std.lists
+def main():
+    let xs = lists.range_list(0, 2000000)
+    let ys = lists.map(xs, fn(x: i64) => x * 3 % 7)
+    print(lists.reduce(ys, 0, fn(a: i64, b: i64) => a + b))

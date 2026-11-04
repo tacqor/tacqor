@@ -1,0 +1,68 @@
+3.141592653589793
+cm
+12.566370614359172
+3.0
+3
+(1, one)
+(one, 1)
+Pair[str, bool](first="yes", second=True)
+15
+[2, 4, 6]
+<2><4><6>
+25
+[7, 8]
+True
+[3, 6]
+10
+True
+False
+[Pair[i64, str](first=1, second="a"), Pair[i64, str](first=2, second="b")]
+first even: 4
+none found
+error: division by zero
+Ok(4)
+Err("division by zero")
+3
+-1
+True
+Some("x")
+Some(42)
+None
+go
+three
+count=2 pi~314 {literal}
+DONE
+3
+Some(4)
+["a", "b"]
+["a", "bb", "ccc"]
+[1, 2, 3]
+[Pair[i64, str](first=0, second="x"), Pair[i64, str](first=1, second="y")]
+007
+["the", "quick", "fox"]
+2
+Hello
+olléh
+True
+6
+Ok(120)
+Err("factorial overflows i64 above 20")
+9
+True
+Some(2.0)
+Some(2)
+1
+Some("a")
+1
+Some("x")
+0
+3
+std ok
+{"name":"Ada","age":36,"tags":["math","code"],"ok":true,"pi":3.14,"none":null,"u":"é"}
+Ada
+37
+code
+None
+Err("unexpected end of input")
+Err("invalid literal at offset 6")
+{"list":[1,"x\"y"],"flag":false}

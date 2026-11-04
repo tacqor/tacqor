@@ -1,0 +1,38 @@
+# A tiny web service: run it, then open http://localhost:8080/hello?name=you
+#   tacqor run examples/server.tq -- 8080
+import std.http
+import std.json
+
+
+def handler(request: http.Request) -> http.Response:
+    match request.path:
+        case "/":
+            return http.html(200, "<h1>Tacqor</h1><p>Try <a href='/hello?name=world'>/hello</a> or <a href='/api/time'>/api/time</a>.</p>")
+        case "/hello":
+            var name = "stranger"
+            for pair in split(request.query, "&"):
+                let eq = find(pair, "=")
+                if eq > 0 and pair[:eq] == "name":
+                    name = pair[eq + 1:]
+            return http.text(200, f"hello, {name}!")
+        case "/api/time":
+            let doc = json.object()
+            json.set(doc, "unix", json.integer(unix_time()))
+            json.set(doc, "utc", json.string(now_text()))
+            return http.json(200, json.encode(doc))
+        case "/boom":
+            fail("deliberate failure")   # becomes a 500, the server keeps running
+        case _:
+            return http.not_found()
+
+def main():
+    var port = 8080
+    if argc() > 0:
+        port = unwrap_or(parse_int(arg(0)), 8080)
+    print(f"listening on http://localhost:{port}/")
+    match http.serve(port, handler):
+        case Ok(done):
+            print("stopped")
+        case Err(problem):
+            eprint(problem)
+            exit(1)

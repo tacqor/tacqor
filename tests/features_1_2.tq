@@ -1,0 +1,44 @@
+# Exercises the 1.2 features: bit operators, attempt(), hashing, hex, shadowing, nested f-string quotes.
+import std.lists
+
+def risky(n: i64) -> i64:
+    if n < 0:
+        fail("negative input")
+    return 100 // n
+
+def text(items: list[str]) -> str:     # a module-level name...
+    return join(items, "+")
+
+def main():
+    print([6 & 3, 6 | 3, 6 ^ 3, ~5, 1 << 10, -16 >> 2, 1 << 63])
+    var flags = 0
+    flags |= 4
+    flags |= 1
+    flags &= ~1
+    flags <<= 1
+    flags ^= 3
+    flags >>= 1
+    print(flags)
+    print(2 + 3 << 1 == 10)
+    print(1 | 2 & 3 == 3)
+    print(hash("abc") == hash("abc") and hash("abc") != hash("abd") and hash("x") >= 0)
+    print(to_hex(255) + " " + str(from_hex("0xFF")) + " " + str(from_hex("zz")) + " " + to_hex(-1))
+    print(attempt(fn() => risky(5)))
+    print(attempt(fn() => risky(0)))
+    print(attempt(fn() => risky(-1)))
+    let log: list[str] = []
+    let body = fn():
+        push(log, "ran")
+        let xs = [1]
+        print(xs[5])
+    print(attempt(body))
+    print(log)
+    print(attempt(fn() => 1 << 70))
+    let text = ["a", "b"]                   # ...shadowed by a local
+    print(text)
+    let d = {"k": "v"}
+    print(f"nested {d["k"]} braces {{x}} {len(text)}")
+    print(lists.sorted_by(["ccc", "a", "bb"], fn(s: str) => -len(s)))
+    print(fixed(2.0 / 3.0, 3))
+    print(unix_time() > 1_600_000_000)
+    print(strip(run_capture("echo captured")))

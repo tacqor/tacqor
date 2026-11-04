@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — FROM_PYTHON</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-for-python-programmers"
+id="toc-tacqor-for-python-programmers">Tacqor for Python Programmers</a>
+<ul>
+<li><a href="#1-what-stays-the-same" id="toc-1-what-stays-the-same">1.
+What stays the same</a></li>
+<li><a href="#2-what-changes" id="toc-2-what-changes">2. What
+changes</a></li>
+<li><a href="#3-side-by-side" id="toc-3-side-by-side">3. Side by
+side</a></li>
+<li><a href="#4-types-briefly" id="toc-4-types-briefly">4. Types,
+briefly</a></li>
+<li><a href="#5-mutability" id="toc-5-mutability">5. Mutability</a></li>
+<li><a href="#6-modules" id="toc-6-modules">6. Modules</a></li>
+<li><a href="#7-errors-in-detail" id="toc-7-errors-in-detail">7. Errors
+in detail</a></li>
+<li><a href="#8-standard-library-map" id="toc-8-standard-library-map">8.
+Standard library map</a></li>
+<li><a href="#9-running-and-shipping" id="toc-9-running-and-shipping">9.
+Running and shipping</a></li>
+<li><a href="#10-performance-expectations"
+id="toc-10-performance-expectations">10. Performance
+expectations</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-for-python-programmers">Tacqor for Python
+Programmers</h1>
+<p>Tacqor looks like Python and is meant to feel like it. This guide
+lists what carries over unchanged, what changes, and how to translate
+the Python idioms you use every day. Every Tacqor snippet below compiles
+and runs as shown.</p>
+<h2 id="1-what-stays-the-same">1. What stays the same</h2>
+<ul>
+<li>Indentation-based blocks, <code>def</code>,
+<code>if</code>/<code>elif</code>/<code>else</code>, <code>while</code>,
+<code>for … in</code>, <code>break</code>, <code>continue</code>,
+<code>return</code>, <code>assert</code>,
+<code>and</code>/<code>or</code>/<code>not</code>, <code>in</code>,
+<code>#</code> comments.</li>
+<li><code>print</code>, <code>len</code>, <code>str</code>,
+<code>int</code>, <code>float</code>, <code>abs</code>,
+<code>min</code>, <code>max</code>, <code>range</code>,
+<code>sum</code>, <code>sorted</code>-style helpers in
+<code>std.lists</code>.</li>
+<li><code>True</code>/<code>False</code>, <code>None</code>,
+<code>[1, 2]</code>, <code>{"k": 1}</code>, slices <code>a[1:3]</code>,
+<code>a[:2]</code>, <code>a[2:]</code>, f-strings
+<code>f"{x}"</code>.</li>
+<li>Operator precedence, <code>//</code> floor division, <code>%</code>
+sign rule, <code>**</code>-style power via <code>pow</code>.</li>
+<li>Lists and dicts are mutable reference values shared on assignment,
+exactly as in Python.</li>
+</ul>
+<h2 id="2-what-changes">2. What changes</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Python</th>
+<th>Tacqor</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>x = 1</code></td>
+<td><code>let x = 1</code> (immutable) or <code>var x = 1</code></td>
+<td>Bindings are declared; most never change.</td>
+</tr>
+<tr class="even">
+<td><code>def f(a, b):</code></td>
+<td><code>def f(a: i64, b: str) -&gt; str:</code></td>
+<td>Parameters and results are typed; locals are inferred.</td>
+</tr>
+<tr class="odd">
+<td><code>class</code></td>
+<td><code>struct</code> + methods; <code>trait</code> for shared
+behaviour</td>
+<td>No inheritance.</td>
+</tr>
+<tr class="even">
+<td><code>None</code> for "no value"</td>
+<td><code>Option[T]</code>: <code>Some(x)</code> / <code>None</code>,
+handled with <code>match</code> or <code>?</code></td>
+<td>The compiler makes you handle the missing case.</td>
+</tr>
+<tr class="odd">
+<td><code>raise</code> / <code>try</code> / <code>except</code></td>
+<td><code>Result[T, E]</code>, <code>?</code>, <code>attempt</code></td>
+<td>Failures are values in the type; see §7.</td>
+</tr>
+<tr class="even">
+<td><code>int</code> of any size</td>
+<td><code>i64</code> with overflow checked at runtime</td>
+<td>No silent wrap, no bignums.</td>
+</tr>
+<tr class="odd">
+<td><code>str</code> of code points</td>
+<td><code>str</code> of UTF-8 bytes; <code>chars(s)</code> for code
+points</td>
+<td>Matches files and sockets.</td>
+</tr>
+<tr class="even">
+<td><code>a[-1]</code></td>
+<td><code>a[len(a) - 1]</code></td>
+<td>Negative indexes are errors, not wraparound.</td>
+</tr>
+<tr class="odd">
+<td><code>for i, x in enumerate(xs)</code></td>
+<td><code>for i in range(len(xs)):</code> then <code>xs[i]</code>, or
+<code>lists.enumerate(xs)</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>x if c else y</code></td>
+<td><code>if</code>/<code>else</code> statement, or a small
+function</td>
+<td>No conditional expression.</td>
+</tr>
+<tr class="odd">
+<td>list comprehensions</td>
+<td><code>lists.map</code>, <code>lists.filter</code>, or a loop with
+<code>push</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>lambda x: x * 2</code></td>
+<td><code>fn(x: i64) =&gt; x * 2</code></td>
+<td>Parameter types are written; result inferred.</td>
+</tr>
+<tr class="odd">
+<td><code>import os</code>, <code>from m import f</code></td>
+<td><code>import std.lists</code> then <code>lists.map(...)</code></td>
+<td>No <code>from … import</code>; names are always qualified.</td>
+</tr>
+<tr class="even">
+<td><code>if __name__ == "__main__":</code></td>
+<td><code>def main():</code></td>
+<td>The entry point is <code>main</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>global</code></td>
+<td>not available</td>
+<td>Pass values in and out, or use a struct.</td>
+</tr>
+<tr class="even">
+<td><code>is</code>, <code>id()</code></td>
+<td>not available</td>
+<td>Compare with <code>==</code> (structural).</td>
+</tr>
+<tr class="odd">
+<td><code>with open(p) as f:</code></td>
+<td><code>read_text(p)</code>, <code>write_text(p, s)</code>,
+<code>read_lines(p)</code></td>
+<td>Files are read and written whole.</td>
+</tr>
+<tr class="even">
+<td><code>**kwargs</code>, default arguments</td>
+<td>not available</td>
+<td>Pass a struct for optional settings.</td>
+</tr>
+<tr class="odd">
+<td><code>while x := f():</code></td>
+<td><code>var x = f()</code> then <code>while …:</code></td>
+<td>No walrus.</td>
+</tr>
+<tr class="even">
+<td><code>a &lt; b &lt; c</code></td>
+<td><code>a &lt; b and b &lt; c</code></td>
+<td>Comparisons do not chain.</td>
+</tr>
+<tr class="odd">
+<td><code>dict.get(k, d)</code></td>
+<td><code>unwrap_or(lookup(d, k), default)</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>d[k] = d.get(k, 0) + 1</code></td>
+<td><code>if k in d: d[k] += 1 else: d[k] = 1</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-side-by-side">3. Side by side</h2>
+<h3 id="word-count">Word count</h3>
+<p>Python:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> {}</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> line <span class="kw">in</span> <span class="bu">open</span>(sys.argv[<span class="dv">1</span>]):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> word <span class="kw">in</span> line.split():</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        counts[word] <span class="op">=</span> counts.get(word, <span class="dv">0</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> word, n <span class="kw">in</span> <span class="bu">sorted</span>(counts.items(), key<span class="op">=</span><span class="kw">lambda</span> kv: <span class="op">-</span>kv[<span class="dv">1</span>])[:<span class="dv">10</span>]:</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(word, n)</span></code></pre></div>
+<p>Tacqor:</p>
+<pre class="text"><code>import std.lists
+import std.strings
+
+def main():
+    var counts: dict[str, i64] = {}
+    for line in read_lines(args()[0]):
+        for word in strings.words(line):
+            if word in counts:
+                counts[word] += 1
+            else:
+                counts[word] = 1
+    let ranked = lists.sorted_by(keys(counts), fn(w: str) =&gt; -counts[w])
+    for word in lists.take(ranked, 10):
+        print(f&quot;{word} {counts[word]}&quot;)</code></pre>
+<p>Differences worth noticing: the dictionary's types are declared once;
+<code>read_lines</code> returns the file as a list; the closure passed
+to <code>sorted_by</code> captures <code>counts</code> (shared, not
+copied, because dicts are reference values); <code>args()</code> are the
+program's arguments without the script name.</p>
+<h3 id="a-class-with-methods">A class with methods</h3>
+<p>Python:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Account:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, owner, balance<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.owner <span class="op">=</span> owner</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.balance <span class="op">=</span> balance</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> withdraw(<span class="va">self</span>, amount):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> amount <span class="op">&gt;</span> <span class="va">self</span>.balance:</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;insufficient funds&quot;</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.balance <span class="op">-=</span> amount</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.balance</span></code></pre></div>
+<p>Tacqor:</p>
+<pre class="text"><code>struct Account:
+    owner: str
+    balance: i64
+
+    def withdraw(self, amount: i64) -&gt; Result[i64, str]:
+        if amount &gt; self.balance:
+            return Err(&quot;insufficient funds&quot;)
+        self.balance -= amount
+        return Ok(self.balance)
+
+def main():
+    let acct = Account(&quot;ann&quot;, 100)
+    match acct.withdraw(30):
+        case Ok(left):
+            print(f&quot;left: {left}&quot;)
+        case Err(problem):
+            print(problem)
+    print(acct.withdraw(500))</code></pre>
+<p>Output: <code>left: 70</code> then
+<code>Err("insufficient funds")</code>. There is no constructor to write
+— <code>Account("ann", 100)</code> fills the fields in order — and the
+failure is part of <code>withdraw</code>'s type, so a caller cannot
+forget it.</p>
+<h3 id="optional-values">Optional values</h3>
+<p>Python:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_user(users, name):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> u <span class="kw">in</span> users:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> u[<span class="st">&quot;name&quot;</span>] <span class="op">==</span> name:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> u</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> find_user(users, <span class="st">&quot;bob&quot;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> u <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(u[<span class="st">&quot;age&quot;</span>])</span></code></pre></div>
+<p>Tacqor:</p>
+<pre class="text"><code>struct User:
+    name: str
+    age: i64
+
+def find_user(users: list[User], name: str) -&gt; Option[User]:
+    for u in users:
+        if u.name == name:
+            return Some(u)
+    return None
+
+def main():
+    let users = [User(&quot;ann&quot;, 31), User(&quot;bob&quot;, 27)]
+    match find_user(users, &quot;bob&quot;):
+        case Some(u):
+            print(u.age)
+        case None:
+            print(&quot;no such user&quot;)</code></pre>
+<h3 id="exceptions-to-result-and-">Exceptions to <code>Result</code> and
+<code>?</code></h3>
+<p>Python:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load(path):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> <span class="bu">open</span>(path) <span class="im">as</span> f:</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="bu">int</span>(f.read())</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> (<span class="pp">OSError</span>, <span class="pp">ValueError</span>) <span class="im">as</span> e:</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="ss">f&quot;bad config: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>Tacqor:</p>
+<pre class="text"><code>def read_number(path: str) -&gt; Result[i64, str]:
+    if not file_exists(path):
+        return Err(f&quot;missing file: {path}&quot;)
+    match parse_int(strip(read_text(path))):
+        case Some(n):
+            return Ok(n)
+        case None:
+            return Err(f&quot;not a number in {path}&quot;)
+
+def load(path: str) -&gt; Result[i64, str]:
+    let n = read_number(path)?      # returns the Err to our caller if there is one
+    return Ok(n * 2)
+
+def main():
+    write_text(&quot;config.txt&quot;, &quot;21&quot;)
+    print(load(&quot;config.txt&quot;))       # Ok(42)
+    print(load(&quot;missing.txt&quot;))      # Err(&quot;missing file: missing.txt&quot;)</code></pre>
+<p><code>?</code> is the equivalent of letting an exception propagate,
+except that the function's signature shows it can happen.</p>
+<h3 id="list-comprehensions">List comprehensions</h3>
+<p>Python:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>squares <span class="op">=</span> [x <span class="op">*</span> x <span class="cf">for</span> x <span class="kw">in</span> nums <span class="cf">if</span> x <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>total <span class="op">=</span> <span class="bu">sum</span>(squares)</span></code></pre></div>
+<p>Tacqor:</p>
+<pre class="text"><code>import std.lists
+
+def main():
+    let nums = [1, 2, 3, 4, 5, 6]
+    let evens = lists.filter(nums, fn(x: i64) =&gt; x % 2 == 0)
+    let squares = lists.map(evens, fn(x: i64) =&gt; x * x)
+    print(sum(squares))             # 56</code></pre>
+<h3 id="generators-and-iteration">Generators and iteration</h3>
+<p>Python generators have no direct equivalent. Build the list
+(<code>lists.range_list</code>, a loop with <code>push</code>) or write
+a struct with a <code>next()</code> method returning
+<code>Option[T]</code>:</p>
+<pre class="text"><code>struct Countdown:
+    n: i64
+
+    def next(self) -&gt; Option[i64]:
+        if self.n &lt;= 0:
+            return None
+        self.n -= 1
+        return Some(self.n + 1)
+
+def main():
+    let c = Countdown(3)
+    var item = c.next()
+    while is_some(item):
+        print(unwrap(item))
+        item = c.next()</code></pre>
+<h2 id="4-types-briefly">4. Types, briefly</h2>
+<p>You write types on function parameters, results and struct fields;
+the compiler infers the rest. The common ones: <code>i64</code>,
+<code>f64</code>, <code>bool</code>, <code>str</code>,
+<code>list[T]</code>, <code>dict[K, V]</code>, <code>Option[T]</code>,
+<code>Result[T, E]</code>, <code>fn(A) -&gt; R</code>, struct names.
+There are no implicit conversions: <code>float(i)</code>,
+<code>int(f)</code>, <code>str(x)</code> are explicit, and
+<code>"n=" + str(n)</code> or <code>f"n={n}"</code> is how you build
+strings from numbers.</p>
+<p>Empty literals need a type the compiler can see:
+<code>var xs: list[i64] = []</code>.</p>
+<h2 id="5-mutability">5. Mutability</h2>
+<p><code>let</code> bindings cannot be reassigned; <code>var</code> ones
+can. Neither freezes the object: <code>let xs = [1]</code> then
+<code>push(xs, 2)</code> is fine, <code>xs = [3]</code> is not. Struct
+fields are always assignable (<code>p.x = 3</code>). Strings are
+immutable.</p>
+<h2 id="6-modules">6. Modules</h2>
+<p>A file is a module. <code>import std.strings</code> makes its
+functions available as <code>strings.words(...)</code>; your own files
+import by path relative to the importing file
+(<code>import util.text</code> → <code>util/text.tq</code>). There is no
+package-level <code>__init__</code>; a folder module is
+<code>name/lib.tq</code>.</p>
+<h2 id="7-errors-in-detail">7. Errors in detail</h2>
+<ul>
+<li>Expected failures return <code>Result[T, E]</code> (any
+<code>E</code>, usually <code>str</code>). Handle with
+<code>match</code>, forward with <code>?</code>, default with
+<code>unwrap_or</code>.</li>
+<li>Bugs (out-of-range index, <code>unwrap</code> on <code>None</code>,
+overflow, failed <code>assert</code>) are runtime errors that stop the
+program with a traceback, like an uncaught exception.</li>
+<li><code>attempt(fn() =&gt; work())</code> turns a runtime error into
+<code>Err(message)</code>. Use it only where the program must continue
+no matter what (a server loop); it is not a general
+<code>try</code>.</li>
+<li><code>fail("message")</code> raises a runtime error
+deliberately.</li>
+</ul>
+<h2 id="8-standard-library-map">8. Standard library map</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Python</th>
+<th>Tacqor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>str.split</code>, <code>join</code>, <code>strip</code>,
+<code>upper</code>, <code>replace</code>, <code>find</code>,
+<code>startswith</code></td>
+<td>builtins <code>split</code>, <code>join</code>, <code>strip</code>,
+<code>upper</code>, <code>replace</code>, <code>find</code>,
+<code>starts_with</code> (also callable as <code>s.upper()</code>)</td>
+</tr>
+<tr class="even">
+<td><code>str.splitlines</code>, <code>.title()</code>,
+<code>.center()</code>, <code>.isdigit()</code></td>
+<td><code>std.strings</code>: <code>lines</code>,
+<code>capitalize</code>, <code>center</code>, <code>is_digit</code>,
+…</td>
+</tr>
+<tr class="odd">
+<td><code>list.append/pop/insert/remove/index/sort/reverse</code></td>
+<td><code>push</code>, <code>pop</code>, <code>insert</code>,
+<code>remove_at</code>, <code>index_of</code>, <code>sort</code>,
+<code>reverse</code></td>
+</tr>
+<tr class="even">
+<td><code>map</code>, <code>filter</code>,
+<code>functools.reduce</code>, <code>any</code>, <code>all</code>,
+<code>zip</code>, <code>enumerate</code></td>
+<td><code>std.lists</code>: <code>map</code>, <code>filter</code>,
+<code>reduce</code>, <code>any</code>, <code>all</code>,
+<code>zip</code>, <code>enumerate</code></td>
+</tr>
+<tr class="odd">
+<td><code>sorted(xs, key=f)</code>, <code>max(xs, key=f)</code></td>
+<td><code>lists.sorted_by(xs, f)</code>,
+<code>lists.max_by(xs, f)</code></td>
+</tr>
+<tr class="even">
+<td><code>dict.keys/values/get/pop</code></td>
+<td><code>keys</code>, <code>values</code>, <code>lookup</code>,
+<code>remove_key</code></td>
+</tr>
+<tr class="odd">
+<td><code>collections.Counter</code>, <code>deque</code></td>
+<td><code>std.collections</code>: <code>Counter</code>,
+<code>Queue[T]</code>, <code>Stack[T]</code></td>
+</tr>
+<tr class="even">
+<td><code>math</code></td>
+<td>builtins <code>sqrt</code>, <code>pow</code>, <code>sin</code>,
+<code>cos</code>, <code>log</code>, … and <code>std.math</code></td>
+</tr>
+<tr class="odd">
+<td><code>json.loads/dumps</code></td>
+<td><code>std.json</code>: <code>parse</code>, <code>encode</code></td>
+</tr>
+<tr class="even">
+<td><code>random</code></td>
+<td><code>random_int(lo, hi)</code>, <code>random_float()</code>,
+<code>seed(n)</code></td>
+</tr>
+<tr class="odd">
+<td><code>time.time()</code>, <code>time.sleep()</code></td>
+<td><code>unix_time()</code>, <code>time_ms()</code>,
+<code>sleep_ms(n)</code></td>
+</tr>
+<tr class="even">
+<td><code>os.path.exists</code>, <code>os.listdir</code>,
+<code>os.makedirs</code>, <code>os.remove</code></td>
+<td><code>file_exists</code>, <code>list_dir</code>,
+<code>make_dir</code>, <code>delete_file</code></td>
+</tr>
+<tr class="odd">
+<td><code>os.environ.get</code></td>
+<td><code>env(name)</code> → <code>Option[str]</code></td>
+</tr>
+<tr class="even">
+<td><code>subprocess.run</code></td>
+<td><code>run(cmd)</code> → status, <code>run_capture(cmd)</code> →
+output</td>
+</tr>
+<tr class="odd">
+<td><code>sys.argv[1:]</code>, <code>sys.exit</code></td>
+<td><code>args()</code>, <code>exit(code)</code></td>
+</tr>
+<tr class="even">
+<td><code>input()</code></td>
+<td><code>input()</code> → <code>str</code> (<code>""</code> at end of
+input)</td>
+</tr>
+<tr class="odd">
+<td><code>http.server</code>, <code>urllib</code></td>
+<td><code>std.http</code>: <code>serve</code>, <code>get</code>,
+<code>post</code></td>
+</tr>
+<tr class="even">
+<td><code>unittest</code></td>
+<td><code>def test_*()</code> + <code>tacqor test</code>;
+<code>std.testing</code></td>
+</tr>
+</tbody>
+</table>
+<p>Full signatures: <code>STDLIB.md</code>.</p>
+<h2 id="9-running-and-shipping">9. Running and shipping</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Python</th>
+<th>Tacqor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>python app.py</code></td>
+<td><code>tacqor app.tq</code></td>
+</tr>
+<tr class="even">
+<td><code>python -m pytest</code></td>
+<td><code>tacqor test tests.tq</code></td>
+</tr>
+<tr class="odd">
+<td><code>pyflakes</code>, <code>mypy</code></td>
+<td><code>tacqor check app.tq</code> (built in)</td>
+</tr>
+<tr class="even">
+<td><code>pip install</code>, <code>requirements.txt</code></td>
+<td><code>tacqor add URL</code>, <code>tacqor.pkg</code>,
+<code>tacqor install</code></td>
+</tr>
+<tr class="odd">
+<td>PyInstaller</td>
+<td><code>tacqor build app.tq -o app</code> (or
+<code>--native</code>)</td>
+</tr>
+<tr class="even">
+<td><code>python -i</code></td>
+<td><code>tacqor repl</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-performance-expectations">10. Performance expectations</h2>
+<p>The VM is 1.1–5× faster than CPython on typical code; native builds
+are 1.6–90× faster, most on arithmetic and loops. Code written the
+Python way (lists, dicts, strings) benefits least; code with numeric
+loops benefits most. <code>PERFORMANCE.md</code> has the numbers and the
+habits that matter.</p>
+</body>
+</html>

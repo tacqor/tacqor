@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — STDLIB</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-12-standard-library"
+id="toc-tacqor-12-standard-library">Tacqor 1.2 standard library</a>
+<ul>
+<li><a href="#built-in-functions" id="toc-built-in-functions">Built-in
+functions</a></li>
+<li><a href="#std-modules" id="toc-std-modules">std modules</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-12-standard-library">Tacqor 1.2 standard library</h1>
+<p>Two layers: <strong>built-in functions</strong> (implemented in the
+runtime, available everywhere without import) and <strong>std
+modules</strong> (written in Tacqor, in the <code>std/</code> folder,
+imported with <code>import std.name</code>). Any built-in or module
+function can also be called in method form on its first argument:
+<code>items.push(x)</code>, <code>text.upper()</code>,
+<code>value.unwrap()</code>.</p>
+<h2 id="built-in-functions">Built-in functions</h2>
+<h3 id="output-input-process">Output, input, process</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>print(x)</code></td>
+<td>Prints any value and a newline.</td>
+</tr>
+<tr class="even">
+<td><code>write(x)</code></td>
+<td>Prints without a newline. <code>flush()</code> flushes stdout.</td>
+</tr>
+<tr class="odd">
+<td><code>eprint(x)</code></td>
+<td>Prints to stderr.</td>
+</tr>
+<tr class="even">
+<td><code>input() -&gt; str</code></td>
+<td>Reads one line from stdin (<code>""</code> at end of input).</td>
+</tr>
+<tr class="odd">
+<td><code>args() -&gt; list[str]</code>, <code>argc() -&gt; i64</code>,
+<code>arg(i) -&gt; str</code></td>
+<td>Program arguments (after <code>--</code> with
+<code>tacqor run</code>).</td>
+</tr>
+<tr class="even">
+<td><code>env(name) -&gt; Option[str]</code></td>
+<td>Environment variable.</td>
+</tr>
+<tr class="odd">
+<td><code>run(command) -&gt; i64</code></td>
+<td>Runs a shell command, returns its exit status.
+<code>run_capture(command) -&gt; str</code> returns its standard output
+instead.</td>
+</tr>
+<tr class="even">
+<td><code>exit(code)</code></td>
+<td>Ends the program with status <code>code</code> (0–255).</td>
+</tr>
+<tr class="odd">
+<td><code>fail(message)</code></td>
+<td>Raises a runtime error.</td>
+</tr>
+<tr class="even">
+<td><code>time_ms() -&gt; i64</code></td>
+<td>Monotonic milliseconds. <code>sleep_ms(n)</code> pauses.
+<code>now_text() -&gt; str</code> is the UTC time as
+<code>YYYY-MM-DDTHH:MM:SSZ</code>; <code>unix_time() -&gt; i64</code> is
+seconds since 1970.</td>
+</tr>
+<tr class="odd">
+<td><code>attempt(f) -&gt; Result[T, str]</code></td>
+<td>Runs <code>f: fn() -&gt; T</code> and turns a runtime error into
+<code>Err(message)</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="files">Files</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>read_text(path) -&gt; str</code>,
+<code>read_lines(path) -&gt; list[str]</code></td>
+<td>Read a whole file (error if missing).</td>
+</tr>
+<tr class="even">
+<td><code>write_text(path, text)</code>,
+<code>append_text(path, text)</code></td>
+<td>Write / append.</td>
+</tr>
+<tr class="odd">
+<td><code>file_exists(path) -&gt; bool</code>,
+<code>delete_file(path) -&gt; bool</code>,
+<code>make_dir(path) -&gt; bool</code>,
+<code>list_dir(path) -&gt; list[str]</code></td>
+<td>File system helpers.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="conversion-and-text">Conversion and text</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>str(x) -&gt; str</code></td>
+<td>Any value to text (same format as <code>print</code>).</td>
+</tr>
+<tr class="even">
+<td><code>int(x) -&gt; i64</code></td>
+<td>From <code>f64</code> (truncating), <code>str</code> (error if
+invalid), or <code>bool</code>.
+<code>parse_int(s) -&gt; Option[i64]</code> never fails.</td>
+</tr>
+<tr class="odd">
+<td><code>float(x) -&gt; f64</code></td>
+<td>From <code>i64</code> or <code>str</code>.
+<code>parse_float(s) -&gt; Option[f64]</code>.</td>
+</tr>
+<tr class="even">
+<td><code>len(s)</code>, <code>char_count(s)</code></td>
+<td>Bytes / Unicode code points. <code>chars(s) -&gt; list[str]</code>
+splits into code points.</td>
+</tr>
+<tr class="odd">
+<td><code>upper</code>, <code>lower</code>, <code>strip</code>,
+<code>capitalize</code>*</td>
+<td>Case and whitespace.</td>
+</tr>
+<tr class="even">
+<td><code>split(s, sep) -&gt; list[str]</code>,
+<code>join(list, sep) -&gt; str</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>find(s, sub) -&gt; i64</code> (<code>-1</code> if absent),
+<code>sub in s</code>, <code>starts_with(s, p)</code>,
+<code>ends_with(s, p)</code>, <code>replace(s, old, new)</code>,
+<code>repeat(s, n)</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>chr(code) -&gt; str</code>, <code>ord(s) -&gt; i64</code></td>
+<td>Code point ↔︎ one-character string.</td>
+</tr>
+<tr class="odd">
+<td><code>fixed(f, digits) -&gt; str</code></td>
+<td>Fixed-point formatting: <code>fixed(3.14159, 2)</code> is
+<code>"3.14"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>to_hex(i) -&gt; str</code>,
+<code>from_hex(s) -&gt; Option[i64]</code></td>
+<td>Hexadecimal (<code>"ff"</code>, <code>"0xFF"</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>hash(s) -&gt; i64</code></td>
+<td>64-bit FNV-1a hash of the bytes, always non-negative.</td>
+</tr>
+<tr class="even">
+<td><code>bytes(s) -&gt; list[i64]</code>,
+<code>from_bytes(list) -&gt; str</code></td>
+<td>Raw bytes.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lists-listt">Lists (<code>list[T]</code>)</h3>
+<p><code>len</code>, <code>push(l, x)</code>,
+<code>pop(l) -&gt; T</code>, <code>insert(l, i, x)</code>,
+<code>remove_at(l, i) -&gt; T</code>,
+<code>index_of(l, x) -&gt; i64</code>, <code>x in l</code>,
+<code>sort(l)</code> (i64/f64/str/bool), <code>reverse(l)</code>,
+<code>clear(l)</code>, <code>extend(l, other)</code>,
+<code>fill(n, x) -&gt; list[T]</code>, <code>sum(l)</code> (i64/f64),
+<code>min_of(l)</code>, <code>max_of(l)</code>, slicing
+<code>l[a:b]</code>.</p>
+<h3 id="dicts-dictk-v">Dicts (<code>dict[K, V]</code>)</h3>
+<p><code>len</code>, <code>d[k]</code> (error if missing),
+<code>d[k] = v</code>, <code>k in d</code>,
+<code>lookup(d, k) -&gt; Option[V]</code>,
+<code>keys(d) -&gt; list[K]</code>,
+<code>values(d) -&gt; list[V]</code>,
+<code>remove_key(d, k) -&gt; bool</code>, <code>clear(d)</code>.</p>
+<h3 id="option-and-result">Option and Result</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>is_some(o)</code>, <code>is_none(o)</code>,
+<code>is_ok(r)</code>, <code>is_err(r)</code></td>
+<td>Tests.</td>
+</tr>
+<tr class="even">
+<td><code>unwrap(v) -&gt; T</code></td>
+<td>The payload; runtime error on <code>None</code>/<code>Err</code>
+(the error is included in the message).</td>
+</tr>
+<tr class="odd">
+<td><code>unwrap_or(v, default) -&gt; T</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>expect(v, message) -&gt; T</code></td>
+<td>Like <code>unwrap</code> with your own message.</td>
+</tr>
+<tr class="odd">
+<td><code>v?</code></td>
+<td>Operator: unwrap or return the failure from the enclosing
+function.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="math">Math</h3>
+<p><code>abs</code>, <code>min(a, b)</code>, <code>max(a, b)</code>
+(i64/f64/str), <code>sqrt</code>, <code>pow</code>, <code>floor</code>,
+<code>ceil</code>, <code>round</code> (f64 → i64, half away from zero),
+<code>sin</code>, <code>cos</code>, <code>tan</code>, <code>asin</code>,
+<code>acos</code>, <code>atan</code>, <code>atan2</code>,
+<code>exp</code>, <code>log</code>, <code>log2</code>,
+<code>log10</code>, <code>random_float() -&gt; f64</code> in [0, 1),
+<code>random_int(lo, hi) -&gt; i64</code> inclusive,
+<code>seed(n)</code>.</p>
+<h3 id="parallelism">Parallelism</h3>
+<p><code>parallel_sum(count, workers, mapper) -&gt; i64</code> and
+<code>parallel_map(count, workers, mapper) -&gt; list[i64]</code> —
+mapper is any <code>fn(i64) -&gt; i64</code> (named function or closure
+capturing only numbers/bools); see the language reference.</p>
+<h3 id="memory">Memory</h3>
+<p><code>gc_collect() -&gt; i64</code> runs the cycle collector and
+returns the number of objects freed; <code>gc_count() -&gt; i64</code>
+is the number of tracked containers.</p>
+<h3 id="networking-blocking-tcp">Networking (blocking TCP)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>tcp_listen(port) -&gt; Result[i64, str]</code></td>
+<td>Listening socket on all interfaces.</td>
+</tr>
+<tr class="even">
+<td><code>tcp_accept(server) -&gt; Result[i64, str]</code></td>
+<td>Waits for a connection.</td>
+</tr>
+<tr class="odd">
+<td><code>tcp_connect(host, port) -&gt; Result[i64, str]</code></td>
+<td>Connects (DNS names allowed).</td>
+</tr>
+<tr class="even">
+<td><code>tcp_read(socket, max_bytes) -&gt; Result[str, str]</code></td>
+<td>Reads what is available, up to the limit; <code>""</code> at end of
+stream.</td>
+</tr>
+<tr class="odd">
+<td><code>tcp_write(socket, data) -&gt; Result[i64, str]</code></td>
+<td>Sends everything; returns the byte count.</td>
+</tr>
+<tr class="even">
+<td><code>tcp_close(socket)</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="std-modules">std modules</h2>
+<h3 id="stdlists"><code>std.lists</code></h3>
+<p>Generic list algorithms, all taking closures:</p>
+<p><code>map(items, f)</code>, <code>filter(items, keep)</code>,
+<code>reduce(items, initial, step)</code>,
+<code>any(items, test)</code>, <code>all(items, test)</code>,
+<code>find_first(items, test) -&gt; Option[T]</code>,
+<code>position(items, test) -&gt; Option[i64]</code>,
+<code>count_if(items, test)</code>, <code>take(items, n)</code>,
+<code>drop(items, n)</code>, <code>flatten(nested)</code>,
+<code>unique(items)</code>, <code>range_list(a, b)</code>,
+<code>sorted_by(items, key: fn(T) -&gt; i64)</code>,
+<code>max_by(items, key) -&gt; Option[T]</code>,
+<code>each(items, action)</code>,
+<code>enumerate(items) -&gt; list[Pair[i64, T]]</code>,
+<code>zip(a, b) -&gt; list[Pair[A, B]]</code>, and
+<code>struct Pair[A, B]</code> with
+<code>first</code>/<code>second</code>.</p>
+<h3 id="stdstrings"><code>std.strings</code></h3>
+<p><code>pad_left(s, width, fill)</code>, <code>pad_right</code>,
+<code>center</code>, <code>is_digit</code>, <code>is_alpha</code>,
+<code>is_space</code>, <code>lines(text)</code>,
+<code>words(text)</code>, <code>count(text, part)</code>,
+<code>capitalize</code>, <code>reverse_text</code>,
+<code>strip_prefix(s, p) -&gt; Option[str]</code>,
+<code>strip_suffix</code>.</p>
+<h3 id="stdmath"><code>std.math</code></h3>
+<p>Constants <code>PI</code>, <code>TAU</code>, <code>E</code>,
+<code>INT_MAX</code>, <code>INT_MIN</code>; <code>clamp</code>,
+<code>clamp_f</code>, <code>gcd</code>, <code>lcm</code>,
+<code>is_prime</code>, <code>factorial(n) -&gt; Result[i64, str]</code>,
+<code>isqrt</code>, <code>lerp</code>, <code>to_degrees</code>,
+<code>to_radians</code>,
+<code>mean(list[f64]) -&gt; Option[f64]</code>.</p>
+<h3 id="stdcollections"><code>std.collections</code></h3>
+<p><code>Stack[T]</code> (<code>push</code>,
+<code>pop -&gt; Option[T]</code>, <code>peek</code>, <code>size</code>),
+<code>Queue[T]</code> (<code>push</code>, <code>pop</code>,
+<code>size</code>), <code>Counter</code> over strings (<code>add</code>,
+<code>get</code>, <code>most_common -&gt; Option[str]</code>), and
+constructors <code>new_stack[T]()</code>, <code>new_queue[T]()</code>,
+<code>new_counter()</code>.</p>
+<h3 id="stdjson"><code>std.json</code></h3>
+<p>A JSON parser and encoder written in Tacqor.
+<code>parse(text) -&gt; Result[Json, str]</code>,
+<code>encode(doc) -&gt; str</code>; build documents with
+<code>null()</code>, <code>boolean(b)</code>, <code>number(f)</code>,
+<code>integer(i)</code>, <code>string(s)</code>,
+<code>array(items)</code>, <code>object()</code> +
+<code>set(obj, key, value)</code>; read them with the <code>Json</code>
+methods <code>get(key) -&gt; Option[Json]</code>,
+<code>at(index) -&gt; Option[Json]</code>, <code>as_text()</code>,
+<code>as_number()</code>, <code>as_int()</code>, <code>as_bool()</code>,
+and the fields <code>kind</code>, <code>items</code>,
+<code>keys</code>.</p>
+<h3 id="stdhttp"><code>std.http</code></h3>
+<p>An HTTP/1.1 server and client. Server:
+<code>serve(port, handler)</code> (forever) and
+<code>serve_count(port, n, handler)</code>, where
+<code>handler: fn(Request) -&gt; Response</code>; a handler that fails
+answers 500 and the server continues. <code>Request</code> has
+<code>method</code>, <code>path</code>, <code>query</code>,
+<code>headers</code>, <code>body</code> and
+<code>header(name) -&gt; Option[str]</code>; build responses with
+<code>text(status, body)</code>, <code>html</code>, <code>json</code>,
+<code>response(status, content_type, body)</code>,
+<code>not_found()</code>. Client: <code>get(url)</code>,
+<code>post(url, body)</code>, <code>request(method, url, body)</code>
+return <code>Result[Response, str]</code>; <code>Response</code> has
+<code>status</code>, <code>headers</code>, <code>body</code>,
+<code>header(name)</code>. Plain <code>http://</code> only, one
+connection at a time, request bodies up to 8 MB.</p>
+<h3 id="stdtesting"><code>std.testing</code></h3>
+<p>For <code>tacqor test</code>:
+<code>assert_eq(actual, expected)</code>, <code>assert_ne</code>,
+<code>assert_true(condition, message)</code>,
+<code>assert_some(option) -&gt; T</code>,
+<code>assert_ok(result) -&gt; T</code>. Failures report the values
+involved.</p>
+<p>* <code>capitalize</code> lives in <code>std.strings</code>.</p>
+</body>
+</html>

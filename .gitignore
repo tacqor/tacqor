@@ -1,0 +1,14 @@
+# build outputs
+/tacqor
+/tacqor.exe
+/.embed/
+*.o
+*.obj
+*.tqb
+.tacqor-native-*.cpp
+# per-project package installs (restore with `tacqor install`)
+/packages/
+# editors and OS
+.vscode/
+.DS_Store
+Thumbs.db

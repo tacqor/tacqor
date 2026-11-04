@@ -1,0 +1,97 @@
+# Standard library: text helpers. Import with `import std.strings`.
+
+def pad_left(text: str, width: i64, fill: str) -> str:
+    var out = text
+    while char_count(out) < width:
+        out = fill + out
+    return out
+
+def pad_right(text: str, width: i64, fill: str) -> str:
+    var out = text
+    while char_count(out) < width:
+        out += fill
+    return out
+
+def center(text: str, width: i64) -> str:
+    let total = width - char_count(text)
+    if total <= 0:
+        return text
+    return repeat(" ", total // 2) + text + repeat(" ", total - total // 2)
+
+def is_digit(text: str) -> bool:
+    if len(text) == 0:
+        return False
+    for ch in chars(text):
+        if ch < "0" or ch > "9":
+            return False
+    return True
+
+def is_alpha(text: str) -> bool:
+    if len(text) == 0:
+        return False
+    for ch in chars(text):
+        let lower_ch = lower(ch)
+        if lower_ch < "a" or lower_ch > "z":
+            return False
+    return True
+
+def is_space(text: str) -> bool:
+    return text == " " or text == "\t" or text == "\n" or text == "\r"
+
+def lines(text: str) -> list[str]:
+    var out: list[str] = []
+    for line in split(text, "\n"):
+        if ends_with(line, "\r"):
+            push(out, line[:len(line) - 1])
+        else:
+            push(out, line)
+    if len(out) > 0 and out[len(out) - 1] == "":
+        pop(out)
+    return out
+
+def words(text: str) -> list[str]:
+    var out: list[str] = []
+    var current = ""
+    for ch in chars(text):
+        if is_space(ch):
+            if current != "":
+                push(out, current)
+                current = ""
+        else:
+            current += ch
+    if current != "":
+        push(out, current)
+    return out
+
+def count(text: str, part: str) -> i64:
+    if len(part) == 0:
+        return 0
+    var n = 0
+    var start = 0
+    while True:
+        let at = find(text[start:], part)
+        if at < 0:
+            break
+        n += 1
+        start += at + len(part)
+    return n
+
+def capitalize(text: str) -> str:
+    if len(text) == 0:
+        return text
+    return upper(text[:1]) + text[1:]
+
+def reverse_text(text: str) -> str:
+    let parts = chars(text)
+    reverse(parts)
+    return join(parts, "")
+
+def strip_prefix(text: str, prefix: str) -> Option[str]:
+    if starts_with(text, prefix):
+        return Some(text[len(prefix):])
+    return None
+
+def strip_suffix(text: str, suffix: str) -> Option[str]:
+    if ends_with(text, suffix):
+        return Some(text[:len(text) - len(suffix)])
+    return None

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — PERFORMANCE</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-performance-report"
+id="toc-tacqor-performance-report">Tacqor Performance Report</a>
+<ul>
+<li><a href="#1-summary" id="toc-1-summary">1. Summary</a></li>
+<li><a href="#2-methodology" id="toc-2-methodology">2.
+Methodology</a></li>
+<li><a href="#3-benchmarks" id="toc-3-benchmarks">3. Benchmarks</a></li>
+<li><a href="#4-results" id="toc-4-results">4. Results</a></li>
+<li><a href="#5-where-the-time-goes" id="toc-5-where-the-time-goes">5.
+Where the time goes</a></li>
+<li><a href="#6-what-the-native-backend-does"
+id="toc-6-what-the-native-backend-does">6. What the native backend
+does</a></li>
+<li><a href="#7-what-the-vm-does" id="toc-7-what-the-vm-does">7. What
+the VM does</a></li>
+<li><a href="#8-writing-fast-tacqor" id="toc-8-writing-fast-tacqor">8.
+Writing fast Tacqor</a></li>
+<li><a href="#9-compile-and-startup-times"
+id="toc-9-compile-and-startup-times">9. Compile and startup
+times</a></li>
+<li><a href="#10-reproducing" id="toc-10-reproducing">10.
+Reproducing</a></li>
+<li><a href="#11-known-gaps-and-planned-work"
+id="toc-11-known-gaps-and-planned-work">11. Known gaps and planned
+work</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-performance-report">Tacqor Performance Report</h1>
+<p>This report describes how Tacqor executes code quickly, what was
+measured, how to reproduce the measurements, and how to write Tacqor
+programs that run fast. Benchmark sources and the runner are in
+<code>benchmarks/</code>.</p>
+<h2 id="1-summary">1. Summary</h2>
+<ul>
+<li>Native builds (<code>tacqor build --native</code>) run compute-bound
+code within 1.4–3× of C++ (<code>-O2</code>) and Rust (<code>-O</code>),
+and 1.6–90× faster than CPython 3.13.</li>
+<li>The bytecode VM is faster than CPython on every workload measured,
+by 1.1–5×.</li>
+<li>The gap to C++ and Rust comes from reference counting of containers
+and strings, checked indexing, and the generic dictionary; the gap is
+largest on dictionary-heavy code and smallest on arithmetic.</li>
+<li>Compile times are negligible: the whole standard library compiles in
+a few milliseconds; a native build takes as long as the system C++
+compiler needs (typically 2–5 s at <code>-O3</code>).</li>
+</ul>
+<h2 id="2-methodology">2. Methodology</h2>
+<ul>
+<li>Same algorithm, written idiomatically in each language, with the
+same checked semantics where the language offers them (C++ uses
+<code>__builtin_add_overflow</code> and <code>vector::at</code>; Rust
+uses <code>checked_add</code> and indexed <code>Vec</code>).</li>
+<li>One Linux x64 machine (2 vCPUs, shared), GCC 13.3, rustc 1.97,
+CPython 3.13.18, Tacqor 1.2 release binary.</li>
+<li>Flags: <code>c++ -std=c++17 -O2</code>, <code>rustc -O</code>,
+Tacqor native at <code>-O3</code> (the backend's default), Tacqor VM via
+<code>tacqor build</code> (embedded-VM executable).</li>
+<li>Wall-clock time of the whole process including startup, best of nine
+runs (three invocations of <code>benchmarks/run.sh</code>, each best of
+three). The machine is shared, so individual runs vary by up to 50 %;
+minima are the stable statistic.</li>
+<li>Output of every program is checked to be identical across languages
+before timing.</li>
+</ul>
+<h2 id="3-benchmarks">3. Benchmarks</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>What it measures</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>loop</code></td>
+<td>function calls with checked integer arithmetic in a tight loop</td>
+<td>12 M calls</td>
+</tr>
+<tr class="even">
+<td><code>fib</code></td>
+<td>recursion, call overhead</td>
+<td>fib(30) = 1.3 M calls</td>
+</tr>
+<tr class="odd">
+<td><code>sieve</code></td>
+<td><code>list[bool]</code> indexing and nested loops</td>
+<td>5 M elements</td>
+</tr>
+<tr class="even">
+<td><code>words</code></td>
+<td>dictionary updates with freshly built string keys</td>
+<td>2 M updates, 1,000 keys</td>
+</tr>
+<tr class="odd">
+<td><code>closures</code></td>
+<td><code>lists.map</code> and <code>lists.reduce</code> with lambdas
+(standard library)</td>
+<td>2 M elements</td>
+</tr>
+<tr class="even">
+<td><code>objs</code></td>
+<td>struct allocation and field access with the cycle collector
+enabled</td>
+<td>3 M allocations</td>
+</tr>
+</tbody>
+</table>
+<p><code>closures</code> and <code>objs</code> have no C++/Rust
+counterpart because they exercise Tacqor-specific machinery (closure
+calls through the standard library, refcounted objects under the
+collector).</p>
+<h2 id="4-results">4. Results</h2>
+<p>Seconds, lower is better.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Benchmark</th>
+<th>C++ -O2</th>
+<th>Rust -O</th>
+<th><strong>Tacqor native</strong></th>
+<th>Tacqor VM</th>
+<th>Python 3.13</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>loop</code> (12 M checked-arithmetic calls)</td>
+<td>0.020</td>
+<td>0.021</td>
+<td><strong>0.028</strong></td>
+<td>0.52</td>
+<td>2.53</td>
+</tr>
+<tr class="even">
+<td><code>fib</code> (fib(30), 1.3 M calls)</td>
+<td>0.005</td>
+<td>0.008</td>
+<td><strong>0.014</strong></td>
+<td>0.064</td>
+<td>0.129</td>
+</tr>
+<tr class="odd">
+<td><code>sieve</code> (5 M, <code>list[bool]</code>)</td>
+<td>0.041</td>
+<td>0.031</td>
+<td><strong>0.096</strong></td>
+<td>0.43</td>
+<td>1.03</td>
+</tr>
+<tr class="even">
+<td><code>words</code> (2 M dict updates, str keys)</td>
+<td>0.105</td>
+<td>0.156</td>
+<td><strong>0.30</strong></td>
+<td>0.44</td>
+<td>0.47</td>
+</tr>
+<tr class="odd">
+<td><code>closures</code> (map/reduce 2 M items)</td>
+<td>—</td>
+<td>—</td>
+<td><strong>0.085</strong></td>
+<td>0.23</td>
+<td>0.34</td>
+</tr>
+<tr class="even">
+<td><code>objs</code> (3 M struct allocations)</td>
+<td>—</td>
+<td>—</td>
+<td><strong>0.19</strong></td>
+<td>0.27</td>
+<td>1.01</td>
+</tr>
+</tbody>
+</table>
+<p>Ratios:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Benchmark</th>
+<th>native vs. best of C++/Rust</th>
+<th>native vs. CPython</th>
+<th>VM vs. CPython</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>loop</code></td>
+<td>1.4× slower</td>
+<td>90× faster</td>
+<td>4.9× faster</td>
+</tr>
+<tr class="even">
+<td><code>fib</code></td>
+<td>1.8–2.8× slower</td>
+<td>9× faster</td>
+<td>2.0× faster</td>
+</tr>
+<tr class="odd">
+<td><code>sieve</code></td>
+<td>2.3–3.1× slower</td>
+<td>11× faster</td>
+<td>2.4× faster</td>
+</tr>
+<tr class="even">
+<td><code>words</code></td>
+<td>1.9–2.8× slower</td>
+<td>1.6× faster</td>
+<td>1.1× faster</td>
+</tr>
+<tr class="odd">
+<td><code>closures</code></td>
+<td>—</td>
+<td>4× faster</td>
+<td>1.5× faster</td>
+</tr>
+<tr class="even">
+<td><code>objs</code></td>
+<td>—</td>
+<td>5× faster</td>
+<td>3.7× faster</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-where-the-time-goes">5. Where the time goes</h2>
+<p><strong><code>loop</code> and <code>fib</code></strong> — the native
+backend keeps <code>i64</code> values in C++ locals (registers after
+optimization); overflow checks compile to
+<code>__builtin_*_overflow</code>, which the compiler lowers to a flag
+test. The remaining difference to C++ is the per-call
+<code>DepthGuard</code> (one increment, one compare, one decrement) and
+the runtime-error plumbing each function carries. The VM pays dispatch
+(one indirect jump per instruction), operand decoding and stack traffic;
+superinstructions (<code>add_store</code>,
+<code>jump_unless_locals</code>, <code>loop_next</code>) cut the
+instruction count by roughly a third on such loops.</p>
+<p><strong><code>sieve</code></strong> — <code>list[bool]</code> is
+stored as a vector of bytes (not <code>std::vector&lt;bool&gt;</code>),
+so the inner loop is a bounds check plus a byte store. The gap to Rust
+is the list header indirection on every access (the list is a refcounted
+heap object reached through a <code>Value</code>) and the bounds check
+being a call to the runtime error path rather than a branch to a trap.
+Both are candidates for future work (hoisting the data pointer and
+length out of loops).</p>
+<p><strong><code>words</code></strong> — each iteration builds a new
+string (<code>"k" + str(i % 1000)</code>), hashes it, probes the
+dictionary and releases the string. C++ and Rust do the same work;
+Tacqor additionally refcounts the key and goes through
+<code>Value</code> tagging in the dictionary's generic key comparison.
+CPython is close on this benchmark because its dictionary and string
+machinery are its strongest components.</p>
+<p><strong><code>closures</code></strong> — <code>lists.map</code> and
+<code>lists.reduce</code> are Tacqor source in the standard library; the
+lambda call is a <code>call_value</code> through a
+<code>ClosureObj</code>. Natively, the call becomes a switch over the
+closure's function id (a thunk table), which the C++ compiler can inline
+when the set of candidates is small. The VM allocates one frame per
+call.</p>
+<p><strong><code>objs</code></strong> — struct allocation is one heap
+allocation plus registration with the cycle collector; the collector's
+threshold (max(200,000, 2× live objects)) keeps collection cost
+amortized to a few percent. Native and VM are close here because
+allocation dominates in both.</p>
+<h2 id="6-what-the-native-backend-does">6. What the native backend
+does</h2>
+<ol type="1">
+<li>Abstractly interprets each function's bytecode to assign a static
+type (<code>i64</code>, <code>f64</code>, <code>bool</code>, or boxed
+<code>Value</code>) to every stack slot at every instruction.</li>
+<li>Emits one C++ local per (slot, type): <code>i3</code>,
+<code>f7</code>, <code>b2</code>, <code>v4</code>. Integers and floats
+never touch a <code>Value</code> unless they flow into a container or a
+generic call.</li>
+<li>Translates each instruction to a C++ statement; jumps become
+<code>goto</code> labels; loops become loops the C++ optimizer
+recognizes.</li>
+<li>Inlines small builtins (<code>len</code>, <code>abs</code>,
+arithmetic, comparisons) and emits calls into the embedded runtime for
+the rest (strings, containers, I/O, sockets).</li>
+<li>Closures and trait methods become <code>switch</code> dispatchers
+over the known candidates, so there is no indirect call the optimizer
+cannot see through.</li>
+<li>Compiles the result with the system compiler at <code>-O3</code> and
+links the runtime statically into the executable.</li>
+</ol>
+<p>See <code>ARCHITECTURE.md</code> §8 and figure 06 for the
+pipeline.</p>
+<h2 id="7-what-the-vm-does">7. What the VM does</h2>
+<ul>
+<li>Computed-goto threaded dispatch (GCC/Clang) with a
+<code>switch</code> fallback.</li>
+<li>One contiguous value stack; frames are offsets into it, so calls do
+not allocate.</li>
+<li><code>Value</code> is 16 bytes; integers, floats and booleans are
+unboxed; strings and containers are refcounted pointers.</li>
+<li>Typed list storage (<code>list[i64]</code>, <code>list[f64]</code>,
+<code>list[bool]</code>) stores raw elements, not
+<code>Value</code>s.</li>
+<li>Superinstructions fuse the common sequences the compiler emits (load
+two locals, compare-and-branch on locals, arithmetic-and-store, range
+loop step).</li>
+<li>String constants are immortal; they are never refcounted.</li>
+</ul>
+<p>See <code>ARCHITECTURE.md</code> §5 and figure 03.</p>
+<h2 id="8-writing-fast-tacqor">8. Writing fast Tacqor</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Habit</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Build with <code>--native</code> for anything compute-bound</td>
+<td>5–18× over the VM on arithmetic and loops, 1.5–3× on container-heavy
+code.</td>
+</tr>
+<tr class="even">
+<td>Give lists an element type the runtime can unbox
+(<code>list[i64]</code>, <code>list[f64]</code>,
+<code>list[bool]</code>)</td>
+<td>Raw storage; no tagging, no refcounts.</td>
+</tr>
+<tr class="odd">
+<td>Keep numeric work in <code>i64</code>/<code>f64</code> locals; avoid
+pushing scalars into <code>list[Value]</code>-like containers inside hot
+loops</td>
+<td>Scalars stay in registers natively.</td>
+</tr>
+<tr class="even">
+<td>Hoist repeated <code>len(xs)</code> out of loops when the list is
+not modified</td>
+<td>Avoids a call per iteration in the VM (the native backend often
+hoists it already).</td>
+</tr>
+<tr class="odd">
+<td>Prefer <code>for x in xs</code> over index loops when the index is
+not needed</td>
+<td><code>iter_next</code> is one instruction; indexing is two plus a
+bounds check.</td>
+</tr>
+<tr class="even">
+<td>Build large strings with <code>join</code> on a list rather than
+repeated <code>+</code></td>
+<td><code>+</code> copies; <code>join</code> allocates once.</td>
+</tr>
+<tr class="odd">
+<td>Reuse a dictionary instead of rebuilding it; precompute keys that
+are reused</td>
+<td>Each fresh key is an allocation plus a hash.</td>
+</tr>
+<tr class="even">
+<td>Use <code>parallel_sum</code> / <code>parallel_map</code> for
+independent per-element work on large inputs</td>
+<td>Scales across cores; mapper closures may capture only scalars.</td>
+</tr>
+<tr class="odd">
+<td>Avoid deep recursion where a loop will do</td>
+<td>Calls are cheap but not free; recursion depth is bounded (see
+<code>SPECIFICATION.md</code> limits).</td>
+</tr>
+<tr class="even">
+<td>Let the collector run; do not create reference cycles you do not
+need</td>
+<td>Acyclic garbage is freed immediately by refcounting; cycles wait for
+the collector.</td>
+</tr>
+</tbody>
+</table>
+<p>Measure before optimizing: <code>time_ms()</code> returns a
+millisecond clock, and <code>tacqor dump</code> shows the instructions a
+function compiles to.</p>
+<h2 id="9-compile-and-startup-times">9. Compile and startup times</h2>
+<p>Measured on the same machine with the release binary (process
+wall-clock, including startup):</p>
+<table>
+<thead>
+<tr class="header">
+<th>Operation</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>tacqor check</code> of a program importing every standard
+module (≈ 1,000 lines of library, 2,500 instructions)</td>
+<td>≈ 8 ms</td>
+</tr>
+<tr class="even">
+<td><code>tacqor hello.tq</code> end to end (start, compile, run,
+exit)</td>
+<td>≈ 4 ms</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor run program.tqb</code> for the 2,500-instruction
+program (decode, verify, run)</td>
+<td>≈ 6 ms</td>
+</tr>
+<tr class="even">
+<td><code>tacqor build</code> (bytecode + embedded VM) of the same
+program</td>
+<td>≈ 20 ms</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor build --native</code> of a 10-line program</td>
+<td>≈ 6 s</td>
+</tr>
+<tr class="even">
+<td><code>tacqor build --native</code> of the program importing every
+standard module</td>
+<td>≈ 19 s</td>
+</tr>
+</tbody>
+</table>
+<p>Native build time is the system C++ compiler at <code>-O3</code> on
+the generated source plus the embedded runtime; it grows with the amount
+of Tacqor code compiled in (every non-generic function of every imported
+module is compiled, used or not; generic functions only when
+instantiated). Use the VM while developing and build natively for
+release.</p>
+<h2 id="10-reproducing">10. Reproducing</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sh</span> benchmarks/run.sh                 <span class="co"># uses ./tacqor or linux-x64/tacqor</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sh</span> benchmarks/run.sh /path/to/tacqor</span></code></pre></div>
+<p>The script builds every benchmark with every toolchain it finds
+(<code>c++</code>, <code>rustc</code>, <code>python3</code> are
+optional) and prints a table of best-of-three times. Run it three times
+and take the minimum of each cell to reproduce the table in §4.</p>
+<h2 id="11-known-gaps-and-planned-work">11. Known gaps and planned
+work</h2>
+<ul>
+<li>Hoist list data pointers and lengths out of loops in the native
+backend (<code>sieve</code>-style code).</li>
+<li>Specialize dictionaries with <code>str</code> keys to avoid generic
+key comparison (<code>words</code>-style code).</li>
+<li>Inline caching of closure targets in the VM.</li>
+<li>A register-based VM would remove most stack traffic; it is a large
+change and is deferred until the native backend stops being the answer
+for hot code.</li>
+</ul>
+</body>
+</html>

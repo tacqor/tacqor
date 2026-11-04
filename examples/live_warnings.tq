@@ -1,0 +1,9 @@
+# Open this file in VS Code to see the warnings. Editing the values clears them.
+def score(n: i64) -> i64:
+    return n * 2
+
+def main():
+    let divisor = 4 - 4
+    print(100 // divisor)
+    print(9223372036854775807 + 1)
+    print(parallel_sum(1000, 128, score))

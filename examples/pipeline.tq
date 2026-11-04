@@ -1,0 +1,25 @@
+# Closures, generics and the standard library working together.
+import std.lists
+import std.strings
+
+struct Sale:
+    region: str
+    amount: i64
+
+def main():
+    let sales = [Sale("north", 120), Sale("south", 80), Sale("north", 45), Sale("east", 300), Sale("south", 10)]
+    let big = lists.filter(sales, fn(s: Sale) => s.amount >= 50)
+    let labels = lists.map(big, fn(s: Sale) => strings.pad_right(s.region, 6, ".") + str(s.amount))
+    for label in labels:
+        print(label)
+    let total = lists.reduce(sales, 0, fn(acc: i64, s: Sale) => acc + s.amount)
+    print(f"total: {total}")
+    let by_amount = lists.sorted_by(sales, fn(s: Sale) => -s.amount)
+    print("top region: " + by_amount[0].region)
+    match lists.find_first(sales, fn(s: Sale) => s.region == "west"):
+        case Some(sale):
+            print(sale)
+        case None:
+            print("no sales in the west")
+    let regions = lists.unique(lists.map(sales, fn(s: Sale) => s.region))
+    print(join(regions, ", "))

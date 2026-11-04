@@ -1,0 +1,16 @@
+flowchart TB
+    T((Type)) --> IMM["Immediates (16 B, copied)"]
+    T --> REF["Reference values (shared, refcounted)"]
+    IMM --> I[i64 · checked arithmetic]
+    IMM --> Fl[f64 · IEEE]
+    IMM --> Bo[bool]
+    REF --> S["str (immutable bytes)"]
+    REF --> L["list[T]<br/>flat storage for i64 / f64 / bool"]
+    REF --> Di["dict[K, V]  K ∈ {i64, str}"]
+    REF --> St["struct (fields + methods)<br/>may be generic: Box[T]"]
+    REF --> O["Option[T] · Result[T, E]"]
+    REF --> Fn["fn(A, B) -> R (closure)"]
+    REF --> Tr["trait object<br/>any struct implementing the trait"]
+    St -.->|implicit upcast| Tr
+    G["Generics [T: Bound]<br/>monomorphized per instantiation"] -.-> St
+    G -.-> Fn

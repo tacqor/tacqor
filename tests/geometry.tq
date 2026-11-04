@@ -1,0 +1,37 @@
+# A module: constants, a generic struct with methods, and plain functions.
+const PI = 3.141592653589793
+const UNIT = "cm"
+
+struct Pair[A, B]:
+    first: A
+    second: B
+
+    def swap(self) -> Pair[B, A]:
+        return Pair(self.second, self.first)
+
+    def describe(self) -> str:
+        return f"({self.first}, {self.second})"
+
+struct Circle:
+    radius: f64
+
+    def area(self) -> f64:
+        return PI * self.radius * self.radius
+
+    def grow(self, by: f64):
+        self.radius += by
+
+def circles(radii: list[f64]) -> list[Circle]:
+    var out: list[Circle] = []
+    for r in radii:
+        push(out, Circle(r))
+    return out
+
+trait Named:
+    def label(self) -> str
+
+struct Tag(Named):
+    text: str
+
+    def label(self) -> str:
+        return "#" + self.text

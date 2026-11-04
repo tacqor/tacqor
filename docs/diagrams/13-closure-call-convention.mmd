@@ -1,0 +1,7 @@
+flowchart LR
+    SRC["let base = 10<br/>let f = fn(x: i64) => x + base"] --> LIFT["Hidden function main@lambda1(x, base)<br/>params = declared + captured"]
+    LIFT --> MC["make_closure: ClosureObj{function, captures=[10]}"]
+    CALL["f(5)"] --> ST["stack: [5, closure]"]
+    ST --> CV["call_value 1: pop closure,<br/>push captures → locals = [5, 10]"]
+    CV --> RUN["enter main@lambda1"]
+    NAT["native: thunks[fn](args, closure)<br/>→ f_main_lambda1(args[0].i, closure.captures[0].i)"] -.-> CV

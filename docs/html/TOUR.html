@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — TOUR</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#a-tour-of-tacqor" id="toc-a-tour-of-tacqor">A tour of
+Tacqor</a>
+<ul>
+<li><a href="#1-hello-types" id="toc-1-hello-types">1. Hello,
+types</a></li>
+<li><a href="#2-collections" id="toc-2-collections">2.
+Collections</a></li>
+<li><a href="#3-structs-and-methods" id="toc-3-structs-and-methods">3.
+Structs and methods</a></li>
+<li><a href="#4-option-and-result-instead-of-exceptions"
+id="toc-4-option-and-result-instead-of-exceptions">4. Option and Result
+instead of exceptions</a></li>
+<li><a href="#5-closures-and-generics"
+id="toc-5-closures-and-generics">5. Closures and generics</a></li>
+<li><a href="#6-generic-structs" id="toc-6-generic-structs">6. Generic
+structs</a></li>
+<li><a href="#7-traits" id="toc-7-traits">7. Traits</a></li>
+<li><a href="#8-modules" id="toc-8-modules">8. Modules</a></li>
+<li><a href="#9-tests" id="toc-9-tests">9. Tests</a></li>
+<li><a href="#10-ship-it" id="toc-10-ship-it">10. Ship it</a></li>
+<li><a href="#11-a-web-service-in-ten-lines"
+id="toc-11-a-web-service-in-ten-lines">11. A web service in ten
+lines</a></li>
+<li><a href="#12-and-the-rest" id="toc-12-and-the-rest">12. And the
+rest</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="a-tour-of-tacqor">A tour of Tacqor</h1>
+<p>Ten minutes, one feature at a time. Every snippet is a complete
+program you can save as <code>tour.tq</code> and run with
+<code>./linux-x64/tacqor run tour.tq</code>.</p>
+<h2 id="1-hello-types">1. Hello, types</h2>
+<pre class="text"><code>def main():
+    let name = &quot;Ada&quot;             # str, immutable binding
+    var count = 0                # i64, reassignable
+    count += 2
+    let ratio = float(count) / 3.0
+    print(f&quot;{name} has {count} items, ratio {ratio}&quot;)</code></pre>
+<p>Types are inferred but static: <code>count = "two"</code> is a
+compile error. Integer arithmetic is checked —
+<code>9223372036854775807 + 1</code> is a runtime error, never silent
+wraparound.</p>
+<h2 id="2-collections">2. Collections</h2>
+<pre class="text"><code>def main():
+    var scores = [90, 72, 85]
+    push(scores, 100)
+    sort(scores)
+    print(scores[1:3])                     # [85, 90]
+    var ages: dict[str, i64] = {}
+    ages[&quot;ada&quot;] = 36
+    for key in keys(ages):
+        print(f&quot;{key}: {ages[key]}&quot;)
+    print(&quot;ada&quot; in ages)</code></pre>
+<h2 id="3-structs-and-methods">3. Structs and methods</h2>
+<pre class="text"><code>struct Account:
+    owner: str
+    balance: i64
+
+    def deposit(self, amount: i64):
+        self.balance += amount
+
+def main():
+    let acct = Account(&quot;Ada&quot;, 10)
+    acct.deposit(5)
+    print(acct)                            # Account(owner=&quot;Ada&quot;, balance=15)</code></pre>
+<p>Structs are reference values: passing <code>acct</code> to a function
+shares it.</p>
+<h2 id="4-option-and-result-instead-of-exceptions">4. Option and Result
+instead of exceptions</h2>
+<pre class="text"><code>def find_user(id: i64) -&gt; Option[str]:
+    if id == 1:
+        return Some(&quot;Ada&quot;)
+    return None
+
+def parse_age(text: str) -&gt; Result[i64, str]:
+    match parse_int(text):
+        case Some(n):
+            if n &lt; 0:
+                return Err(&quot;negative age&quot;)
+            return Ok(n)
+        case None:
+            return Err(f&quot;not a number: {text}&quot;)
+
+def describe(id: i64, age_text: str) -&gt; Result[str, str]:
+    let age = parse_age(age_text)?         # returns the Err early
+    let name = unwrap_or(find_user(id), &quot;stranger&quot;)
+    return Ok(f&quot;{name}, {age}&quot;)
+
+def main():
+    print(describe(1, &quot;36&quot;))               # Ok(&quot;Ada, 36&quot;)
+    print(describe(2, &quot;x&quot;))                # Err(&quot;not a number: x&quot;)
+    match describe(1, &quot;-5&quot;):
+        case Ok(text):
+            print(text)
+        case Err(problem):
+            print(&quot;problem: &quot; + problem)</code></pre>
+<p><code>match</code> must handle both arms. <code>?</code> propagates
+failures; the compiler checks that the enclosing function returns a
+compatible <code>Option</code>/<code>Result</code>.</p>
+<h2 id="5-closures-and-generics">5. Closures and generics</h2>
+<pre class="text"><code>import std.lists
+
+def apply_twice[T](value: T, f: fn(T) -&gt; T) -&gt; T:
+    return f(f(value))
+
+def main():
+    let bonus = 10
+    let add_bonus = fn(x: i64) =&gt; x + bonus          # captures bonus by value
+    print(apply_twice(5, add_bonus))                  # 25
+    print(apply_twice(&quot;ha&quot;, fn(s: str) =&gt; s + s))     # hahahaha
+    let evens = lists.filter(lists.range_list(0, 10), fn(n: i64) =&gt; n % 2 == 0)
+    print(lists.map(evens, fn(n: i64) =&gt; n * n))</code></pre>
+<p>Generic functions are instantiated per concrete type, so
+<code>apply_twice[i64]</code> and <code>apply_twice[str]</code> are two
+ordinary functions in the output — no boxing, no dynamic dispatch.</p>
+<h2 id="6-generic-structs">6. Generic structs</h2>
+<pre class="text"><code>struct Stack[T]:
+    items: list[T]
+
+    def push(self, item: T):
+        push(self.items, item)
+
+    def pop(self) -&gt; Option[T]:
+        if len(self.items) == 0:
+            return None
+        return Some(pop(self.items))
+
+def main():
+    let s = Stack[str]([])
+    s.push(&quot;a&quot;)
+    s.push(&quot;b&quot;)
+    print(s.pop())                         # Some(&quot;b&quot;)</code></pre>
+<h2 id="7-traits">7. Traits</h2>
+<pre class="text"><code>trait Animal:
+    def sound(self) -&gt; str
+
+struct Dog(Animal):
+    name: str
+
+    def sound(self) -&gt; str:
+        return self.name + &quot; says woof&quot;
+
+struct Cat(Animal):
+    def sound(self) -&gt; str:
+        return &quot;meow&quot;
+
+def chorus(animals: list[Animal]):
+    for a in animals:
+        print(a.sound())
+
+def loudest[T: Animal](a: T) -&gt; str:
+    return upper(a.sound())
+
+def main():
+    chorus([Dog(&quot;Rex&quot;), Cat()])
+    print(loudest(Dog(&quot;Fido&quot;)))</code></pre>
+<p><code>list[Animal]</code> holds different structs and dispatches each
+call at runtime; <code>T: Animal</code> is a bound checked when the
+generic function is instantiated and resolved statically inside.</p>
+<h2 id="8-modules">8. Modules</h2>
+<p><code>shapes.tq</code>:</p>
+<pre class="text"><code>const PI = 3.141592653589793
+
+struct Circle:
+    radius: f64
+
+    def area(self) -&gt; f64:
+        return PI * self.radius * self.radius</code></pre>
+<p><code>main.tq</code>:</p>
+<pre class="text"><code>import shapes
+import std.strings
+
+def main():
+    let c = shapes.Circle(2.0)
+    print(strings.pad_left(str(round(c.area())), 5, &quot; &quot;))</code></pre>
+<p>The <code>std</code> folder next to the executable is on the import
+path; your own modules are found next to the importing file or through
+<code>TACQOR_PATH</code>.</p>
+<h2 id="9-tests">9. Tests</h2>
+<p><code>tests.tq</code>:</p>
+<pre class="text"><code>import std.testing
+import shapes
+
+def test_area():
+    testing.assert_eq(round(shapes.Circle(1.0).area()), 3)</code></pre>
+<p><code>tacqor test tests.tq</code> runs every <code>test_*</code>
+function and reports PASS/FAIL.</p>
+<h2 id="10-ship-it">10. Ship it</h2>
+<pre class="text"><code>./linux-x64/tacqor build --native main.tq -o main     # machine code, needs c++ on PATH
+./linux-x64/tacqor build main.tq -o main_vm           # bytecode + embedded VM, no compiler needed
+./main</code></pre>
+<p>Both executables run the same program with the same checks; the
+native one is 1.5–18× faster depending on the workload (most on
+arithmetic and loops, least on allocation-heavy code; see
+<code>docs/PERFORMANCE.md</code>).</p>
+<h2 id="11-a-web-service-in-ten-lines">11. A web service in ten
+lines</h2>
+<pre class="text"><code>import std.http
+
+def handler(request: http.Request) -&gt; http.Response:
+    if request.path == &quot;/&quot;:
+        return http.text(200, &quot;hello from Tacqor&quot;)
+    return http.not_found()
+
+def main():
+    http.serve(8080, handler)</code></pre>
+<p>Run it, open <code>http://localhost:8080/</code>, and try
+<code>http.get(...)</code> from another program. A handler that fails
+answers 500 and the server keeps going (<code>attempt</code> does that
+for you).</p>
+<h2 id="12-and-the-rest">12. And the rest</h2>
+<p><code>tacqor repl</code> for a scratchpad,
+<code>tacqor add ../somelib</code> (or a git URL) to install a package
+into <code>packages/</code>,
+<code>parallel_map(n, 8, fn(i: i64) =&gt; work(i))</code> for data
+parallelism, and a cycle collector that quietly frees self-referential
+structures. See <code>LANGUAGE.md</code> and <code>STDLIB.md</code> for
+everything.</p>
+</body>
+</html>

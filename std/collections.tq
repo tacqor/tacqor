@@ -1,0 +1,73 @@
+# Standard library: generic containers built on lists and dicts. Import with `import std.collections`.
+
+struct Stack[T]:
+    items: list[T]
+
+    def push(self, item: T):
+        push(self.items, item)
+
+    def pop(self) -> Option[T]:
+        if len(self.items) == 0:
+            return None
+        return Some(pop(self.items))
+
+    def peek(self) -> Option[T]:
+        if len(self.items) == 0:
+            return None
+        return Some(self.items[len(self.items) - 1])
+
+    def size(self) -> i64:
+        return len(self.items)
+
+struct Queue[T]:
+    items: list[T]
+    head: i64
+
+    def push(self, item: T):
+        push(self.items, item)
+
+    def pop(self) -> Option[T]:
+        if self.head >= len(self.items):
+            return None
+        let item = self.items[self.head]
+        self.head += 1
+        if self.head > 32 and self.head * 2 > len(self.items):
+            self.items = self.items[self.head:]
+            self.head = 0
+        return Some(item)
+
+    def size(self) -> i64:
+        return len(self.items) - self.head
+
+struct Counter:
+    counts: dict[str, i64]
+
+    def add(self, key: str):
+        if key in self.counts:
+            self.counts[key] += 1
+        else:
+            self.counts[key] = 1
+
+    def get(self, key: str) -> i64:
+        return unwrap_or(lookup(self.counts, key), 0)
+
+    def most_common(self) -> Option[str]:
+        var best: Option[str] = None
+        var best_count = 0
+        for key in keys(self.counts):
+            if self.counts[key] > best_count:
+                best_count = self.counts[key]
+                best = Some(key)
+        return best
+
+def new_stack[T]() -> Stack[T]:
+    var items: list[T] = []
+    return Stack(items)
+
+def new_queue[T]() -> Queue[T]:
+    var items: list[T] = []
+    return Queue(items, 0)
+
+def new_counter() -> Counter:
+    var counts: dict[str, i64] = {}
+    return Counter(counts)

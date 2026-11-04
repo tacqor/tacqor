@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph VM["VM (one per thread)"]
+        direction TB
+        D["Dispatch loop<br/>computed-goto threaded code<br/>(switch fallback on MSVC)"]
+        subgraph Stack["Contiguous value stack (16 B slots)"]
+            direction TB
+            F0["frame 0: main<br/>locals | operands"]
+            F1["frame 1: f<br/>locals | operands"]
+            F2["frame 2: g (current)<br/>locals | operands ← sp"]
+        end
+        FR["frames[]: function*, ip, locals*"]
+        D --> Stack
+        D --> FR
+    end
+    PROG[(Program<br/>functions · types · structs · traits · texts)] --> D
+    CTX["Context<br/>args · stdout · struct table · locks"] --> D
+    TX["Immortal text constants"] --> D
+    D -->|parallel_sum / parallel_map| W1[Worker VM 1]
+    D --> W2[Worker VM n]
+    W1 --> HEAP[(Heap objects<br/>refcounted)]
+    D --> HEAP

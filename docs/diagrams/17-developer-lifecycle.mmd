@@ -1,0 +1,10 @@
+flowchart LR
+    N["tacqor new app"] --> W["write code<br/>VS Code live scanner<br/>tacqor check · repl"]
+    W --> T["tacqor test tests.tq<br/>std.testing"]
+    T --> R["tacqor main.tq args<br/>(VM, instant start)"]
+    R --> P["tacqor add FOLDER|GIT-URL<br/>tacqor.pkg · packages/"]
+    P --> B1["tacqor build main.tq -o app<br/>self-contained, VM embedded"]
+    P --> B2["tacqor build --native main.tq -o app<br/>machine code via C++ compiler"]
+    B1 --> D["deploy: one file,<br/>no runtime dependencies"]
+    B2 --> D
+    I["sh install.sh"] -.-> W

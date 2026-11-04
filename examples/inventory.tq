@@ -1,0 +1,28 @@
+# Structs, dicts, lists of structs, and string formatting.
+
+struct Item:
+    name: str
+    price: f64
+    quantity: i64
+
+def total_value(items: list[Item]) -> f64:
+    var total = 0.0
+    for item in items:
+        total += item.price * float(item.quantity)
+    return total
+
+def restock(item: Item, amount: i64):
+    assert amount > 0
+    item.quantity += amount
+
+def main():
+    let stock = [Item("bolt", 0.25, 400), Item("hinge", 3.5, 12), Item("latch", 7.0, 3)]
+    var by_name: dict[str, Item] = {}
+    for item in stock:
+        by_name[item.name] = item
+    restock(by_name["latch"], 5)
+    print("Items: " + str(len(stock)))
+    print("Total value: " + str(total_value(stock)))
+    for item in stock:
+        if item.quantity < 20:
+            print("Low stock: " + item.name + " (" + str(item.quantity) + ")")

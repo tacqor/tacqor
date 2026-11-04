@@ -1,0 +1,36 @@
+classDiagram
+    class Value {
+        +Tag tag (1 byte)
+        +union payload (8 bytes)
+        int64 i
+        double f
+        bool b
+        Obj* o
+    }
+    class Obj {
+        +uint32 refs
+        +bool immortal
+        +bool tracked
+        +gc links
+        +each_child()
+        +clear_children()
+    }
+    class TextObj { +string bytes; +cached hash }
+    class ListObj {
+        +Elem kind
+        +vector~Value~ values
+        +vector~int64~ ints
+        +vector~double~ floats
+        +vector~uint8~ bools
+    }
+    class DictObj { +vector entries (insertion order); +unordered_map index }
+    class ObjectObj { +uint32 struct id; +vector~Value~ fields }
+    class ClosureObj { +uint32 function; +vector~Value~ captures }
+    class VariantObj { +which (Some/Ok=1); +is_result; +Value payload }
+    Value --> Obj : tag ≥ text
+    Obj <|-- TextObj
+    Obj <|-- ListObj
+    Obj <|-- DictObj
+    Obj <|-- ObjectObj
+    Obj <|-- ClosureObj
+    Obj <|-- VariantObj

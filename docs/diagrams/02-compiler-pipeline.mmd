@@ -1,0 +1,23 @@
+flowchart TB
+    subgraph Load["Module loading"]
+        R[Root module] --> I{imports?}
+        I -->|"import a.b"| F["Find a/b.tq or a/b/lib.tq<br/>file dir → packages/ → std → TACQOR_PATH"]
+        F --> P2[Parse module]
+        P2 --> I
+        I -->|cycle| E1[error: circular import]
+    end
+    Load --> P1["Pass 1 · register names<br/>structs, generic structs, traits, consts"]
+    P1 --> P1b["Pass 1b · trait method signatures"]
+    P1b --> P2a["Pass 2 · resolve struct fields<br/>(instantiates generic structs on demand)"]
+    P2a --> P3["Pass 3 · function headers<br/>+ method headers"]
+    P3 --> P3b["Pass 3b · trait conformance<br/>build vtables"]
+    P3b --> P4["Pass 4 · compile bodies<br/>type check + emit bytecode"]
+    P4 --> G{generic call?}
+    G -->|yes, new instantiation| INST["Unify arg types → bind T<br/>check bounds → compile body<br/>(nested, state saved)"]
+    INST --> P4
+    P4 --> L{lambda?}
+    L -->|yes| LAM["Capture analysis → lift to<br/>hidden function (params + captures)"]
+    LAM --> P4
+    P4 --> PEEP["Peephole per function<br/>load2 · load_integer · add_store<br/>jump_unless · jump_unless_locals"]
+    PEEP --> VER[verify Program]
+    VER --> OUT[(Program)]

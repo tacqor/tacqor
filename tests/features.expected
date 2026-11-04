@@ -1,0 +1,66 @@
+5.0
+Point(x=0.0, y=0.0)
+3.75
+3.5
+3.5
+7
+3
+-1
+1000.0
+-5.0
+[1, 3, 5, 7, 9]
+[3, 5]
+[1, 3]
+[7, 9]
+9
+[100, 3, 5, 7]
+100
+3
+5
+7
+False
+-1
+[7, 5, 3, 100]
+apple, birch, cedar
+3
+{"the": 3, "cat": 1, "and": 2, "dog": 1, "bird": 1}
+["the", "cat", "and", "dog", "bird"]
+5
+True
+False
+Account(owner="Ada", balance=35, history=[5, 20])
+35
+2
+negative zero small large
+6765
+42!
+-17
+5.0
+12
+H
+World
+HELLO, WORLD
+hello, world
+7
+Hello, Tacqor
+True
+False
+padded|
+True
+λ
+955
+True
+12
+0.5
+4
+4.5
+1024.0
+3
+-4
+2
+9223372036854775807
+28
+True
+True
+False
+2997

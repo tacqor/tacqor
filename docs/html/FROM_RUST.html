@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — FROM_RUST</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-for-rust-programmers"
+id="toc-tacqor-for-rust-programmers">Tacqor for Rust Programmers</a>
+<ul>
+<li><a href="#1-what-carries-over" id="toc-1-what-carries-over">1. What
+carries over</a></li>
+<li><a href="#2-what-is-different-and-why"
+id="toc-2-what-is-different-and-why">2. What is different, and
+why</a></li>
+<li><a href="#3-side-by-side" id="toc-3-side-by-side">3. Side by
+side</a></li>
+<li><a href="#4-memory-model" id="toc-4-memory-model">4. Memory
+model</a></li>
+<li><a href="#5-concurrency" id="toc-5-concurrency">5.
+Concurrency</a></li>
+<li><a href="#6-tooling-map" id="toc-6-tooling-map">6. Tooling
+map</a></li>
+<li><a href="#7-what-you-will-miss-and-what-to-do-instead"
+id="toc-7-what-you-will-miss-and-what-to-do-instead">7. What you will
+miss, and what to do instead</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-for-rust-programmers">Tacqor for Rust Programmers</h1>
+<p>Tacqor borrows Rust's error model and type discipline and leaves out
+the ownership system. If you know Rust, you know most of Tacqor already;
+this guide covers what is the same, what is deliberately different, and
+how the familiar idioms are written. Every Tacqor snippet compiles and
+runs as shown.</p>
+<h2 id="1-what-carries-over">1. What carries over</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Rust</th>
+<th>Tacqor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Option&lt;T&gt;</code>, <code>Some</code>,
+<code>None</code></td>
+<td><code>Option[T]</code>, <code>Some</code>, <code>None</code></td>
+</tr>
+<tr class="even">
+<td><code>Result&lt;T, E&gt;</code>, <code>Ok</code>,
+<code>Err</code></td>
+<td><code>Result[T, E]</code>, <code>Ok</code>, <code>Err</code></td>
+</tr>
+<tr class="odd">
+<td><code>?</code></td>
+<td><code>?</code> (same semantics: early return of the
+<code>None</code>/<code>Err</code>)</td>
+</tr>
+<tr class="even">
+<td><code>match</code> with exhaustiveness</td>
+<td><code>match</code> … <code>case</code> with exhaustiveness</td>
+</tr>
+<tr class="odd">
+<td><code>unwrap</code>, <code>unwrap_or</code>, <code>expect</code>,
+<code>is_some</code>, <code>is_ok</code></td>
+<td>same names, as functions or methods</td>
+</tr>
+<tr class="even">
+<td><code>struct</code> with <code>impl</code> methods</td>
+<td><code>struct</code> with methods inside the struct</td>
+</tr>
+<tr class="odd">
+<td><code>trait</code> + <code>impl Trait for S</code> +
+<code>dyn Trait</code></td>
+<td><code>trait</code> + <code>struct S(Trait)</code> + trait-typed
+values</td>
+</tr>
+<tr class="even">
+<td>generics <code>fn f&lt;T: Trait&gt;(x: T)</code> monomorphized</td>
+<td><code>def f[T: Trait](x: T)</code> monomorphized</td>
+</tr>
+<tr class="odd">
+<td>closures `</td>
+<td>x</td>
+</tr>
+<tr class="even">
+<td><code>let</code> (immutable) / <code>let mut</code></td>
+<td><code>let</code> / <code>var</code></td>
+</tr>
+<tr class="odd">
+<td><code>const</code></td>
+<td><code>const</code></td>
+</tr>
+<tr class="even">
+<td>checked overflow (debug)</td>
+<td>checked overflow, always</td>
+</tr>
+<tr class="odd">
+<td><code>i64</code>, <code>f64</code>, <code>bool</code>,
+<code>String</code>, <code>Vec&lt;T&gt;</code>,
+<code>HashMap&lt;K, V&gt;</code></td>
+<td><code>i64</code>, <code>f64</code>, <code>bool</code>,
+<code>str</code>, <code>list[T]</code>, <code>dict[K, V]</code></td>
+</tr>
+<tr class="even">
+<td><code>#[test]</code></td>
+<td><code>def test_*()</code> + <code>tacqor test</code></td>
+</tr>
+<tr class="odd">
+<td><code>cargo new</code>, <code>cargo test</code>,
+<code>cargo build --release</code></td>
+<td><code>tacqor new</code>, <code>tacqor test</code>,
+<code>tacqor build --native</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-what-is-different-and-why">2. What is different, and why</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Rust</th>
+<th>Tacqor</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ownership, borrowing, lifetimes</td>
+<td>None. Containers, structs and closures are reference values; scalars
+and strings are copied.</td>
+<td>The largest source of Rust's learning curve; Tacqor pays a constant
+factor in refcounting instead (<code>WHITEPAPER.md</code> §2.4).</td>
+</tr>
+<tr class="even">
+<td><code>&amp;</code>, <code>&amp;mut</code>, <code>Box</code>,
+<code>Rc</code>, <code>RefCell</code>, <code>Arc</code></td>
+<td>Not needed. Passing a list shares it; struct fields are always
+mutable.</td>
+<td>One way to pass values.</td>
+</tr>
+<tr class="odd">
+<td><code>enum</code> with data</td>
+<td><code>Option</code>/<code>Result</code> only; model other sums as a
+struct with a <code>kind</code> field or as traits.</td>
+<td>Keeps the type system small (see <code>ROADMAP.md</code> for user
+enums).</td>
+</tr>
+<tr class="even">
+<td><code>impl</code> blocks,
+<code>self</code>/<code>&amp;self</code>/<code>&amp;mut self</code></td>
+<td>Methods are written inside the struct; the receiver is always
+<code>self</code>.</td>
+<td>No borrow distinction to express.</td>
+</tr>
+<tr class="odd">
+<td>Traits with default methods, associated types, generic traits</td>
+<td>Traits list signatures only.</td>
+<td>Simplicity; may grow.</td>
+</tr>
+<tr class="even">
+<td><code>Vec&lt;u8&gt;</code>, <code>i32</code>, <code>u64</code>,
+<code>usize</code>, <code>char</code></td>
+<td><code>i64</code>, <code>f64</code>, <code>bool</code>,
+<code>str</code> only; <code>bytes(s)</code> gives a
+<code>list[i64]</code>.</td>
+<td>One integer type removes conversion bugs.</td>
+</tr>
+<tr class="odd">
+<td><code>String</code> / <code>&amp;str</code></td>
+<td>One <code>str</code> type, immutable UTF-8 bytes.</td>
+<td>No borrowing, so no view type.</td>
+</tr>
+<tr class="even">
+<td><code>panic!</code> / <code>unwrap</code></td>
+<td><code>fail(msg)</code> / <code>unwrap</code>; runtime errors print a
+traceback and exit 1</td>
+<td>Same semantics; <code>attempt(f)</code> catches at boundaries.</td>
+</tr>
+<tr class="odd">
+<td><code>std::thread</code>, <code>Mutex</code>, channels,
+<code>async</code></td>
+<td><code>parallel_sum</code> / <code>parallel_map</code> only</td>
+<td>No shared mutable state across threads (refcounts are not
+atomic).</td>
+</tr>
+<tr class="even">
+<td><code>mod</code>, <code>use</code>, <code>pub</code></td>
+<td><code>import a.b</code>; everything in a module is public; names
+stay qualified</td>
+<td>Smaller surface.</td>
+</tr>
+<tr class="odd">
+<td>Shadowing with <code>let x = …</code> twice</td>
+<td>Not allowed in the same scope</td>
+<td>Avoids accidental re-typing.</td>
+</tr>
+<tr class="even">
+<td><code>loop</code>, <code>while let</code>, labelled breaks</td>
+<td><code>while True:</code>, <code>while is_some(x):</code>,
+innermost-loop <code>break</code></td>
+<td>Python's control flow.</td>
+</tr>
+<tr class="odd">
+<td><code>if let Some(x) = …</code></td>
+<td><code>match … case Some(x): … case None:</code></td>
+<td>One form of destructuring.</td>
+</tr>
+<tr class="even">
+<td><code>impl Display</code> / <code>{:?}</code></td>
+<td><code>str(x)</code> and <code>f"{x}"</code> print every value
+structurally</td>
+<td>Nothing to derive.</td>
+</tr>
+<tr class="odd">
+<td><code>#[derive(PartialEq, Clone)]</code></td>
+<td><code>==</code> is structural for every type; no <code>clone</code>
+for containers (slice <code>xs[:]</code> copies a list)</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Macros</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Cargo registry</td>
+<td><code>tacqor add URL</code> from any git repository or folder</td>
+<td>No central registry to run.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-side-by-side">3. Side by side</h2>
+<h3 id="errors-and-">Errors and <code>?</code></h3>
+<p>Rust:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> parse_pair(s<span class="op">:</span> <span class="op">&amp;</span><span class="dt">str</span>) <span class="op">-&gt;</span> <span class="dt">Result</span><span class="op">&lt;</span>(<span class="dt">i64</span><span class="op">,</span> <span class="dt">i64</span>)<span class="op">,</span> <span class="dt">String</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> it <span class="op">=</span> s<span class="op">.</span>split(<span class="ch">&#39;,&#39;</span>)<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> a <span class="op">=</span> it<span class="op">.</span>next()<span class="op">.</span>ok_or(<span class="st">&quot;missing a&quot;</span>)<span class="op">?.</span>trim()<span class="op">.</span><span class="pp">parse::</span><span class="op">&lt;</span><span class="dt">i64</span><span class="op">&gt;</span>()<span class="op">.</span>map_err(<span class="op">|</span>e<span class="op">|</span> e<span class="op">.</span>to_string())<span class="op">?;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> b <span class="op">=</span> it<span class="op">.</span>next()<span class="op">.</span>ok_or(<span class="st">&quot;missing b&quot;</span>)<span class="op">?.</span>trim()<span class="op">.</span><span class="pp">parse::</span><span class="op">&lt;</span><span class="dt">i64</span><span class="op">&gt;</span>()<span class="op">.</span>map_err(<span class="op">|</span>e<span class="op">|</span> e<span class="op">.</span>to_string())<span class="op">?;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">Ok</span>((a<span class="op">,</span> b))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Tacqor:</p>
+<pre class="text"><code>struct Pair:
+    a: i64
+    b: i64
+
+def number(text: str, what: str) -&gt; Result[i64, str]:
+    match parse_int(strip(text)):
+        case Some(n):
+            return Ok(n)
+        case None:
+            return Err(f&quot;{what} is not a number: {text}&quot;)
+
+def parse_pair(s: str) -&gt; Result[Pair, str]:
+    let parts = split(s, &quot;,&quot;)
+    if len(parts) != 2:
+        return Err(&quot;expected two numbers&quot;)
+    let a = number(parts[0], &quot;a&quot;)?
+    let b = number(parts[1], &quot;b&quot;)?
+    return Ok(Pair(a, b))
+
+def main():
+    print(parse_pair(&quot;3, 4&quot;))        # Ok(Pair(a=3, b=4))
+    print(parse_pair(&quot;3, x&quot;))        # Err(&quot;b is not a number:  x&quot;)</code></pre>
+<p>There are no tuples; a two-field struct is the idiom.
+<code>parse_int</code> returns <code>Option[i64]</code> rather than a
+<code>Result</code> with a typed error, and the conversion from
+<code>Option</code> to <code>Result</code> is a <code>match</code>
+rather than <code>ok_or</code>.</p>
+<h3 id="traits-and-dynamic-dispatch">Traits and dynamic dispatch</h3>
+<p>Rust:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">trait</span> Shape <span class="op">{</span> <span class="kw">fn</span> area(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">f64</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Circle <span class="op">{</span> r<span class="op">:</span> <span class="dt">f64</span> <span class="op">}</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">impl</span> Shape <span class="cf">for</span> Circle <span class="op">{</span> <span class="kw">fn</span> area(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">f64</span> <span class="op">{</span> <span class="dv">3.14159</span> <span class="op">*</span> <span class="kw">self</span><span class="op">.</span>r <span class="op">*</span> <span class="kw">self</span><span class="op">.</span>r <span class="op">}</span> <span class="op">}</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> total(shapes<span class="op">:</span> <span class="op">&amp;</span>[<span class="dt">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> Shape<span class="op">&gt;</span>]) <span class="op">-&gt;</span> <span class="dt">f64</span> <span class="op">{</span> shapes<span class="op">.</span>iter()<span class="op">.</span>map(<span class="op">|</span>s<span class="op">|</span> s<span class="op">.</span>area())<span class="op">.</span>sum() <span class="op">}</span></span></code></pre></div>
+<p>Tacqor:</p>
+<pre class="text"><code>trait Shape:
+    def area(self) -&gt; f64
+
+struct Circle(Shape):
+    r: f64
+
+    def area(self) -&gt; f64:
+        return 3.14159 * self.r * self.r
+
+struct Square(Shape):
+    side: f64
+
+    def area(self) -&gt; f64:
+        return self.side * self.side
+
+def total(shapes: list[Shape]) -&gt; f64:
+    var sum = 0.0
+    for s in shapes:
+        sum += s.area()
+    return sum
+
+def main():
+    let shapes: list[Shape] = [Circle(1.0), Square(2.0)]
+    print(total(shapes))             # 7.14159</code></pre>
+<p>A struct names its traits in parentheses and the compiler checks the
+method set. A <code>list[Shape]</code> holds any implementing struct; no
+<code>Box</code>, no <code>dyn</code>. Static dispatch is the generic
+form: <code>def total[T: Shape](shapes: list[T]) -&gt; f64</code>
+compiles one copy per concrete <code>T</code>, like Rust's
+<code>impl Trait</code> parameters.</p>
+<h3 id="generics-with-bounds">Generics with bounds</h3>
+<p>Rust:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode rust"><code class="sourceCode rust"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> largest<span class="op">&lt;</span>T<span class="op">:</span> <span class="bu">PartialOrd</span> <span class="op">+</span> <span class="bu">Copy</span><span class="op">&gt;</span>(items<span class="op">:</span> <span class="op">&amp;</span>[T]) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span> … <span class="op">}</span></span></code></pre></div>
+<p>Tacqor has no <code>PartialOrd</code>; comparisons are built in for
+<code>i64</code>, <code>f64</code> and <code>str</code>, so generic
+ordering goes through a key function:</p>
+<pre class="text"><code>import std.lists
+
+struct Item:
+    name: str
+    weight: i64
+
+def main():
+    let items = [Item(&quot;a&quot;, 5), Item(&quot;b&quot;, 9), Item(&quot;c&quot;, 2)]
+    match lists.max_by(items, fn(i: Item) =&gt; i.weight):
+        case Some(heaviest):
+            print(heaviest.name)    # b
+        case None:
+            print(&quot;empty&quot;)</code></pre>
+<h3 id="closures-and-capture">Closures and capture</h3>
+<p>Rust closures borrow or move their environment; Tacqor closures copy
+scalars and strings and share containers at creation time. There is no
+<code>move</code> and no <code>FnMut</code>: a closure cannot assign to
+a captured variable. To accumulate, share a container:</p>
+<pre class="text"><code>import std.lists
+
+def main():
+    let seen: list[str] = []
+    let record = fn(word: str):
+        push(seen, word)
+    lists.each([&quot;x&quot;, &quot;y&quot;], record)
+    print(seen)                      # [&quot;x&quot;, &quot;y&quot;]</code></pre>
+<h3 id="iterators">Iterators</h3>
+<p>There is no iterator trait or lazy adaptor chain.
+<code>std.lists</code> provides eager <code>map</code>,
+<code>filter</code>, <code>reduce</code>, <code>zip</code>,
+<code>enumerate</code>, <code>take</code>, <code>drop</code>,
+<code>flatten</code>, <code>unique</code>, <code>sorted_by</code>; each
+returns a new list. For large pipelines, write one loop.</p>
+<pre class="text"><code>import std.lists
+
+def main():
+    let xs = lists.range_list(1, 11)
+    let odd_squares = lists.map(lists.filter(xs, fn(x: i64) =&gt; x % 2 == 1), fn(x: i64) =&gt; x * x)
+    print(lists.reduce(odd_squares, 0, fn(acc: i64, x: i64) =&gt; acc + x))   # 165</code></pre>
+<h3 id="mutation-through-parameters">Mutation through parameters</h3>
+<p>Rust distinguishes <code>&amp;T</code> from <code>&amp;mut T</code>.
+In Tacqor a list, dict or struct parameter is always the shared object;
+a function that modifies it modifies the caller's value. Scalars and
+strings are copies.</p>
+<pre class="text"><code>def bump(counts: dict[str, i64], key: str):
+    if key in counts:
+        counts[key] += 1
+    else:
+        counts[key] = 1
+
+def main():
+    var c: dict[str, i64] = {}
+    bump(c, &quot;a&quot;)
+    bump(c, &quot;a&quot;)
+    print(c)                         # {&quot;a&quot;: 2}</code></pre>
+<p>If you need a copy, make one: <code>let copy = xs[:]</code> for
+lists; for dicts and structs, build a new value.</p>
+<h3 id="panics-and-recovery">Panics and recovery</h3>
+<p>Rust's <code>catch_unwind</code> is rarely used; Tacqor's
+<code>attempt</code> fills the same niche:</p>
+<pre class="text"><code>def risky(n: i64) -&gt; i64:
+    let xs = [1, 2, 3]
+    return xs[n]
+
+def main():
+    print(attempt(fn() =&gt; risky(1)))     # Ok(2)
+    print(attempt(fn() =&gt; risky(7)))     # Err(&quot;list index out of bounds&quot;)</code></pre>
+<h2 id="4-memory-model">4. Memory model</h2>
+<p>Reference counting plus a cycle collector. Objects are freed when the
+last reference disappears; cycles are reclaimed by a trial-deletion
+collector that runs after a few hundred thousand container allocations.
+Cost: one increment/decrement per reference copy. You never write a
+destructor, there is no <code>Drop</code>, and there is no
+<code>unsafe</code>. Performance consequences are in
+<code>PERFORMANCE.md</code> §5: native Tacqor is 1.4–3× slower than Rust
+on compute-bound code.</p>
+<h2 id="5-concurrency">5. Concurrency</h2>
+<p><code>parallel_sum(count, workers, f)</code> and
+<code>parallel_map(count, workers, f)</code> run
+<code>f: fn(i64) -&gt; i64</code> over <code>0..count</code> on
+<code>workers</code> threads and return exactly the same result as the
+sequential loop. <code>f</code> may capture only <code>i64</code>,
+<code>f64</code> and <code>bool</code> values, enforced at compile time,
+so no thread ever shares a mutable object — the Send/Sync guarantee by
+construction rather than by trait.</p>
+<h2 id="6-tooling-map">6. Tooling map</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Cargo</th>
+<th>Tacqor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>cargo new app</code></td>
+<td><code>tacqor new app</code></td>
+</tr>
+<tr class="even">
+<td><code>cargo run -- args</code></td>
+<td><code>tacqor run main.tq -- args</code> or
+<code>tacqor main.tq args</code></td>
+</tr>
+<tr class="odd">
+<td><code>cargo check</code></td>
+<td><code>tacqor check main.tq</code></td>
+</tr>
+<tr class="even">
+<td><code>cargo test</code></td>
+<td><code>tacqor test tests.tq</code></td>
+</tr>
+<tr class="odd">
+<td><code>cargo build --release</code></td>
+<td><code>tacqor build --native main.tq -o app</code></td>
+</tr>
+<tr class="even">
+<td><code>cargo add crate</code></td>
+<td><code>tacqor add URL</code></td>
+</tr>
+<tr class="odd">
+<td><code>Cargo.toml</code> / <code>Cargo.lock</code></td>
+<td><code>tacqor.pkg</code></td>
+</tr>
+<tr class="even">
+<td><code>rustfmt</code></td>
+<td>none yet (see <code>STYLE.md</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>clippy</code></td>
+<td>warnings in <code>tacqor check</code></td>
+</tr>
+<tr class="even">
+<td><code>cargo expand</code></td>
+<td><code>tacqor dump</code> (bytecode) and <code>tacqor emit</code>
+(C++)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-what-you-will-miss-and-what-to-do-instead">7. What you will
+miss, and what to do instead</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Missing</th>
+<th>Alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>User-defined enums</td>
+<td>A struct with a <code>kind: str</code> field plus payload fields, or
+one struct per case implementing a trait</td>
+</tr>
+<tr class="even">
+<td>Tuples</td>
+<td>A small struct, or <code>Pair[A, B]</code> from
+<code>std.lists</code></td>
+</tr>
+<tr class="odd">
+<td>Pattern matching on structs and nested patterns</td>
+<td><code>match</code> on the <code>Option</code>/<code>Result</code>,
+then <code>if</code> on fields</td>
+</tr>
+<tr class="even">
+<td><code>impl Trait</code> return types</td>
+<td>Return the trait type: <code>def make() -&gt; Shape</code></td>
+</tr>
+<tr class="odd">
+<td>Slices and views</td>
+<td>Slicing copies (<code>xs[a:b]</code>); pass the list and indexes for
+a view</td>
+</tr>
+<tr class="even">
+<td>Integer types other than <code>i64</code></td>
+<td>Mask with <code>&amp; 0xFF</code> and friends;
+<code>to_hex</code>/<code>from_hex</code>,
+<code>bytes</code>/<code>from_bytes</code> for byte work</td>
+</tr>
+<tr class="odd">
+<td><code>Iterator</code></td>
+<td>Eager <code>std.lists</code> functions, or a struct with a
+<code>next() -&gt; Option[T]</code> method</td>
+</tr>
+<tr class="even">
+<td>Lifetimes</td>
+<td>Nothing to write; references are never dangling</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

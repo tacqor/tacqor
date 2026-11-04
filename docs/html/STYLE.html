@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — STYLE</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-style-guide" id="toc-tacqor-style-guide">Tacqor
+Style Guide</a>
+<ul>
+<li><a href="#layout" id="toc-layout">Layout</a></li>
+<li><a href="#naming" id="toc-naming">Naming</a></li>
+<li><a href="#bindings" id="toc-bindings">Bindings</a></li>
+<li><a href="#functions" id="toc-functions">Functions</a></li>
+<li><a href="#types" id="toc-types">Types</a></li>
+<li><a href="#control-flow" id="toc-control-flow">Control flow</a></li>
+<li><a href="#errors-and-messages" id="toc-errors-and-messages">Errors
+and messages</a></li>
+<li><a href="#modules" id="toc-modules">Modules</a></li>
+<li><a href="#comments-and-documentation"
+id="toc-comments-and-documentation">Comments and documentation</a></li>
+<li><a href="#performance-habits"
+id="toc-performance-habits">Performance habits</a></li>
+<li><a href="#testing" id="toc-testing">Testing</a></li>
+<li><a href="#things-to-avoid" id="toc-things-to-avoid">Things to
+avoid</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-style-guide">Tacqor Style Guide</h1>
+<p>Conventions used by the standard library and examples. Following them
+makes code read the same everywhere; none of them is enforced by the
+compiler except where noted.</p>
+<h2 id="layout">Layout</h2>
+<ul>
+<li>Four spaces per indentation level (enforced). No tabs
+(enforced).</li>
+<li>One blank line between functions; two before a top-level
+<code>struct</code> or <code>trait</code> when the file is long.</li>
+<li>Lines up to 110 characters. Break long calls after a comma;
+continuation lines inside brackets are free-form.</li>
+<li>A file is: optional shebang, a comment describing the module,
+imports, constants, structs and traits, functions, <code>main</code>
+last.</li>
+</ul>
+<h2 id="naming">Naming</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Thing</th>
+<th>Convention</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Functions, methods, locals, fields, modules</td>
+<td><code>snake_case</code></td>
+<td><code>parse_row</code>, <code>total_area</code>,
+<code>std.lists</code></td>
+</tr>
+<tr class="even">
+<td>Structs, traits, type parameters</td>
+<td><code>CamelCase</code>, single capitals for type parameters</td>
+<td><code>Account</code>, <code>Shape</code>, <code>T</code>,
+<code>K</code>, <code>V</code></td>
+</tr>
+<tr class="odd">
+<td>Constants</td>
+<td><code>UPPER_SNAKE</code></td>
+<td><code>MAX_REQUEST</code></td>
+</tr>
+<tr class="even">
+<td>Tests</td>
+<td><code>test_</code> prefix, describe the behaviour</td>
+<td><code>test_rejects_empty_name</code></td>
+</tr>
+<tr class="odd">
+<td>Predicates</td>
+<td><code>is_</code>/<code>has_</code> prefix, return
+<code>bool</code></td>
+<td><code>is_prime</code>, <code>has_header</code></td>
+</tr>
+<tr class="even">
+<td>Conversions</td>
+<td><code>to_x</code> / <code>from_x</code> / <code>parse_x</code></td>
+<td><code>to_hex</code>, <code>from_bytes</code>,
+<code>parse_int</code></td>
+</tr>
+</tbody>
+</table>
+<p>Avoid single-letter names except for loop indices, lambda parameters
+in one-line lambdas, and type parameters.</p>
+<h2 id="bindings">Bindings</h2>
+<ul>
+<li>Default to <code>let</code>; use <code>var</code> only for values
+that are reassigned. The compiler tells you when a <code>var</code> is
+needed.</li>
+<li>Annotate the type when the initializer does not fix it
+(<code>var items: list[i64] = []</code>) and when it helps the reader at
+a module boundary; otherwise let inference work.</li>
+<li>Declare variables close to first use, inside the narrowest
+block.</li>
+</ul>
+<h2 id="functions">Functions</h2>
+<ul>
+<li>Every function that can fail for an expected reason returns
+<code>Result[T, str]</code> (or a struct error type when callers need to
+inspect it). Reserve runtime errors (<code>fail</code>,
+<code>assert</code>, <code>unwrap</code>) for bugs.</li>
+<li>Use <code>?</code> to propagate; use <code>match</code> at the point
+where you decide what to do.</li>
+<li>Keep <code>main</code> short: parse arguments, call into functions,
+report.</li>
+<li>Prefer returning a value over mutating an argument, except for
+performance-sensitive code and methods that obviously mutate
+<code>self</code> (<code>push</code>, <code>deposit</code>).</li>
+<li>Procedures (no result) should have verb names: <code>save</code>,
+<code>print_report</code>.</li>
+</ul>
+<h2 id="types">Types</h2>
+<ul>
+<li>Use <code>Option[T]</code> for "may be absent", never a sentinel
+like <code>-1</code> or <code>""</code> — except where a built-in
+already uses one (<code>find</code> returns <code>-1</code>); wrap such
+built-ins when passing results around.</li>
+<li>Use structs for records of more than two fields;
+<code>std.lists.Pair</code> for exactly two.</li>
+<li>Use traits only when more than one struct needs the same interface;
+a single struct with methods is simpler.</li>
+<li>Generic code should be <em>actually</em> generic: if it only ever
+runs on one type, write it for that type.</li>
+</ul>
+<h2 id="control-flow">Control flow</h2>
+<ul>
+<li><code>for x in items</code> over an index loop unless the index is
+needed; <code>for i in range(len(items))</code> when it is.</li>
+<li><code>while True:</code> with <code>break</code>/<code>return</code>
+for loops whose exit condition sits in the middle.</li>
+<li><code>match</code> for <code>Option</code>/<code>Result</code> and
+for multi-way string/integer dispatch; <code>if</code>/<code>elif</code>
+for ranges and compound conditions.</li>
+<li>One <code>return</code> per arm is fine; early returns for guard
+clauses are encouraged.</li>
+</ul>
+<h2 id="errors-and-messages">Errors and messages</h2>
+<ul>
+<li>Error strings are lowercase, no trailing period, name the offending
+value: <code>f"port out of range: {port}"</code>.</li>
+<li>Validate at the boundary (arguments, files, requests) and trust the
+types inside.</li>
+<li>Use <code>eprint</code> for diagnostics, <code>print</code> for
+output a user or another program consumes.</li>
+<li>Exit codes: 0 success, 1 failure, 2 usage error.</li>
+</ul>
+<h2 id="modules">Modules</h2>
+<ul>
+<li>One module per concept; names are nouns (<code>geometry</code>,
+<code>http</code>). Keep <code>main</code> in the entry file.</li>
+<li>Import with the default alias unless it clashes; <code>as</code> is
+for clashes, not for shortening.</li>
+<li>Public API first in the file, helpers below. There is no private
+keyword; prefix internal helpers with <code>_</code> by convention?
+<strong>No</strong> — Tacqor does not treat <code>_</code> specially;
+put helpers at the bottom and document the intended API in the module
+comment.</li>
+</ul>
+<h2 id="comments-and-documentation">Comments and documentation</h2>
+<ul>
+<li>A module starts with a comment stating what it provides and the
+one-line usage.</li>
+<li>Comment <em>why</em>, not <em>what</em>; the types already say
+what.</li>
+<li>Keep examples in comments runnable (the standard library does).</li>
+</ul>
+<h2 id="performance-habits">Performance habits</h2>
+<ul>
+<li>Lists of <code>i64</code>, <code>f64</code> or <code>bool</code> use
+flat native storage; prefer them to lists of structs for numeric
+work.</li>
+<li>Build strings with <code>join</code> over a list rather than
+repeated <code>+=</code> in a long loop.</li>
+<li>Use <code>parallel_sum</code>/<code>parallel_map</code> for
+CPU-bound loops over an index; keep the mapper pure.</li>
+<li>Build with <code>--native</code> before concluding something is
+slow.</li>
+</ul>
+<h2 id="testing">Testing</h2>
+<ul>
+<li>One <code>tests.tq</code> per module or project; import the module
+under test.</li>
+<li>Name tests after behaviours; one assertion idea per test.</li>
+<li>Use <code>std.testing</code> so failures print the values
+involved.</li>
+</ul>
+<h2 id="things-to-avoid">Things to avoid</h2>
+<ul>
+<li>Shadowing a module-level function with a local of the same name
+(allowed, but confusing).</li>
+<li>Catching everything with <code>attempt</code> far from the failure;
+catch at the boundary you own.</li>
+<li>Deep nesting of <code>match</code> inside <code>match</code>;
+extract a function.</li>
+<li>Global mutable state through captured containers in lambdas that are
+passed around widely.</li>
+</ul>
+</body>
+</html>

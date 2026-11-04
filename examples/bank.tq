@@ -1,0 +1,35 @@
+# Error handling with Result, match and `?`, plus struct methods and f-strings.
+
+struct Account:
+    owner: str
+    balance: i64
+
+    def withdraw(self, amount: i64) -> Result[i64, str]:
+        if amount <= 0:
+            return Err(f"invalid amount {amount}")
+        if amount > self.balance:
+            return Err(f"{self.owner} has only {self.balance}, cannot withdraw {amount}")
+        self.balance -= amount
+        return Ok(self.balance)
+
+    def deposit(self, amount: i64) -> Result[i64, str]:
+        if amount <= 0:
+            return Err(f"invalid amount {amount}")
+        self.balance += amount
+        return Ok(self.balance)
+
+def transfer(source: Account, target: Account, amount: i64) -> Result[str, str]:
+    source.withdraw(amount)?
+    target.deposit(amount)?
+    return Ok(f"moved {amount} from {source.owner} to {target.owner}")
+
+def main():
+    let ada = Account("Ada", 100)
+    let bob = Account("Bob", 20)
+    for amount in [30, 500, -1, 70]:
+        match transfer(ada, bob, amount):
+            case Ok(message):
+                print(message)
+            case Err(problem):
+                print("failed: " + problem)
+    print(f"{ada.owner}: {ada.balance}, {bob.owner}: {bob.balance}")

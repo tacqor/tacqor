@@ -1,0 +1,28 @@
+# Reads a text file and prints the most common words. Run with a path argument.
+
+def main():
+    if argc() != 1:
+        print("Pass one file path.")
+        exit(2)
+    var counts: dict[str, i64] = {}
+    for line in split(read_text(arg(0)), "\n"):
+        for word in split(lower(line), " "):
+            let clean = strip(word)
+            if clean == "":
+                continue
+            if clean in counts:
+                counts[clean] += 1
+            else:
+                counts[clean] = 1
+    var best: list[str] = []
+    var best_count = 0
+    for word in keys(counts):
+        let count = counts[word]
+        if count > best_count:
+            best_count = count
+            best = [word]
+        elif count == best_count:
+            push(best, word)
+    sort(best)
+    print(str(len(counts)) + " distinct words")
+    print("Most common (" + str(best_count) + "): " + join(best, ", "))

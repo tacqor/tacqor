@@ -1,0 +1,11 @@
+def score(n: i64) -> i64:
+    if n >= 0 and n < 100000000:
+        return (n * 48271 + 17) % 2147483647
+    else:
+        return 0
+
+def main():
+    var total = 0
+    for index in range(12000000):
+        total = total + score(index)
+    print(total)

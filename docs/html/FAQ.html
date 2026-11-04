@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — FAQ</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-faq" id="toc-tacqor-faq">Tacqor FAQ</a></li>
+</ul>
+</nav>
+<h1 id="tacqor-faq">Tacqor FAQ</h1>
+<h3 id="what-is-tacqor-in-one-sentence">What is Tacqor, in one
+sentence?</h3>
+<p>A statically typed, compiled language with Python's indentation
+syntax and Rust's error discipline (<code>Option</code>,
+<code>Result</code>, <code>?</code>, checked arithmetic), shipped as a
+single executable that runs programs in a bytecode VM or compiles them
+to native code.</p>
+<h3 id="who-is-it-for">Who is it for?</h3>
+<p>People who write scripts, tools, services and data-processing
+programs in Python and want them to be type-checked and fast without
+learning an ownership system, and people who like Rust's error handling
+but want a smaller language.</p>
+<h3 id="is-it-interpreted-or-compiled">Is it interpreted or
+compiled?</h3>
+<p>Both. <code>tacqor file.tq</code> compiles to bytecode in memory and
+runs it in the VM; <code>tacqor build --native</code> compiles the same
+bytecode to C++ and then to machine code. Both produce identical output
+for every program; the test suite checks this for every feature.</p>
+<h3 id="how-fast-is-it">How fast is it?</h3>
+<p>Native builds run within 1.4–3× of C++ and Rust on compute-bound code
+and 1.6–90× faster than CPython; the VM is faster than CPython on every
+benchmark. See <code>PERFORMANCE.md</code>.</p>
+<h3 id="do-i-need-a-c-compiler">Do I need a C++ compiler?</h3>
+<p>Only for <code>build --native</code>. Running, testing,
+<code>build</code> (bytecode + embedded VM) and everything else need
+just the <code>tacqor</code> binary.</p>
+<h3 id="is-there-a-garbage-collector">Is there a garbage collector?</h3>
+<p>Reference counting frees most objects immediately; a cycle collector
+runs automatically to reclaim reference cycles. There are no pauses to
+tune; <code>gc_collect()</code> forces a collection if you want one.</p>
+<h3 id="why-are-there-no-classes-or-inheritance">Why are there no
+classes or inheritance?</h3>
+<p>Structs hold data and methods; traits describe behaviour that several
+structs share; generics write code once for many types. Together these
+cover what inheritance is used for, without the fragile base class
+problem or the question of which overridden method runs. This is the
+same position as Rust and Go.</p>
+<h3 id="why-is-there-no-tryexcept">Why is there no
+<code>try</code>/<code>except</code>?</h3>
+<p>Because then every call could fail invisibly. A function that can
+fail says so in its type by returning <code>Result[T, E]</code>; the
+caller handles it with <code>match</code>, propagates it with
+<code>?</code>, or converts it with <code>unwrap_or</code>.
+<code>attempt(f)</code> exists for the boundary case — keep a server
+running when one request fails — not as a general control-flow
+mechanism.</p>
+<h3 id="what-happens-on-integer-overflow">What happens on integer
+overflow?</h3>
+<p>A runtime error with a traceback, in both the VM and native code.
+There is no silent wraparound. If you want wrapping, use the bit
+operators on masked values or <code>f64</code>.</p>
+<h3 id="why-i64-and-f64-only-where-are-i32-u8-">Why <code>i64</code> and
+<code>f64</code> only? Where are <code>i32</code>, <code>u8</code>,
+…?</h3>
+<p>One integer type and one float type remove a whole class of
+conversion bugs and keep the language small. Lists of <code>i64</code>,
+<code>f64</code> and <code>bool</code> are stored unboxed, so there is
+no memory penalty for the common cases. Narrower types may come later if
+a use case demands them (see <code>ROADMAP.md</code>).</p>
+<h3 id="are-strings-unicode">Are strings Unicode?</h3>
+<p>Strings are immutable UTF-8 byte strings. <code>len</code> counts
+bytes and indexing yields bytes; <code>chars</code>,
+<code>char_count</code>, <code>chr</code> and <code>ord</code> work in
+code points. This matches what files and sockets deliver and avoids the
+index-is-not-a-character surprise of UTF-16 languages.</p>
+<h3 id="can-i-write-concurrent-programs">Can I write concurrent
+programs?</h3>
+<p>Data-parallel ones: <code>parallel_sum</code> and
+<code>parallel_map</code> run a function over an index range on up to 64
+threads and return deterministic results. There are no shared-memory
+threads, locks or async; the HTTP server handles one connection at a
+time. This keeps the memory model simple (refcounts are not atomic). See
+<code>ROADMAP.md</code> for what is planned.</p>
+<h3 id="how-do-i-handle-none">How do I handle <code>None</code>?</h3>
+<pre class="text"><code>match lookup(ages, &quot;ann&quot;):
+    case Some(age):
+        print(age)
+    case None:
+        print(&quot;unknown&quot;)</code></pre>
+<p>Or <code>unwrap_or(lookup(ages, "ann"), 0)</code>, or
+<code>lookup(ages, "ann")?</code> inside a function that itself returns
+an <code>Option</code>.</p>
+<h3 id="how-do-modules-work">How do modules work?</h3>
+<p><code>import std.lists</code> loads <code>std/lists.tq</code> and
+exposes its definitions as <code>lists.map</code>,
+<code>lists.filter</code>, and so on; <code>import utils.geometry</code>
+loads <code>utils/geometry.tq</code> relative to the importing file.
+There is no <code>from … import</code>. See <code>TOOLING.md</code> §3
+for the search path and <code>LANGUAGE.md</code> §1.</p>
+<h3 id="how-do-i-install-a-package">How do I install a package?</h3>
+<p><code>tacqor add https://github.com/someone/pkg</code> (or a local
+folder) puts it in <code>packages/pkg</code> and records it in
+<code>tacqor.pkg</code>; <code>import pkg</code> loads
+<code>packages/pkg/lib.tq</code>. <code>tacqor install</code> restores
+all packages from the manifest on another machine. There is no central
+registry.</p>
+<h3 id="how-do-i-distribute-a-program">How do I distribute a
+program?</h3>
+<p><code>tacqor build app.tq -o app</code> makes a single executable
+that runs anywhere the <code>tacqor</code> binary runs (no standard
+library files needed). <code>tacqor build --native app.tq -o app</code>
+makes a machine-code executable that depends only on the C++ standard
+library of the machine that built it.</p>
+<h3 id="does-it-run-on-windows-and-macos">Does it run on Windows and
+macOS?</h3>
+<p>The toolchain is portable C++17: <code>build-windows.cmd</code>
+builds it with MSVC and <code>make</code> builds it with GCC or Clang on
+macOS and Linux. The distribution includes a static Linux x64 binary;
+other platforms build from source. Networking uses Winsock on Windows
+and BSD sockets elsewhere.</p>
+<h3 id="is-it-production-ready">Is it production ready?</h3>
+<p>The toolchain has a differential test suite across all four execution
+modes, runs clean under AddressSanitizer and UndefinedBehaviorSanitizer,
+and survived 6,100 fuzz cases with no crashes. The language has no
+planned breaking changes. What it does not have yet: a large ecosystem,
+an LSP server, a debugger, and shared-memory concurrency. See
+<code>ROADMAP.md</code>.</p>
+<h3 id="can-i-call-c-code">Can I call C code?</h3>
+<p>Not directly. <code>run(command)</code> and
+<code>run_capture(command)</code> run external programs; TCP sockets
+talk to services. A foreign-function interface is on the roadmap. In the
+meantime, <code>tacqor emit</code> gives you the C++ for a program,
+which can be linked with other C++ by hand.</p>
+<h3 id="why-does-the-repl-repeat-side-effects">Why does the REPL repeat
+side effects?</h3>
+<p>Because Tacqor compiles whole programs: the REPL recompiles and
+re-runs the session after each entry and shows only new output. A
+<code>print</code> in a definition you entered earlier runs again but
+its output is hidden; a file write runs again for real. Use the REPL for
+exploring values and types, not for scripts with side effects.</p>
+<h3 id="why-does-printitems-1-fail">Why does
+<code>print(items[-1])</code> fail?</h3>
+<p>Negative indexes are not wrapped around (unlike Python) —
+<code>items[-1]</code> is out of bounds. Use
+<code>items[len(items) - 1]</code>. Slices clamp like Python, so
+<code>items[-1:]</code> is simply empty. Being explicit avoids the
+off-by-one class of bugs where a negative index silently reads the wrong
+end.</p>
+<h3 id="why-cant-my-lambda-assign-to-a-captured-variable">Why can't my
+lambda assign to a captured variable?</h3>
+<p>Closures capture by value at creation time, so assigning to a capture
+could never be seen outside the lambda. The compiler rejects it instead
+of letting the write disappear. Share a list, dict or struct and mutate
+that instead.</p>
+<h3 id="why-must-none-ok-and-err-sometimes-be-annotated">Why must
+<code>None</code>, <code>Ok</code> and <code>Err</code> sometimes be
+annotated?</h3>
+<p><code>None</code> alone does not say what the <code>Some</code> would
+hold; <code>Ok(3)</code> does not say the error type. When the context
+supplies the type (a return type, a parameter, an annotated
+<code>let</code>) no annotation is needed; otherwise write
+<code>let x: Option[i64] = None</code>.</p>
+<h3 id="where-do-i-report-a-bug-or-ask-for-a-feature">Where do I report
+a bug or ask for a feature?</h3>
+<p>See <code>CONTRIBUTING.md</code> for the process and
+<code>SECURITY.md</code> for anything security-related.</p>
+<h3 id="where-should-i-read-next">Where should I read next?</h3>
+<p><code>TOUR.md</code> to learn the language in twenty minutes,
+<code>COOKBOOK.md</code> for working programs, <code>LANGUAGE.md</code>
+and <code>STDLIB.md</code> as references, <code>SPECIFICATION.md</code>
+for the exact rules, and <code>WHITEPAPER.md</code> for why things are
+the way they are. <code>INDEX.md</code> lists every document.</p>
+</body>
+</html>

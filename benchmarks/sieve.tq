@@ -1,0 +1,14 @@
+def main():
+    let n = 5000000
+    var flags: list[bool] = []
+    for i in range(n + 1):
+        push(flags, True)
+    var count = 0
+    for i in range(2, n + 1):
+        if flags[i]:
+            count += 1
+            var j = i * i
+            while j <= n:
+                flags[j] = False
+                j += i
+    print(count)

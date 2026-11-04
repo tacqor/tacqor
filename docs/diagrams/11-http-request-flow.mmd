@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant C as Client (http.get)
+    participant S as Server loop (http.serve)
+    participant H as Your handler fn(Request) -> Response
+    C->>S: tcp_connect, send "GET /path HTTP/1.1 ..."
+    S->>S: tcp_accept → read_message (headers + content-length body)
+    S->>S: parse_request → Request{method, path, query, headers, body}
+    S->>H: attempt(fn() => handler(request))
+    alt handler returns
+        H-->>S: Response{status, headers, body}
+    else handler fails at runtime
+        H-->>S: Err(message) → eprint, Response 500
+    end
+    S->>C: encode_response → tcp_write, tcp_close
+    C->>C: parse_response → Ok(Response)

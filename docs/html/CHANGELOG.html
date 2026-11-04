@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — CHANGELOG</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#changelog" id="toc-changelog">Changelog</a>
+<ul>
+<li><a href="#120--2026-11-04" id="toc-120--2026-11-04">1.2.0 —
+2026-11-04</a></li>
+<li><a href="#110" id="toc-110">1.1.0</a></li>
+<li><a href="#100" id="toc-100">1.0.0</a></li>
+<li><a href="#060" id="toc-060">0.6.0</a></li>
+<li><a href="#050" id="toc-050">0.5.0</a></li>
+<li><a href="#040" id="toc-040">0.4.0</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="changelog">Changelog</h1>
+<p>All notable changes to Tacqor. Versions follow
+<code>MAJOR.MINOR.PATCH</code>: a minor release may add language
+features and standard-library functions; it does not remove or change
+the meaning of existing programs. The bytecode format is versioned
+separately (<code>docs/BYTECODE.md</code> §8) and may change in any
+minor release; recompile <code>.tqb</code> files when upgrading.</p>
+<h2 id="120--2026-11-04">1.2.0 — 2026-11-04</h2>
+<p>Production-readiness release.</p>
+<p><strong>Language</strong></p>
+<ul>
+<li>Bit operators on <code>i64</code>: <code>&amp;</code>,
+<code>|</code>, <code>^</code>, <code>~</code>, <code>&lt;&lt;</code>,
+<code>&gt;&gt;</code> and their compound assignments; shift counts are
+checked (0–63) with a compile-time warning for constants
+(<code>invalid-shift</code>).</li>
+<li><code>attempt(f)</code>: runs a zero-argument function value and
+converts a runtime error into <code>Err(message)</code>; the only
+catching construct.</li>
+<li>Nested quotes inside f-string braces
+(<code>f"{d["key"]}"</code>).</li>
+<li>Local bindings may shadow module names.</li>
+<li><code>attempt</code> is no longer a reserved word (it is a
+builtin).</li>
+</ul>
+<p><strong>Runtime and library</strong></p>
+<ul>
+<li>TCP networking: <code>tcp_listen</code>, <code>tcp_accept</code>,
+<code>tcp_connect</code>, <code>tcp_read</code>, <code>tcp_write</code>,
+<code>tcp_close</code> (Winsock on Windows, BSD sockets elsewhere).</li>
+<li><code>std.http</code>: HTTP/1.1 server (<code>serve</code>,
+<code>serve_count</code>) and client (<code>get</code>,
+<code>post</code>), <code>Request</code>/<code>Response</code> structs,
+response helpers.</li>
+<li><code>run_capture(command)</code>, <code>unix_time()</code>,
+<code>hash(text)</code> (FNV-1a),
+<code>bytes</code>/<code>from_bytes</code>,
+<code>to_hex</code>/<code>from_hex</code>,
+<code>fixed(f, digits)</code>.</li>
+<li>104 builtins in total.</li>
+</ul>
+<p><strong>Hardening</strong></p>
+<ul>
+<li>Iterative destruction of deeply nested values (no C++ stack overflow
+on long linked structures).</li>
+<li>Call-depth guard in the VM and native code (100,000 frames; native
+executables run on a 512 MB stack thread).</li>
+<li>Limits on expression nesting, block nesting, value nesting (2,000
+levels for printing and comparison), source size (1 MB) and bytecode
+size.</li>
+<li>Immortal constant pool is released on exit so sanitizer builds
+report no leaks.</li>
+<li>The complete suite, including native builds, runs clean under
+AddressSanitizer and UndefinedBehaviorSanitizer; 5,500 mutated programs
+and 600 corrupted bytecode files were fuzzed with zero findings.</li>
+</ul>
+<p><strong>Tooling</strong></p>
+<ul>
+<li><code>tacqor file.tq [args]</code> runs a file directly;
+<code>#!/usr/bin/env tacqor</code> scripts.</li>
+<li>Diagnostics show the source line with a caret and length
+underline.</li>
+<li><code>install.sh</code> (<code>--prefix</code>,
+<code>--uninstall</code>), <code>TACQOR_HOME</code>, standard library
+lookup in <code>../lib/tacqor/std</code>, <code>~/.tacqor/std</code>,
+<code>/usr/local/lib/tacqor/std</code>.</li>
+<li><code>tacqor diagnose --stdin [FILE]</code> for editors; VS Code
+extension 1.2.0.</li>
+<li>Documentation set: whitepaper, architecture, specification, bytecode
+reference, cookbook, style guide, diagnostics catalog, tooling
+reference, performance report, FAQ, migration guides
+(<code>docs/</code>), 17 rendered diagrams.</li>
+</ul>
+<p><strong>Fixes</strong></p>
+<ul>
+<li>Smoke-test expectations for argument echo and warning codes.</li>
+<li>Block-bodied lambdas are documented as statement-position only (bind
+the lambda with <code>let</code> before passing it); the parser reports
+<code>expected a newline</code> inside call parentheses.</li>
+</ul>
+<h2 id="110">1.1.0</h2>
+<ul>
+<li><strong>Traits</strong>: <code>trait Name:</code> with method
+signatures; <code>struct S(Trait)</code>; trait-typed values with
+dynamic dispatch through vtables (<code>call_trait</code>); generic
+bounds <code>[T: Trait]</code> with static dispatch per instantiation;
+implicit struct→trait conversion.</li>
+<li><strong>Cycle collector</strong>: CPython-style trial deletion over
+tracked containers; automatic threshold max(200,000, 2× live);
+<code>gc_collect()</code>, <code>gc_count()</code>; paused during
+parallel sections.</li>
+<li><strong>Closures in parallel code</strong>:
+<code>parallel_map(count, workers, f)</code> returning every result in
+order; mapper closures may capture
+<code>i64</code>/<code>f64</code>/<code>bool</code>; 128-bit
+accumulation in <code>parallel_sum</code>.</li>
+<li><strong>Package manager</strong>:
+<code>tacqor add SOURCE [NAME]</code>, <code>install</code>,
+<code>remove</code>, <code>tacqor.pkg</code> manifest,
+<code>packages/</code> resolution.</li>
+<li><strong>REPL</strong>: <code>tacqor repl</code> with
+<code>:show</code>, <code>:reset</code>, <code>:quit</code>, block
+entry, recompile-and-replay semantics.</li>
+<li>Generic structs implementing traits; qualified trait names across
+modules.</li>
+</ul>
+<h2 id="100">1.0.0</h2>
+<ul>
+<li><strong>Modules</strong>: <code>import a.b [as c]</code>, file and
+<code>lib.tq</code> folder modules, standard library search path,
+<code>TACQOR_PATH</code>; errors name the module file.</li>
+<li><strong>Generics</strong>: type parameters on functions and structs,
+inference by unification, explicit instantiation
+<code>f[i64](...)</code>, monomorphization with an instantiation
+cache.</li>
+<li><strong>Closures</strong>: <code>fn(x: T) =&gt; expr</code> and
+block lambdas, capture by value, named functions as values,
+<code>fn(A) -&gt; R</code> types, <code>call_value</code>
+convention.</li>
+<li><strong><code>Option[T]</code> and
+<code>Result[T, E]</code></strong>:
+<code>Some</code>/<code>None</code>/<code>Ok</code>/<code>Err</code>,
+<code>match … case</code>, exhaustiveness checking, <code>?</code>,
+<code>unwrap</code>, <code>unwrap_or</code>, <code>expect</code>,
+<code>is_some</code>/<code>is_none</code>/<code>is_ok</code>/<code>is_err</code>.</li>
+<li><strong>Methods</strong> inside structs with <code>self</code>;
+method-call syntax for builtins and module functions
+(<code>items.push(x)</code>, <code>name.upper()</code>).</li>
+<li><strong>f-strings</strong> and <code>const</code> declarations.</li>
+<li><strong>Standard library</strong> in Tacqor source:
+<code>std.lists</code>, <code>std.strings</code>, <code>std.math</code>,
+<code>std.testing</code>, <code>std.collections</code>,
+<code>std.json</code>.</li>
+<li><strong>Tooling</strong>: <code>tacqor test</code>
+(<code>def test_*()</code>), <code>tacqor new</code>, warnings with
+codes, <code>diagnose</code> JSON.</li>
+<li>Bytecode magic bumped; verifier extended for the new ops
+(<code>push_function</code>, <code>make_closure</code>,
+<code>call_value</code>, <code>make_variant</code>,
+<code>variant_which</code>, <code>variant_payload</code>).</li>
+</ul>
+<h2 id="060">0.6.0</h2>
+<ul>
+<li><strong>Native backend</strong>: <code>tacqor build --native</code>
+and <code>tacqor emit</code>; typed abstract interpretation of the
+bytecode, typed C++ registers, embedded runtime, compiled by the system
+C++ compiler at <code>-O3</code>.</li>
+<li><strong>Typed list storage</strong>: <code>list[i64]</code>,
+<code>list[f64]</code>, <code>list[bool]</code> stored unboxed.</li>
+<li>Superinstructions <code>loop_init</code>/<code>loop_next</code>,
+<code>iter_next</code>; <code>jump_unless_locals</code>.</li>
+</ul>
+<h2 id="050">0.5.0</h2>
+<ul>
+<li><code>f64</code>, generic <code>list[T]</code>,
+<code>dict[K, V]</code> (insertion-ordered,
+<code>i64</code>/<code>str</code> keys), <code>struct</code>
+declarations, <code>while</code>, <code>break</code>,
+<code>continue</code>, <code>elif</code>, procedures, string slicing,
+~40 builtins.</li>
+<li>VM rewrite: contiguous value stack, frames as offsets, computed-goto
+dispatch,
+<code>load2</code>/<code>load_integer</code>/<code>add_store</code>
+fusions — about 6× faster than 0.4.</li>
+<li>Portable bytecode (<code>compile</code>) with verification on load;
+embedded-VM executables (<code>build</code>).</li>
+</ul>
+<h2 id="040">0.4.0</h2>
+<ul>
+<li>Preview: <code>i64</code>, <code>str</code>, <code>list[i64]</code>,
+<code>let</code>/<code>var</code>, <code>def</code>,
+<code>if</code>/<code>else</code>, <code>for … in range</code>,
+<code>print</code>, checked arithmetic, a tree-walking compiler to a
+simple stack VM.</li>
+</ul>
+</body>
+</html>

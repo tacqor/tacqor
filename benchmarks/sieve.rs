@@ -1,0 +1,1 @@
+fn main(){ let n=5000000usize; let mut f=Vec::new(); for _ in 0..=n { f.push(true); } let mut c=0; let mut i=2; while i<=n { if f[i] { c+=1; let mut j=i*i; while j<=n { f[j]=false; j+=i; } } i+=1; } println!("{}", c); }

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — SECURITY</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#security-policy" id="toc-security-policy">Security
+Policy</a>
+<ul>
+<li><a href="#supported-versions" id="toc-supported-versions">Supported
+versions</a></li>
+<li><a href="#reporting-a-vulnerability"
+id="toc-reporting-a-vulnerability">Reporting a vulnerability</a></li>
+<li><a href="#what-counts-as-a-security-issue"
+id="toc-what-counts-as-a-security-issue">What counts as a security
+issue</a></li>
+<li><a href="#design-measures-already-in-place"
+id="toc-design-measures-already-in-place">Design measures already in
+place</a></li>
+<li><a href="#hardening-advice-for-deployments"
+id="toc-hardening-advice-for-deployments">Hardening advice for
+deployments</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="security-policy">Security Policy</h1>
+<h2 id="supported-versions">Supported versions</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Version</th>
+<th>Supported</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1.2.x</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>1.1.x and earlier</td>
+<td>no — upgrade; programs run unchanged</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reporting-a-vulnerability">Reporting a vulnerability</h2>
+<p>Report security issues privately to the maintainer — <strong>security
+contact: <em>add your email or private issue form here before
+publishing</em></strong> — not in the public issue tracker. Include the
+Tacqor version, platform, a reproducing program or input, and what the
+impact is. You will receive an acknowledgement within a few days and a
+fix or a mitigation plan before any public disclosure; credit is given
+in <code>CHANGELOG.md</code> unless you ask otherwise.</p>
+<h2 id="what-counts-as-a-security-issue">What counts as a security
+issue</h2>
+<p>Tacqor's security goal is: <strong>no input to the toolchain can make
+it execute code or corrupt memory</strong>, whatever the source of that
+input — a source file, a <code>.tqb</code> bytecode file, an executable
+with an embedded program, data read from a file, a socket or standard
+input by a running program, or a package fetched with
+<code>tacqor add</code>.</p>
+<p>In scope:</p>
+<ul>
+<li>Memory-unsafe behaviour (crash, out-of-bounds access,
+use-after-free) in the compiler, VM, bytecode loader, native-code
+generator, or runtime library on any input.</li>
+<li>A <code>.tqb</code> file or embedded program that passes the
+verifier but performs an operation the verifier is meant to exclude
+(type confusion, stack underflow, wild jumps).</li>
+<li>Generated C++ (<code>emit</code>, <code>build --native</code>) that
+is unsafe for a program that the VM runs safely.</li>
+<li>Unbounded resource use from bounded input (a small file that makes
+the compiler allocate without limit or recurse without limit).</li>
+<li>Ways to make <code>tacqor add</code> write outside
+<code>packages/</code>, or to make a module import read a file outside
+the documented search path.</li>
+</ul>
+<p>Out of scope:</p>
+<ul>
+<li>Programs doing what they say: a Tacqor program can read and write
+files, run commands with <code>run</code>, open sockets, and exit with
+any status. Running an untrusted program is running untrusted code.</li>
+<li>Denial of service by a program that simply loops or allocates
+(<code>while True:</code>, growing a list forever); the limits protect
+the toolchain, not the host.</li>
+<li>The security of third-party packages. <code>tacqor add</code>
+fetches code; review it as you would any dependency.</li>
+<li><code>std.http</code> is a small HTTP/1.1 implementation intended
+for tools and internal services; it does not implement TLS, request size
+limits beyond the runtime's text limit, or protection against slow
+clients. Put it behind a reverse proxy for anything exposed to the
+internet.</li>
+</ul>
+<h2 id="design-measures-already-in-place">Design measures already in
+place</h2>
+<ul>
+<li>Every container access in the VM and runtime is bounds-checked;
+integer arithmetic is overflow-checked; there is no unchecked pointer
+arithmetic on data from outside.</li>
+<li>Bytecode is verified on load: opcode range, operand ranges, jump
+targets, stack depth at every instruction, type indices, function and
+struct references, trailer length and magic
+(<code>docs/BYTECODE.md</code> §4). Verification happens before any
+instruction runs, including for embedded programs.</li>
+<li>Source size (1 MB), bytecode size, expression and block nesting,
+call depth, value nesting and text size are bounded, with a diagnostic
+at the bound (<code>docs/SPECIFICATION.md</code> §10).</li>
+<li>Deep structures are destroyed iteratively, so no input can overflow
+the C++ stack through destructors.</li>
+<li>The toolchain reads packages only from <code>packages/</code>, the
+importing directory, the standard library directory and
+<code>TACQOR_PATH</code>; module names are identifiers, so
+<code>..</code> cannot appear in an import.</li>
+<li>The complete test suite runs under AddressSanitizer and
+UndefinedBehaviorSanitizer; 5,500 mutated source programs and 600
+corrupted bytecode files were fuzzed with no findings
+(<code>docs/WHITEPAPER.md</code> §12). The fuzzing harness is rerun
+before each release.</li>
+</ul>
+<h2 id="hardening-advice-for-deployments">Hardening advice for
+deployments</h2>
+<ul>
+<li>Run native executables rather than scripts where the program is
+fixed; there is no compiler in the executable to attack.</li>
+<li>Set <code>TACQOR_HOME</code> explicitly in services so the standard
+library location cannot be influenced by the working directory.</li>
+<li>Treat <code>packages/</code> as part of your source tree: commit
+<code>tacqor.pkg</code>, review what <code>tacqor install</code>
+fetched, and pin to a commit by vendoring if the source repository is
+not under your control.</li>
+<li>Validate all data from sockets and files in the program;
+<code>parse_int</code>, <code>std.json.parse</code> and
+<code>std.http.parse_request</code> return
+<code>Option</code>/<code>Result</code> and never trust their
+input.</li>
+</ul>
+</body>
+</html>

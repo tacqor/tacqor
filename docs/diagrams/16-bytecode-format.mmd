@@ -1,0 +1,16 @@
+flowchart TB
+    subgraph F[".tqb file layout (little-endian)"]
+        direction TB
+        M["magic  TQBC 0x12 CR LF 0x1A"]
+        TX["texts: count · (len · bytes)*"]
+        TY["types: count · (kind · first · second · param count · params)*"]
+        SS["structs: count · (name · field count · (name · type)*)*"]
+        TT["traits: count · (name · method count · (name · fn type)*)*"]
+        VT["vtables per struct: count · (trait · size · function ids)*"]
+        EN["entry function index"]
+        FN["functions: count · (name · params · result · captures ·<br/>locals · code count · instructions)*"]
+        IN["instruction = op (1) · operand (8) · line · column · length (4 each)"]
+        M --> TX --> TY --> SS --> TT --> VT --> EN --> FN --> IN
+    end
+    F --> VER["Verifier<br/>every index in range · jump targets valid ·<br/>vtable signatures match · entry is main"]
+    EXE["Standalone executable =<br/>VM binary + bytecode + length + TQEX trailer"]

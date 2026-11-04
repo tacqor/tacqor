@@ -1,0 +1,25 @@
+# while loops, break, mutable lists, and the built-in timer.
+
+def is_prime(n: i64) -> bool:
+    if n < 2:
+        return False
+    var d = 2
+    while d * d <= n:
+        if n % d == 0:
+            return False
+        d += 1
+    return True
+
+def main():
+    let started = time_ms()
+    var found: list[i64] = []
+    var candidate = 2
+    while True:
+        if is_prime(candidate):
+            push(found, candidate)
+            if len(found) == 10000:
+                break
+        candidate += 1
+    print("10000th prime: " + str(found[len(found) - 1]))
+    print("first ten: " + str(found[:10]))
+    print("elapsed ms: " + str(time_ms() - started))

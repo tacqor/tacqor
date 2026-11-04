@@ -1,0 +1,16 @@
+# Run with: tacqor test tests/unit_tests.tq
+import std.testing
+import std.lists
+import std.math
+
+def test_lists():
+    testing.assert_eq(lists.map([1, 2, 3], fn(x: i64) => x * x), [1, 4, 9])
+    testing.assert_eq(lists.reduce(["a", "b"], "", fn(acc: str, s: str) => acc + s), "ab")
+
+def test_math():
+    testing.assert_eq(math.gcd(48, 18), 6)
+    testing.assert_eq(testing.assert_ok(math.factorial(4)), 24)
+
+def test_option():
+    let found = lists.find_first([5, 8], fn(x: i64) => x > 6)
+    testing.assert_eq(testing.assert_some(found), 8)

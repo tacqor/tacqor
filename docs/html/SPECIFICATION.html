@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — SPECIFICATION</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#the-tacqor-language-specification"
+id="toc-the-tacqor-language-specification">The Tacqor Language
+Specification</a>
+<ul>
+<li><a href="#1-lexical-structure" id="toc-1-lexical-structure">1.
+Lexical structure</a></li>
+<li><a href="#2-grammar" id="toc-2-grammar">2. Grammar</a></li>
+<li><a href="#3-names-and-scopes" id="toc-3-names-and-scopes">3. Names
+and scopes</a></li>
+<li><a href="#4-types-and-values" id="toc-4-types-and-values">4. Types
+and values</a></li>
+<li><a href="#5-declarations" id="toc-5-declarations">5.
+Declarations</a></li>
+<li><a href="#6-expressions" id="toc-6-expressions">6.
+Expressions</a></li>
+<li><a href="#7-statements" id="toc-7-statements">7. Statements</a></li>
+<li><a href="#8-runtime-errors" id="toc-8-runtime-errors">8. Runtime
+errors</a></li>
+<li><a href="#9-compile-time-diagnostics"
+id="toc-9-compile-time-diagnostics">9. Compile-time diagnostics</a></li>
+<li><a href="#10-limits" id="toc-10-limits">10. Limits</a></li>
+<li><a href="#11-standard-environment"
+id="toc-11-standard-environment">11. Standard environment</a></li>
+<li><a href="#12-conformance" id="toc-12-conformance">12.
+Conformance</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="the-tacqor-language-specification">The Tacqor Language
+Specification</h1>
+<p><strong>Version 1.2</strong> — This document defines the syntax and
+semantics of Tacqor precisely enough to write an independent
+implementation. The reference implementation's behaviour is normative
+where this text is silent. <code>LANGUAGE.md</code> is the readable
+reference for programmers; this is the specification.</p>
+<p>Notation: grammar rules use EBNF — <code>{x}</code> zero or more,
+<code>[x]</code> optional, <code>x | y</code> alternatives,
+<code>"..."</code> literal tokens, <code>(...)</code> grouping.</p>
+<hr />
+<h2 id="1-lexical-structure">1. Lexical structure</h2>
+<h3 id="11-source-text">1.1 Source text</h3>
+<p>A source file is a sequence of bytes interpreted as UTF-8; the lexer
+operates on bytes and only ASCII characters are significant. A file may
+not contain a null byte. Size limit: 4,000,000 bytes. Line endings are
+<code>LF</code> or <code>CR LF</code>.</p>
+<h3 id="12-lines-indentation-and-continuation">1.2 Lines, indentation
+and continuation</h3>
+<p>The grammar is line-oriented. A <strong>logical line</strong> ends at
+a newline that is not inside brackets (<code>( ) [ ] { }</code>) and not
+preceded by a backslash. Blank lines and lines containing only a comment
+are ignored.</p>
+<p>The leading spaces of a logical line form its
+<strong>indentation</strong>, which must be a multiple of four; tab and
+form-feed characters in indentation are errors. When the indentation
+increases, an <code>INDENT</code> token is produced; when it decreases,
+one <code>DEDENT</code> per level, and the new level must be one
+previously seen on the stack ("inconsistent indentation" otherwise). At
+end of file every open level is closed.</p>
+<h3 id="13-comments">1.3 Comments</h3>
+<p><code>#</code> starts a comment that runs to the end of the physical
+line, except inside string literals. A first line beginning with
+<code>#!</code> is therefore a comment, which makes shebang scripts
+possible.</p>
+<h3 id="14-tokens">1.4 Tokens</h3>
+<pre class="ebnf"><code>name       = letter { letter | digit } ;      letter = &quot;a&quot;..&quot;z&quot; | &quot;A&quot;..&quot;Z&quot; | &quot;_&quot; ; digit = &quot;0&quot;..&quot;9&quot; ;
+integer    = digit { digit | &quot;_&quot; } ;          (* no leading zero unless the literal is 0 *)
+float      = digit { digit | &quot;_&quot; } &quot;.&quot; digit { digit } [ exponent ]
+           | digit { digit | &quot;_&quot; } exponent ;
+exponent   = ( &quot;e&quot; | &quot;E&quot; ) [ &quot;+&quot; | &quot;-&quot; ] digit { digit } ;
+string     = &#39;&quot;&#39; { character | escape } &#39;&quot;&#39; ;
+fstring    = &#39;f&quot;&#39; { character | escape | &quot;{&quot; expression &quot;}&quot; | &quot;{{&quot; | &quot;}}&quot; } &#39;&quot;&#39; ;
+escape     = &quot;\n&quot; | &quot;\r&quot; | &quot;\t&quot; | &quot;\0&quot; | &#39;\&quot;&#39; | &quot;\\&quot; | &quot;\{&quot; | &quot;\}&quot; ;
+symbol     = &quot;(&quot; | &quot;)&quot; | &quot;[&quot; | &quot;]&quot; | &quot;{&quot; | &quot;}&quot; | &quot;:&quot; | &quot;,&quot; | &quot;.&quot; | &quot;?&quot; | &quot;~&quot; | &quot;&amp;&quot; | &quot;|&quot; | &quot;^&quot;
+           | &quot;+&quot; | &quot;-&quot; | &quot;*&quot; | &quot;/&quot; | &quot;//&quot; | &quot;%&quot; | &quot;&lt;&lt;&quot; | &quot;&gt;&gt;&quot; | &quot;=&quot; | &quot;==&quot; | &quot;!=&quot; | &quot;&lt;&quot; | &quot;&lt;=&quot; | &quot;&gt;&quot; | &quot;&gt;=&quot;
+           | &quot;-&gt;&quot; | &quot;=&gt;&quot; | &quot;+=&quot; | &quot;-=&quot; | &quot;*=&quot; | &quot;/=&quot; | &quot;//=&quot; | &quot;%=&quot; | &quot;&amp;=&quot; | &quot;|=&quot; | &quot;^=&quot; | &quot;&lt;&lt;=&quot; | &quot;&gt;&gt;=&quot; ;</code></pre>
+<p>Underscores in numeric literals are separators and are ignored. An
+integer literal must fit in <code>i64</code>;
+<code>-9223372036854775808</code> is accepted as a whole. A letter or
+<code>.</code> directly after a number is an error. A string literal may
+not span lines. Inside the braces of an f-string, a quoted string may
+appear (<code>f"{d["k"]}"</code>); <code>{{</code> and <code>}}</code>
+denote literal braces.</p>
+<h3 id="15-keywords">1.5 Keywords</h3>
+<p>Reserved:
+<code>def struct trait let var if elif else while for in break continue return assert and or not True False None range fn match case import as const Some Ok Err Option Result i64 f64 bool str list dict</code>.
+The names of built-in functions are not reserved: a declaration or local
+of the same name shadows the built-in.</p>
+<hr />
+<h2 id="2-grammar">2. Grammar</h2>
+<h3 id="21-module">2.1 Module</h3>
+<pre class="ebnf"><code>module      = { import | const | struct | trait | function } ;
+import      = &quot;import&quot; name { &quot;.&quot; name } [ &quot;as&quot; name ] NEWLINE ;
+const       = &quot;const&quot; name &quot;=&quot; literal_expr NEWLINE ;           (* integer, float, bool, string, [-]number, or another const *)
+function    = &quot;def&quot; name [ type_params ] &quot;(&quot; [ params ] &quot;)&quot; [ &quot;-&gt;&quot; type ] &quot;:&quot; block ;
+params      = param { &quot;,&quot; param } [ &quot;,&quot; ] ;      param = name &quot;:&quot; type ;
+type_params = &quot;[&quot; type_param { &quot;,&quot; type_param } &quot;]&quot; ;   type_param = name [ &quot;:&quot; type ] ;
+struct      = &quot;struct&quot; name [ type_params ] [ &quot;(&quot; [ type { &quot;,&quot; type } ] &quot;)&quot; ] &quot;:&quot; NEWLINE INDENT
+              { field | method } DEDENT ;
+field       = name &quot;:&quot; type NEWLINE ;
+method      = &quot;def&quot; name &quot;(&quot; &quot;self&quot; { &quot;,&quot; param } &quot;)&quot; [ &quot;-&gt;&quot; type ] &quot;:&quot; block ;
+trait       = &quot;trait&quot; name &quot;:&quot; NEWLINE INDENT { signature } DEDENT ;
+signature   = &quot;def&quot; name &quot;(&quot; &quot;self&quot; { &quot;,&quot; param } &quot;)&quot; [ &quot;-&gt;&quot; type ] NEWLINE ;</code></pre>
+<p>A struct's parenthesized list names the traits it implements. A trait
+must declare at least one method. <code>main</code> is
+<code>def main():</code> with no parameters and no result, and must
+exist in the root module when a program is run (not when it is checked
+or tested).</p>
+<h3 id="22-types">2.2 Types</h3>
+<pre class="ebnf"><code>type        = &quot;i64&quot; | &quot;f64&quot; | &quot;bool&quot; | &quot;str&quot;
+            | &quot;list&quot; &quot;[&quot; type &quot;]&quot;
+            | &quot;dict&quot; &quot;[&quot; type &quot;,&quot; type &quot;]&quot;
+            | &quot;Option&quot; &quot;[&quot; type &quot;]&quot;
+            | &quot;Result&quot; &quot;[&quot; type &quot;,&quot; type &quot;]&quot;
+            | &quot;fn&quot; &quot;(&quot; [ type { &quot;,&quot; type } ] &quot;)&quot; [ &quot;-&gt;&quot; type ]
+            | [ name &quot;.&quot; ] name [ &quot;[&quot; type { &quot;,&quot; type } &quot;]&quot; ] ;      (* struct, trait, type parameter *)</code></pre>
+<h3 id="23-statements">2.3 Statements</h3>
+<pre class="ebnf"><code>block       = NEWLINE INDENT statement { statement } DEDENT ;
+statement   = let | assignment | expression_stmt | if | while | for | match
+            | &quot;break&quot; NEWLINE | &quot;continue&quot; NEWLINE | &quot;return&quot; [ expression ] NEWLINE | &quot;assert&quot; expression NEWLINE ;
+let         = ( &quot;let&quot; | &quot;var&quot; ) name [ &quot;:&quot; type ] &quot;=&quot; expression NEWLINE ;
+assignment  = target assign_op expression NEWLINE ;
+target      = name | postfix_expr &quot;[&quot; expression &quot;]&quot; | postfix_expr &quot;.&quot; name ;
+assign_op   = &quot;=&quot; | &quot;+=&quot; | &quot;-=&quot; | &quot;*=&quot; | &quot;/=&quot; | &quot;//=&quot; | &quot;%=&quot; | &quot;&amp;=&quot; | &quot;|=&quot; | &quot;^=&quot; | &quot;&lt;&lt;=&quot; | &quot;&gt;&gt;=&quot; ;
+expression_stmt = ( call | method_call | question ) NEWLINE ;
+if          = &quot;if&quot; expression &quot;:&quot; block { &quot;elif&quot; expression &quot;:&quot; block } [ &quot;else&quot; &quot;:&quot; block ] ;
+while       = &quot;while&quot; expression &quot;:&quot; block ;
+for         = &quot;for&quot; name &quot;in&quot; ( &quot;range&quot; &quot;(&quot; expression [ &quot;,&quot; expression ] &quot;)&quot; | expression ) &quot;:&quot; block ;
+match       = &quot;match&quot; expression &quot;:&quot; NEWLINE INDENT case { case } DEDENT ;
+case        = &quot;case&quot; pattern &quot;:&quot; block ;
+pattern     = &quot;Some&quot; &quot;(&quot; ( name | &quot;_&quot; ) &quot;)&quot; | &quot;None&quot; | &quot;Ok&quot; &quot;(&quot; ( name | &quot;_&quot; ) &quot;)&quot; | &quot;Err&quot; &quot;(&quot; ( name | &quot;_&quot; ) &quot;)&quot;
+            | expression | &quot;_&quot; ;</code></pre>
+<p>When the expression of a <code>let</code>, <code>var</code>,
+assignment or <code>return</code> is a block-bodied lambda, the
+<code>NEWLINE</code> is supplied by the lambda's block.</p>
+<h3 id="24-expressions">2.4 Expressions</h3>
+<pre class="ebnf"><code>expression  = or_expr ;
+or_expr     = and_expr { &quot;or&quot; and_expr } ;
+and_expr    = not_expr { &quot;and&quot; not_expr } ;
+not_expr    = &quot;not&quot; not_expr | comparison ;
+comparison  = bitor [ ( &quot;==&quot; | &quot;!=&quot; | &quot;&lt;&quot; | &quot;&lt;=&quot; | &quot;&gt;&quot; | &quot;&gt;=&quot; | &quot;in&quot; ) bitor ] ;    (* no chaining *)
+bitor       = bitxor { &quot;|&quot; bitxor } ;
+bitxor      = bitand { &quot;^&quot; bitand } ;
+bitand      = shift { &quot;&amp;&quot; shift } ;
+shift       = additive { ( &quot;&lt;&lt;&quot; | &quot;&gt;&gt;&quot; ) additive } ;
+additive    = term { ( &quot;+&quot; | &quot;-&quot; ) term } ;
+term        = unary { ( &quot;*&quot; | &quot;/&quot; | &quot;//&quot; | &quot;%&quot; ) unary } ;
+unary       = ( &quot;-&quot; | &quot;~&quot; ) unary | postfix ;
+postfix     = atom { &quot;[&quot; expression &quot;]&quot; | &quot;[&quot; [ expression ] &quot;:&quot; [ expression ] &quot;]&quot;
+                   | &quot;.&quot; name [ [ type_args ] &quot;(&quot; [ arguments ] &quot;)&quot; ] | &quot;?&quot; } ;
+atom        = integer | float | string | fstring | &quot;True&quot; | &quot;False&quot; | &quot;None&quot;
+            | &quot;(&quot; expression &quot;)&quot; | &quot;[&quot; [ arguments ] &quot;]&quot; | &quot;{&quot; [ entry { &quot;,&quot; entry } ] &quot;}&quot;
+            | name [ type_args ] &quot;(&quot; [ arguments ] &quot;)&quot; | name
+            | ( &quot;Some&quot; | &quot;Ok&quot; | &quot;Err&quot; | &quot;str&quot; ) &quot;(&quot; [ arguments ] &quot;)&quot;
+            | lambda ;
+entry       = expression &quot;:&quot; expression ;
+arguments   = expression { &quot;,&quot; expression } [ &quot;,&quot; ] ;
+type_args   = &quot;[&quot; type { &quot;,&quot; type } &quot;]&quot; ;
+lambda      = &quot;fn&quot; &quot;(&quot; [ params ] &quot;)&quot; [ &quot;-&gt;&quot; type ] ( &quot;=&gt;&quot; expression | &quot;:&quot; block ) ;</code></pre>
+<p>Precedence from lowest to highest is the order of the rules above;
+all binary operators are left-associative. Unary operators bind tighter
+than every binary operator. <code>not</code> may not appear as a direct
+operand of a comparison without parentheses.</p>
+<hr />
+<h2 id="3-names-and-scopes">3. Names and scopes</h2>
+<p>Each module has one namespace for functions, structs, traits,
+constants and import aliases; declaring the same name twice in it is an
+error. A module's declarations are visible throughout the module
+regardless of order, and to importers through the alias
+(<code>alias.name</code>, <code>alias.Type</code>,
+<code>alias.CONST</code>).</p>
+<p>Within a function, bindings live in lexical block scopes (function
+body, each <code>if</code>/<code>elif</code>/<code>else</code> block,
+loop body, match arm). A binding is visible from its declaration to the
+end of its block. Declaring a name that is already bound in an enclosing
+block is an error ("already bound in this scope"); the binding of a
+captured variable inside a lambda is likewise an error. A local may
+shadow a module-level name or a built-in; within its scope the local is
+what the name means, so a shadowed function cannot be called by that
+name.</p>
+<p>The loop variable of <code>for</code> is an immutable binding scoped
+to the body. <code>self</code> in a method is an ordinary immutable
+parameter.</p>
+<hr />
+<h2 id="4-types-and-values">4. Types and values</h2>
+<h3 id="41-types">4.1 Types</h3>
+<p>Every expression has exactly one static type. The types are:
+<code>i64</code>, <code>f64</code>, <code>bool</code>, <code>str</code>,
+<code>list[T]</code>, <code>dict[K, V]</code> with <code>K</code> ∈
+{<code>i64</code>, <code>str</code>}, <code>Option[T]</code>,
+<code>Result[T, E]</code>, function types
+<code>fn(T1, …, Tn) -&gt; R</code> and <code>fn(T1, …, Tn)</code>,
+struct types (including instantiations of generic structs), trait types,
+and the special non-value type <em>none</em> (the result of a
+procedure), which cannot be bound or passed.</p>
+<p>Type equality is structural for all built-in types and nominal for
+structs and traits (two distinct declarations are distinct types; one
+generic struct's instantiations are equal when their arguments are
+equal).</p>
+<h3 id="42-assignability">4.2 Assignability</h3>
+<p>A value of type <code>S</code> may be used where <code>T</code> is
+expected if <code>S = T</code>, or <code>T</code> is a trait that
+<code>S</code> implements, or <code>S = T</code> as trait types. No
+other implicit conversion exists.</p>
+<h3 id="43-value-and-reference-semantics">4.3 Value and reference
+semantics</h3>
+<p><code>i64</code>, <code>f64</code> and <code>bool</code> are copied
+on every use. <code>str</code> is immutable, so sharing is unobservable.
+<code>list</code>, <code>dict</code>, structs, closures,
+<code>Option</code> and <code>Result</code> values are
+<strong>references</strong>: binding, passing, returning, storing in a
+container or capturing shares the object. Mutation through any reference
+is visible through all. <code>let</code> forbids rebinding the name, not
+mutating the object.</p>
+<h3 id="44-equality-and-ordering">4.4 Equality and ordering</h3>
+<p><code>==</code>/<code>!=</code> are defined on any two values of the
+same type and compare structurally: by value for immediates and strings;
+element-wise for lists; by key set and values for dicts; field-wise for
+structs (same struct type); by function identity and captured values for
+closures; by case and payload for
+<code>Option</code>/<code>Result</code>. <code>&lt;</code>,
+<code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code> are defined on
+<code>i64</code>, <code>f64</code> and <code>str</code> (bytewise).
+Comparisons on <code>f64</code> follow IEEE 754 (<code>nan</code> is
+unequal to everything).</p>
+<h3 id="45-numeric-semantics">4.5 Numeric semantics</h3>
+<p><code>i64</code> is two's-complement 64-bit. <code>+ - *</code> raise
+a runtime error on overflow. <code>//</code> is floor division and
+<code>%</code> has the sign of the divisor; both raise on a zero
+divisor; <code>i64_min // -1</code> raises on overflow and
+<code>i64_min % -1</code> is 0. Unary <code>-</code> raises on
+<code>i64_min</code>. <code>&amp; | ^ ~</code> are bitwise on the
+two's-complement representation; <code>&lt;&lt; n</code> and
+<code>&gt;&gt; n</code> require <code>0 ≤ n ≤ 63</code> (runtime error
+otherwise), <code>&lt;&lt;</code> discards bits shifted out,
+<code>&gt;&gt;</code> is arithmetic (sign-preserving).</p>
+<p><code>f64</code> is IEEE 754 binary64; <code>+ - * /</code> never
+raise; <code>%</code> is <code>fmod</code> adjusted to take the
+divisor's sign. <code>int(f)</code> truncates toward zero and raises for
+<code>nan</code> or out of range; <code>floor</code>, <code>ceil</code>,
+<code>round</code> (half away from zero) return <code>i64</code> with
+the same check.</p>
+<hr />
+<h2 id="5-declarations">5. Declarations</h2>
+<h3 id="51-bindings">5.1 Bindings</h3>
+<p><code>let name = e</code> / <code>var name = e</code> evaluate
+<code>e</code> and bind. With <code>: T</code>, <code>e</code> must be
+assignable to <code>T</code> and the binding has type <code>T</code>.
+Without, the binding has <code>e</code>'s type; <code>e</code> may not
+be <code>[]</code>, <code>{}</code>, <code>None</code>,
+<code>Ok(x)</code> or <code>Err(x)</code> whose type the context does
+not determine. Assignment <code>name = e</code> requires a
+<code>var</code> binding (not a captured one) and <code>e</code>
+assignable to its type. Compound assignments <code>x op= e</code> mean
+<code>x = x op e</code> with <code>x</code> evaluated once; for indexed
+and field targets the container/object and index are evaluated once.</p>
+<h3 id="52-functions">5.2 Functions</h3>
+<p>A function has a fixed signature. Every control path of a function
+with a result type must end in <code>return e</code> (with
+<code>e</code> assignable to the result), <code>exit(...)</code>,
+<code>fail(...)</code>, an exhaustive <code>match</code> all of whose
+arms exit, or a <code>while True:</code> loop containing no
+<code>break</code>. Code after such an exit (or after
+<code>break</code>/<code>continue</code>) is an error. A procedure may
+<code>return</code> without a value.</p>
+<h3 id="53-generics">5.3 Generics</h3>
+<p>Type parameters are bound per call. Inference unifies each declared
+parameter type expression with the corresponding argument type: a type
+parameter binds to the argument type on first occurrence and must match
+on later ones; <code>list[P]</code>, <code>dict[K, V]</code>,
+<code>Option[P]</code>, <code>Result[P, E]</code>, <code>fn(...)</code>
+and generic struct types unify component-wise. If any parameter remains
+unbound the call is an error (supply explicit arguments). Each distinct
+tuple of type arguments yields one instantiation, compiled as an
+ordinary function. A bound <code>T: Trait</code> requires the argument
+type to implement the trait (or be the trait).</p>
+<h3 id="54-structs-methods-and-traits">5.4 Structs, methods and
+traits</h3>
+<p>A struct value is constructed by <code>Name(f1, …, fn)</code> with
+one argument per field in order (type arguments inferred from the
+arguments or given as <code>Name[T](…)</code>). Fields are read and
+written with <code>.field</code>. Methods are called with
+<code>value.method(args)</code>; <code>self</code> is the receiver.</p>
+<p>A struct that names traits must define every trait method with
+exactly the trait's parameter types and result type. Calling a trait
+method on a value whose static type is the trait dispatches to the
+implementing struct's method at run time. A trait-typed value supports
+method calls, <code>==</code>, printing, and passing on; field access
+requires the static struct type.</p>
+<h3 id="55-constants">5.5 Constants</h3>
+<p>A <code>const</code> is a compile-time literal of type
+<code>i64</code>, <code>f64</code>, <code>bool</code> or
+<code>str</code> (optionally negated, or another const). Uses are
+replaced by the value.</p>
+<h3 id="56-modules-and-packages">5.6 Modules and packages</h3>
+<p><code>import a.b</code> binds the alias <code>b</code> (or the
+<code>as</code> name) to the module found as <code>a/b.tq</code> or
+<code>a/b/lib.tq</code> in: the importing file's directory;
+<code>packages/</code> next to the root program; <code>packages/</code>
+in the working directory; the standard library directory; each
+<code>TACQOR_PATH</code> entry. A module is loaded and compiled once per
+program; import cycles are errors. Imported modules' <code>main</code>
+functions are ignored.</p>
+<hr />
+<h2 id="6-expressions">6. Expressions</h2>
+<h3 id="61-evaluation-order">6.1 Evaluation order</h3>
+<p>Operands are evaluated left to right; arguments left to right; the
+receiver of a method call before its arguments; for
+<code>a[i] = e</code> and <code>a.f = e</code> the target's
+subexpressions before <code>e</code>. <code>and</code>/<code>or</code>
+evaluate the right operand only if needed. <code>range</code> bounds are
+evaluated once before the loop.</p>
+<h3 id="62-literals">6.2 Literals</h3>
+<p>Integer and float literals as in §1.4. <code>[e1, …]</code> is a
+<code>list[T]</code> where <code>T</code> is the first element's type
+and every element must be assignable to it (or the expected type's
+element type). <code>{k1: v1, …}</code> likewise for
+<code>dict[K, V]</code>. <code>Some(e)</code> is <code>Option[T]</code>;
+<code>None</code>, <code>Ok(e)</code>, <code>Err(e)</code> take their
+full type from the expected type and are errors without one.</p>
+<h3 id="63-f-strings">6.3 f-strings</h3>
+<p><code>f"…{e}…"</code> is equivalent to concatenating the literal
+segments with <code>str(e)</code> for each expression; the result is
+<code>str</code>.</p>
+<h3 id="64-indexing-and-slicing">6.4 Indexing and slicing</h3>
+<p><code>list[i]</code> and <code>str[i]</code> require
+<code>0 ≤ i &lt; len</code> (runtime error otherwise);
+<code>str[i]</code> yields a one-byte string. <code>dict[k]</code>
+raises when <code>k</code> is absent. <code>x[a:b]</code>,
+<code>x[:b]</code>, <code>x[a:]</code> produce a new list or string with
+indices clamped to <code>[0, len]</code> (never negative-wrapped);
+<code>a &gt; b</code> gives an empty result.</p>
+<h3 id="65-calls">6.5 Calls</h3>
+<p><code>f(args)</code> calls a module function, generic instantiation,
+struct constructor, function-typed local, or built-in, in that
+resolution order. <code>x.f(args)</code> calls a method of
+<code>x</code>'s struct or trait if one exists, else
+<code>f(x, args)</code>. A procedure call is only valid as a statement.
+Argument types must be assignable to parameter types.</p>
+<h3 id="66-lambdas">6.6 Lambdas</h3>
+<p><code>fn(p: T, …) [-&gt; R] =&gt; e</code> and
+<code>fn(…) [-&gt; R]: block</code> create a closure. Parameters are
+typed explicitly; the result type is <code>R</code> if given, otherwise
+the body expression's type (expression form only; a block form without
+<code>-&gt; R</code> is a procedure). Every name in the body (including
+nested lambdas) that resolves to a binding of the enclosing function is
+<strong>captured by value</strong> when the lambda expression is
+evaluated; inside the lambda such names are immutable. The closure's
+type is <code>fn(T, …) -&gt; R</code>.</p>
+<h3 id="67-">6.7 <code>?</code></h3>
+<p><code>e?</code> requires <code>e : Option[T]</code> in a function
+returning <code>Option[U]</code>, or <code>e : Result[T, E]</code> in a
+function returning <code>Result[U, E]</code>. If <code>e</code> is
+<code>Some(v)</code>/<code>Ok(v)</code> the expression's value is
+<code>v</code>; otherwise the enclosing function returns <code>e</code>
+immediately.</p>
+<h3 id="68-attempt">6.8 <code>attempt</code></h3>
+<p><code>attempt(f)</code> with <code>f : fn() -&gt; T</code> evaluates
+<code>f()</code> and yields <code>Ok(result) : Result[T, str]</code>; if
+a runtime error occurs during the call the stack is unwound to the
+<code>attempt</code> and the value is <code>Err(message)</code>. If
+<code>f</code> is a procedure the type is <code>Result[bool, str]</code>
+with <code>Ok(True)</code>. <code>exit</code> is not intercepted.</p>
+<h3 id="69-parallel-operations">6.9 Parallel operations</h3>
+<p><code>parallel_sum(count, workers, m)</code> and
+<code>parallel_map(count, workers, m)</code> require
+<code>m : fn(i64) -&gt; i64</code> and <code>1 ≤ workers ≤ 64</code>.
+They evaluate <code>m(i)</code> for every <code>0 ≤ i &lt; count</code>
+on up to <code>workers</code> threads and return the exact sum (runtime
+error if it does not fit <code>i64</code>) or the list of results in
+index order. If <code>m</code> is a closure, all its captured values
+must be <code>i64</code>, <code>f64</code> or <code>bool</code>
+(compile-time error for a lambda literal, runtime error otherwise). The
+first error raised, in index order, propagates.</p>
+<hr />
+<h2 id="7-statements">7. Statements</h2>
+<ul>
+<li><code>if</code>/<code>elif</code>/<code>else</code>: conditions are
+<code>bool</code>. Each block is a scope.</li>
+<li><code>while c:</code> evaluates <code>c</code> before each
+iteration.</li>
+<li><code>for i in range(n)</code> / <code>range(a, b)</code>:
+<code>i</code> takes <code>a, a+1, …, b-1</code> (<code>a = 0</code> by
+default); bounds evaluated once; empty when <code>b ≤ a</code>.
+<code>for x in L</code>: <code>x</code> takes each element of the list
+<code>L</code> as it is at each step (<code>L</code> is evaluated once;
+mutations during the loop are observed through the current length).</li>
+<li><code>break</code> / <code>continue</code> affect the innermost loop
+and must be inside one.</li>
+<li><code>match</code> is described in §2.3/§5; arms are tried in order;
+the scrutinee is evaluated once; a non-exhaustive match is a compile
+error; an <code>Option</code>/<code>Result</code> match may not repeat
+an arm; nothing may follow <code>case _</code>.</li>
+<li><code>assert c</code> raises <code>assertion failed</code> when
+<code>c</code> is <code>False</code>.</li>
+<li>An expression statement evaluates a call (or <code>e?</code>) and
+discards its result.</li>
+</ul>
+<hr />
+<h2 id="8-runtime-errors">8. Runtime errors</h2>
+<p>A runtime error terminates the program with status 1 after writing
+<code>FILE:LINE:COLUMN: runtime error: MESSAGE</code> and, when the call
+depth exceeds one, a traceback of <code>in FUNCTION (line N)</code>
+lines, to standard error — unless it occurs inside <code>attempt</code>.
+The defined runtime errors are: integer overflow
+(<code>+ - * // -</code> and parallel sums), division or modulo by zero,
+invalid shift count, index out of bounds (list, string, argument),
+missing dictionary key, <code>unwrap</code>/<code>expect</code> on
+<code>None</code>/<code>Err</code>,
+<code>pop</code>/<code>min_of</code>/<code>max_of</code> on an empty
+list, <code>assert</code> failure, <code>fail(message)</code>,
+conversion failures (<code>int</code>, <code>float</code>,
+<code>chr</code>, <code>ord</code>, <code>from_bytes</code>,
+<code>fixed</code>), invalid worker count, invalid parallel capture,
+function nesting beyond 100,000 frames, value nesting beyond 2,000,
+resource limits (text 256 MB, list 256 M elements, stack 4 M values),
+and I/O failures reported by built-ins that do not return
+<code>Result</code>.</p>
+<p><code>exit(code)</code> ends the program immediately with
+<code>code</code> (0–255) after flushing output.</p>
+<hr />
+<h2 id="9-compile-time-diagnostics">9. Compile-time diagnostics</h2>
+<p>A conforming implementation rejects programs that violate any rule in
+§§1–7 with a diagnostic carrying the file, line and column. The
+reference implementation additionally reports <strong>warnings</strong>
+that do not prevent execution: a divisor that is a constant zero, an
+arithmetic operation whose constant operands overflow, an index that is
+provably outside a list of known length, a loop with provably no
+iterations, an assertion that is provably false, a shift count provably
+outside 0–63, and a parallel worker count provably outside 1–64.</p>
+<hr />
+<h2 id="10-limits">10. Limits</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Limit</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Source file</td>
+<td>4,000,000 bytes</td>
+</tr>
+<tr class="even">
+<td>Block / expression nesting</td>
+<td>96 levels; expression height 192; 96 operators per expression</td>
+</tr>
+<tr class="odd">
+<td>Locals per function; list literal size</td>
+<td>65,536</td>
+</tr>
+<tr class="even">
+<td>Call depth</td>
+<td>100,000 frames</td>
+</tr>
+<tr class="odd">
+<td>Value stack (VM)</td>
+<td>4,000,000 values (512,000 per worker)</td>
+</tr>
+<tr class="even">
+<td>Text or file size</td>
+<td>256,000,000 bytes</td>
+</tr>
+<tr class="odd">
+<td>Value nesting (print, compare)</td>
+<td>2,000 levels</td>
+</tr>
+<tr class="even">
+<td>Bytecode file</td>
+<td>64,000,000 bytes</td>
+</tr>
+<tr class="odd">
+<td>Parallel workers</td>
+<td>64</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-standard-environment">11. Standard environment</h2>
+<p>The entry point is <code>main</code>. <code>args()</code> returns the
+arguments after the program name (after <code>--</code> when run through
+<code>tacqor run</code>). <code>print</code>/<code>write</code> go to
+standard output, <code>eprint</code> to standard error,
+<code>input</code> reads standard input. The built-in functions and the
+standard library are specified in <code>STDLIB.md</code>; their
+signatures are part of this specification.</p>
+<hr />
+<h2 id="12-conformance">12. Conformance</h2>
+<p>An implementation conforms if, for every valid program, it produces
+the same output and exit status as this specification defines, and for
+every invalid program it reports a diagnostic. The reference
+implementation's differential test suite (<code>tests/smoke.sh</code>)
+is the executable form of this requirement: all four execution paths
+must agree byte for byte.</p>
+</body>
+</html>

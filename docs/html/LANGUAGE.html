@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — LANGUAGE</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#tacqor-12-language-reference"
+id="toc-tacqor-12-language-reference">Tacqor 1.2 language reference</a>
+<ul>
+<li><a href="#1-source-files-and-modules"
+id="toc-1-source-files-and-modules">1. Source files and modules</a></li>
+<li><a href="#2-types" id="toc-2-types">2. Types</a></li>
+<li><a href="#3-declarations" id="toc-3-declarations">3.
+Declarations</a></li>
+<li><a href="#4-statements" id="toc-4-statements">4. Statements</a></li>
+<li><a href="#5-expressions" id="toc-5-expressions">5.
+Expressions</a></li>
+<li><a href="#6-built-in-functions" id="toc-6-built-in-functions">6.
+Built-in functions</a></li>
+<li><a href="#7-errors-and-checking" id="toc-7-errors-and-checking">7.
+Errors and checking</a></li>
+<li><a href="#8-tooling" id="toc-8-tooling">8. Tooling</a></li>
+<li><a href="#9-memory" id="toc-9-memory">9. Memory</a></li>
+<li><a href="#10-packages" id="toc-10-packages">10. Packages</a></li>
+<li><a href="#11-repl" id="toc-11-repl">11. REPL</a></li>
+<li><a href="#12-networking-and-processes"
+id="toc-12-networking-and-processes">12. Networking and
+processes</a></li>
+<li><a href="#13-limits-and-non-features"
+id="toc-13-limits-and-non-features">13. Limits and non-features</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="tacqor-12-language-reference">Tacqor 1.2 language reference</h1>
+<p>Tacqor is a statically typed language with Python's surface syntax,
+Rust-style checked arithmetic and
+<code>Option</code>/<code>Result</code> error handling, generics,
+traits, closures, modules, and two execution modes: a bytecode VM and
+native machine code through the system C++ compiler. This document is
+the complete reference. For a guided introduction read
+<code>TOUR.md</code>; for the library read <code>STDLIB.md</code>.</p>
+<h2 id="1-source-files-and-modules">1. Source files and modules</h2>
+<p>A program is a UTF-8 <code>.tq</code> file. Indentation is four
+spaces per level, <code>#</code> starts a comment, brackets may span
+lines, and a trailing backslash continues a line. Top-level declarations
+are <code>import</code>, <code>const</code>, <code>struct</code>, and
+<code>def</code>. The file passed to <code>tacqor run</code> is the root
+module and must define <code>def main():</code>.</p>
+<pre class="text"><code>import std.lists              # loads std/lists.tq; refer to it as lists
+import geometry as geo        # loads geometry.tq next to this file; refer to it as geo
+
+const LIMIT = 100
+
+struct Point:
+    x: f64
+    y: f64
+
+def main():
+    print(lists.map([1, 2, 3], fn(n: i64) =&gt; n * LIMIT))</code></pre>
+<p><strong>Resolution.</strong> <code>import a.b.c</code> loads
+<code>a/b/c.tq</code> (or <code>a/b/c/lib.tq</code>), searched in: the
+importing file's directory, the <code>packages/</code> folder next to
+the root program and in the working directory (see §10), the
+<code>std</code> directory shipped next to the <code>tacqor</code>
+executable, and each entry of <code>TACQOR_PATH</code> (colon
+separated). A module is loaded once however many times it is imported;
+circular imports are an error. Everything a module declares is public
+and reached through its alias: <code>alias.function(...)</code>,
+<code>alias.Type</code>, <code>alias.CONSTANT</code>. A module's own
+<code>main</code>, if any, is ignored when it is imported.</p>
+<p>Names of functions, structs, traits, constants and import aliases
+share one namespace per module. Local variables may shadow any of them,
+and built-in function names too; inside the local's scope the local
+wins.</p>
+<h2 id="2-types">2. Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>i64</code></td>
+<td>64-bit signed integers. Every operation is overflow-checked;
+literals may use <code>_</code> separators
+(<code>1_000_000</code>).</td>
+</tr>
+<tr class="even">
+<td><code>f64</code></td>
+<td>IEEE doubles. Literals need digits on both sides of the point
+(<code>1.0</code>, <code>2.5e-3</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>bool</code></td>
+<td><code>True</code>, <code>False</code>.</td>
+</tr>
+<tr class="even">
+<td><code>str</code></td>
+<td>Immutable UTF-8 byte strings. <code>len</code> counts bytes;
+<code>chars</code>/<code>char_count</code> work in code points. Indexing
+yields one byte.</td>
+</tr>
+<tr class="odd">
+<td><code>list[T]</code></td>
+<td>Mutable, growable lists. <code>list[i64]</code>,
+<code>list[f64]</code> and <code>list[bool]</code> are stored as flat
+native arrays.</td>
+</tr>
+<tr class="even">
+<td><code>dict[K, V]</code></td>
+<td>Mutable, insertion-ordered dictionaries with <code>i64</code> or
+<code>str</code> keys.</td>
+</tr>
+<tr class="odd">
+<td><code>Option[T]</code></td>
+<td><code>Some(value)</code> or <code>None</code>.</td>
+</tr>
+<tr class="even">
+<td><code>Result[T, E]</code></td>
+<td><code>Ok(value)</code> or <code>Err(error)</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>fn(A, B) -&gt; R</code>, <code>fn(A)</code></td>
+<td>Function values (closures). Omit <code>-&gt; R</code> for a
+procedure.</td>
+</tr>
+<tr class="even">
+<td><em>struct</em></td>
+<td>User types with named, typed, mutable fields and methods; may be
+generic.</td>
+</tr>
+<tr class="odd">
+<td><em>trait</em></td>
+<td>An interface. A value of trait type is any struct that implements
+it; calls dispatch at runtime.</td>
+</tr>
+</tbody>
+</table>
+<p>Lists, dicts, structs and closures are reference values: binding or
+passing them shares the object (<code>let</code> makes the
+<em>binding</em> immutable, not the object). Everything else is a value.
+<code>==</code> and <code>!=</code> compare structurally for every type.
+There are no implicit conversions: use <code>float(i)</code>,
+<code>int(f)</code>, <code>str(x)</code>.</p>
+<p>Type expressions: <code>i64</code>, <code>list[str]</code>,
+<code>dict[str, list[i64]]</code>, <code>Option[Point]</code>,
+<code>Result[i64, str]</code>, <code>fn(i64, i64) -&gt; bool</code>,
+<code>fn(str)</code>, <code>Pair[i64, str]</code>,
+<code>geo.Point</code>.</p>
+<h2 id="3-declarations">3. Declarations</h2>
+<h3 id="bindings">Bindings</h3>
+<pre class="text"><code>let name = expr              # immutable binding, type inferred
+var count = 0                # reassignable
+var items: list[i64] = []    # annotation needed when the value does not determine the type
+let none: Option[str] = None</code></pre>
+<h3 id="functions">Functions</h3>
+<pre class="text"><code>def area(width: f64, height: f64) -&gt; f64:
+    return width * height
+
+def log(message: str):       # a procedure: no result; `return` leaves early
+    print(message)
+
+def first[T](items: list[T]) -&gt; Option[T]:    # generic
+    if len(items) == 0:
+        return None
+    return Some(items[0])</code></pre>
+<p>Every path of a value-returning function must <code>return</code>. A
+statement after <code>return</code>, <code>break</code>,
+<code>continue</code>, an exhaustive <code>match</code> whose arms all
+exit, or a <code>while True:</code> loop without <code>break</code> is
+an error (unreachable). Calls to <code>exit(...)</code> and
+<code>fail(...)</code> also end a path.</p>
+<p>Generic type parameters are written in brackets after the name,
+optionally with a trait bound (<code>[T: Shape]</code>). They are
+inferred from the arguments at each call (<code>first([1, 2])</code>
+gives <code>T = i64</code>), or given explicitly
+(<code>first[i64]([])</code>). A bound is checked at every instantiation
+and lets the body call the trait's methods on values of type
+<code>T</code> — statically, since each instantiation knows the concrete
+type. Each distinct instantiation is compiled separately
+(monomorphization), so generic code runs at full speed in native builds.
+A generic function cannot be used as a value without explicit type
+arguments.</p>
+<h3 id="structs-and-methods">Structs and methods</h3>
+<pre class="text"><code>struct Stack[T]:
+    items: list[T]
+
+    def push(self, item: T):
+        push(self.items, item)
+
+    def pop(self) -&gt; Option[T]:
+        if len(self.items) == 0:
+            return None
+        return Some(pop(self.items))
+
+let s = Stack[i64]([])      # or Stack([1, 2]) with T inferred from the fields
+s.push(3)
+print(s.pop())              # Some(3)
+print(s.items)              # [1, 2]</code></pre>
+<p>Construct a struct positionally. Methods are <code>def</code>s inside
+the struct whose first parameter is <code>self</code>; call them with
+<code>value.method(args)</code>. Fields are read and written with
+<code>value.field</code>. A struct may refer to itself
+(<code>next: Option[Node[T]]</code>).</p>
+<h3 id="traits">Traits</h3>
+<pre class="text"><code>trait Shape:
+    def area(self) -&gt; f64
+    def name(self) -&gt; str
+
+struct Circle(Shape):            # the traits a struct implements, in parentheses
+    radius: f64
+
+    def area(self) -&gt; f64:
+        return 3.141592653589793 * self.radius * self.radius
+
+    def name(self) -&gt; str:
+        return &quot;circle&quot;
+
+def describe(s: Shape) -&gt; str:   # any implementing struct can be passed
+    return f&quot;{s.name()}: {s.area()}&quot;
+
+def total[T: Shape](shapes: list[T]) -&gt; f64:   # or a bound: static calls per instantiation
+    var sum = 0.0
+    for s in shapes:
+        sum += s.area()
+    return sum
+
+let shapes: list[Shape] = [Circle(1.0), Square(2.0)]   # heterogeneous: dynamic dispatch</code></pre>
+<p>A trait lists method signatures. A struct declares the traits it
+implements after its name; the compiler checks that every method exists
+with exactly the trait's signature. A struct value converts implicitly
+wherever one of its traits is expected (parameters, annotated bindings,
+list elements with an annotated type, returns), and
+<code>s.method()</code> on a trait-typed value dispatches on the actual
+struct. Trait values compare with <code>==</code> structurally and print
+as the underlying struct. Generic structs may implement traits too
+(<code>struct Box[T](Shape)</code>); traits can be qualified across
+modules (<code>geometry.Named</code>).</p>
+<h3 id="constants">Constants</h3>
+<p><code>const NAME = literal</code> declares a module-level constant:
+an integer, float, bool, string, or another constant. Constants are
+inlined where used.</p>
+<h3 id="function-values-and-closures">Function values and closures</h3>
+<pre class="text"><code>let double = fn(x: i64) =&gt; x * 2            # result type inferred
+let greet = fn(name: str) -&gt; str =&gt; &quot;hi &quot; + name
+let log_all = fn(items: list[str]):         # block body; must be the last thing on the line
+    for item in items:
+        print(item)
+let f = area                                # a named function as a value</code></pre>
+<p>A lambda captures the enclosing variables it mentions <strong>by
+value</strong> at the moment it is created: integers and strings are
+copied, lists/dicts/structs are shared. Captured names cannot be
+assigned inside the lambda (use a shared container or struct to
+communicate out). Block-bodied lambdas are allowed where a statement
+ends (<code>let</code>, <code>var</code>, assignment,
+<code>return</code>), not inside brackets.</p>
+<p>Call a function value like any function: <code>double(4)</code>. Pass
+it as <code>fn(i64) -&gt; i64</code>. The method-call form
+<code>x.f(args)</code> on a value whose type has no such method calls
+the built-in or module function <code>f(x, args)</code> instead:
+<code>items.push(1)</code>, <code>name.upper()</code>,
+<code>s.len()</code>.</p>
+<h2 id="4-statements">4. Statements</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Statement</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>x = e</code>, <code>a[i] = e</code>, <code>d[k] = e</code>,
+<code>p.field = e</code></td>
+<td>Assignment. <code>+=</code> <code>-=</code> <code>*=</code>
+<code>//=</code> <code>%=</code> <code>&amp;=</code> `</td>
+</tr>
+<tr class="even">
+<td><code>if c:</code> / <code>elif c:</code> / <code>else:</code></td>
+<td>Conditions are <code>bool</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>while c:</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>for i in range(n):</code>,
+<code>for i in range(a, b):</code></td>
+<td>Counts <code>0</code>/<code>a</code> up to but excluding
+<code>n</code>/<code>b</code>; bounds evaluated once.</td>
+</tr>
+<tr class="odd">
+<td><code>for item in some_list:</code></td>
+<td>Iterates elements in order.</td>
+</tr>
+<tr class="even">
+<td><code>break</code>, <code>continue</code></td>
+<td>Innermost loop.</td>
+</tr>
+<tr class="odd">
+<td><code>return [e]</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>assert c</code></td>
+<td>Runtime error <code>assertion failed</code> when false.</td>
+</tr>
+<tr class="odd">
+<td><code>match e:</code></td>
+<td>See below.</td>
+</tr>
+<tr class="even">
+<td>any call</td>
+<td>A call can stand alone; its result is discarded.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="match">match</h3>
+<pre class="text"><code>match lookup(ages, name):          # Option[i64]
+    case Some(age):
+        print(age)
+    case None:
+        print(&quot;unknown&quot;)
+
+match parse(text):                 # Result[Json, str]
+    case Ok(doc):
+        use(doc)
+    case Err(problem):
+        print(problem)
+
+match command:                     # i64, f64, bool or str: literal cases, then `case _`
+    case &quot;add&quot;:
+        add()
+    case &quot;list&quot;:
+        show()
+    case _:
+        print(&quot;?&quot;)</code></pre>
+<p>Option and Result matches must cover both arms (or end with
+<code>case _</code>); matches on plain values must end with
+<code>case _</code>. <code>case Some(_)</code> ignores the payload.</p>
+<h2 id="5-expressions">5. Expressions</h2>
+<p>Precedence, highest first (same as Python): calls, indexing
+<code>a[i]</code>, slicing <code>a[i:j]</code>, field access and method
+calls, <code>?</code>; unary <code>-</code> and <code>~</code>;
+<code>*</code> <code>/</code> <code>//</code> <code>%</code>;
+<code>+</code> <code>-</code>; shifts <code>&lt;&lt;</code>
+<code>&gt;&gt;</code>; <code>&amp;</code>; <code>^</code>;
+<code>|</code>; comparisons <code>==</code> <code>!=</code>
+<code>&lt;</code> <code>&lt;=</code> <code>&gt;</code>
+<code>&gt;=</code> <code>in</code>; <code>not</code>; <code>and</code>;
+<code>or</code>. Comparisons do not chain
+(<code>a &lt; b and b &lt; c</code>). <code>and</code>/<code>or</code>
+short-circuit.</p>
+<ul>
+<li>Integer division <code>//</code> floors; <code>%</code> takes the
+divisor's sign. <code>/</code> is for <code>f64</code> only. Division by
+zero and overflow are runtime errors for <code>i64</code>;
+<code>f64</code> follows IEEE (<code>inf</code>, <code>nan</code>).</li>
+<li>Bit operations on <code>i64</code>: <code>&amp;</code>
+<code>|</code> <code>^</code> <code>~</code>, <code>&lt;&lt;</code>
+(wrapping, like Rust's <code>wrapping_shl</code>) and
+<code>&gt;&gt;</code> (arithmetic, keeps the sign). Shift counts must be
+0–63 (runtime error otherwise; a warning when constant). Compound forms
+<code>&amp;=</code> <code>|=</code> <code>^=</code>
+<code>&lt;&lt;=</code> <code>&gt;&gt;=</code> exist.</li>
+<li><code>str + str</code> concatenates. Ordering comparisons work on
+<code>i64</code>, <code>f64</code>, <code>str</code>.</li>
+<li><code>x in list</code>, <code>key in dict</code>,
+<code>sub in text</code>.</li>
+<li>Slices clamp like Python: <code>items[1:]</code>,
+<code>text[:3]</code>, <code>items[-1:]</code> is empty (indices are not
+negative-wrapped).</li>
+<li>Literals: <code>[1, 2]</code>, <code>["a"]</code>,
+<code>{"k": 1}</code>, <code>[]</code>/<code>{}</code> (need a type from
+context), <code>Some(x)</code>, <code>None</code>, <code>Ok(x)</code>,
+<code>Err(e)</code>. <code>None</code>, <code>Ok</code> and
+<code>Err</code> need the full type from context (an annotation, a
+parameter type, or the function's return type).</li>
+<li><strong>f-strings:</strong>
+<code>f"{name} is {age + 1} years"</code> formats any expression with
+<code>str()</code>. <code>{{</code> and <code>}}</code> are literal
+braces; quotes may be nested inside the braces
+(<code>f"{d["key"]}"</code>).</li>
+<li><strong><code>?</code>:</strong> <code>value?</code> unwraps
+<code>Some</code>/<code>Ok</code> or returns the
+<code>None</code>/<code>Err</code> from the enclosing function, which
+must return the same <code>Option</code>/<code>Result</code> error
+shape.</li>
+</ul>
+<h2 id="6-built-in-functions">6. Built-in functions</h2>
+<p>The complete list with signatures is in <code>STDLIB.md</code>.
+Highlights: <code>print</code>, <code>write</code>, <code>eprint</code>,
+<code>input</code>, <code>args</code>, <code>str</code>,
+<code>int</code>, <code>float</code>, <code>len</code>,
+<code>push</code>, <code>pop</code>, <code>sort</code>,
+<code>keys</code>, <code>lookup</code>, <code>split</code>,
+<code>join</code>, <code>find</code>, <code>replace</code>,
+<code>chars</code>, <code>unwrap</code>, <code>unwrap_or</code>,
+<code>is_some</code>, <code>parse_int</code>, <code>read_text</code>,
+<code>write_text</code>, <code>read_lines</code>,
+<code>file_exists</code>, <code>env</code>, <code>random_int</code>,
+<code>time_ms</code>, <code>sleep_ms</code>, <code>run</code>,
+<code>exit</code>, <code>fail</code>, and the math set
+<code>sqrt pow sin cos ... log</code>. <code>len(x)</code> and
+<code>x.len()</code> are the same call.</p>
+<p><code>parallel_sum(count, workers, mapper)</code> maps a
+<code>fn(i64) -&gt; i64</code> over <code>range(count)</code> on 1–64
+threads and returns the exact sum;
+<code>parallel_map(count, workers, mapper)</code> returns every result
+as a <code>list[i64]</code>, in order. The mapper may be a named
+function or a closure, and the result never depends on the worker count.
+Because workers run truly in parallel, a closure mapper may only capture
+<code>i64</code>, <code>f64</code> and <code>bool</code> values (checked
+at compile time for lambdas and at runtime for other function values);
+read any larger data through the index, e.g. by computing it from
+<code>i</code> or by capturing a constant.</p>
+<h2 id="7-errors-and-checking">7. Errors and checking</h2>
+<h3 id="recovering-from-runtime-errors">Recovering from runtime
+errors</h3>
+<p>Runtime errors (a failed index, <code>unwrap</code> on
+<code>None</code>, <code>fail(...)</code>, overflow, an assertion) abort
+the program with a traceback — unless they happen inside
+<code>attempt</code>:</p>
+<pre class="text"><code>let outcome = attempt(fn() =&gt; risky(input))      # Result[i64, str]
+match outcome:
+    case Ok(value):
+        use(value)
+    case Err(message):
+        log(&quot;recovered: &quot; + message)</code></pre>
+<p><code>attempt(f)</code> runs a zero-argument function value and
+returns <code>Ok(result)</code> or <code>Err(message)</code> (for a
+procedure, <code>Ok(True)</code>). It is how a server keeps running when
+one request fails (see <code>std.http</code>), and the only form of
+catching in the language: there is no
+<code>try</code>/<code>except</code>, so a function that can fail should
+return a <code>Result</code>, and <code>attempt</code> is reserved for
+boundaries. <code>exit(...)</code> is never caught.</p>
+<p>The compiler rejects type mismatches, unknown names, assignment to
+immutable or captured bindings, missing returns, unreachable code,
+non-exhaustive matches, misuse of <code>?</code>, wrong arities and bad
+generic inference. Errors name the file for modules:
+<code>std/json.tq:12:5: error: ...</code>.</p>
+<p>The scanner (<code>tacqor check</code>, <code>tacqor diagnose</code>,
+the VS Code extension) warns about operations that would certainly fail
+or do nothing: constant division by zero, constant overflow, indexes
+outside lists of known length, empty loops, assertions that always fail,
+invalid worker counts.</p>
+<p>At runtime every integer operation, index, dictionary lookup,
+conversion, <code>unwrap</code> and <code>assert</code> is checked. A
+failure prints <code>file:line:column: runtime error: message</code>
+followed by the call stack and exits with status 1.
+<code>exit(code)</code> ends the program with that status. Native
+executables behave identically.</p>
+<h2 id="8-tooling">8. Tooling</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>tacqor FILE.tq [args]</code>,
+<code>tacqor run FILE.tq [-- args]</code></td>
+<td>Compile and run in the VM (also runs <code>.tqb</code>). A file
+starting with <code>#!/usr/bin/env tacqor</code> runs as a script.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor test FILE.tq</code></td>
+<td>Run every <code>def test_*()</code> in the file, report PASS/FAIL,
+exit 1 on failure.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor build FILE.tq -o EXE</code></td>
+<td>Standalone executable: bytecode + embedded VM. Runs anywhere
+compatible.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor build --native FILE.tq -o EXE</code></td>
+<td>Machine code through the system C++ compiler (<code>CXX</code>,
+default <code>c++</code>; <code>cl</code> on Windows).</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor emit FILE.tq -o FILE.cpp</code></td>
+<td>The C++ that <code>--native</code> compiles.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor compile FILE.tq -o FILE.tqb</code></td>
+<td>Portable bytecode.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor check FILE.tq</code> /
+<code>diagnose FILE.tq</code></td>
+<td>Warnings as text / JSON (<code>diagnose --stdin</code> for
+editors).</td>
+</tr>
+<tr class="even">
+<td><code>tacqor dump FILE.tq</code></td>
+<td>Disassemble the compiled program.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor new NAME</code></td>
+<td>Create a project folder with <code>main.tq</code>,
+<code>tests.tq</code>, <code>README.md</code>.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor repl</code></td>
+<td>Interactive scratchpad (§11).</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor add SOURCE [NAME]</code>, <code>install</code>,
+<code>remove NAME</code></td>
+<td>Package management (§10).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-memory">9. Memory</h2>
+<p>Values are reference counted, so most objects are freed the moment
+they become unreachable. Cycles (a struct that reaches itself through a
+field or a list) are reclaimed by a cycle collector that runs
+automatically after a few hundred thousand container allocations, in
+both the VM and native executables. <code>gc_collect()</code> runs it
+now and returns the number of objects freed; <code>gc_count()</code>
+reports how many containers are currently tracked. Lists of numbers and
+booleans, strings, and immediates are never tracked, so they cost
+nothing extra.</p>
+<h2 id="10-packages">10. Packages</h2>
+<p><code>tacqor add SOURCE [NAME]</code> installs a package into
+<code>packages/NAME</code> from a local folder or a git URL (via
+<code>git clone</code>) and records it in <code>tacqor.pkg</code>;
+<code>tacqor install</code> restores every package listed there;
+<code>tacqor remove NAME</code> uninstalls. A package is a folder of
+<code>.tq</code> modules: <code>import NAME</code> loads
+<code>packages/NAME/lib.tq</code> and <code>import NAME.part</code>
+loads <code>packages/NAME/part.tq</code>. There is no central registry:
+a package is any git repository or folder, which keeps the mechanism
+simple and auditable.</p>
+<h2 id="11-repl">11. REPL</h2>
+<p><code>tacqor repl</code> is a scratchpad: definitions
+(<code>def</code>, <code>struct</code>, <code>trait</code>,
+<code>import</code>, <code>const</code>) and statements accumulate, an
+expression on its own is printed, and a line ending in <code>:</code>
+opens a block that an empty line closes. Because Tacqor compiles whole
+programs, the session is recompiled and re-run after each entry and only
+new output is shown; side effects such as file writes therefore repeat.
+<code>:show</code> prints the session, <code>:reset</code> clears it,
+<code>:quit</code> leaves.</p>
+<h2 id="12-networking-and-processes">12. Networking and processes</h2>
+<p><code>tcp_listen</code>, <code>tcp_accept</code>,
+<code>tcp_connect</code>, <code>tcp_read</code>, <code>tcp_write</code>,
+<code>tcp_close</code> are blocking TCP primitives that return
+<code>Result</code>s; <code>std.http</code> builds an HTTP/1.1 server
+(<code>serve</code>, <code>serve_count</code>) and client
+(<code>get</code>, <code>post</code>) on them in Tacqor.
+<code>run(command)</code> runs a shell command and returns its status;
+<code>run_capture(command)</code> returns its output.
+<code>unix_time()</code> is seconds since the epoch;
+<code>hash(text)</code> is a 64-bit FNV-1a hash folded to a non-negative
+<code>i64</code>.</p>
+<h2 id="13-limits-and-non-features">13. Limits and non-features</h2>
+<p>No inheritance: traits plus generics and closures cover the same
+ground without an object hierarchy. No
+<code>try</code>/<code>except</code>: use <code>Result</code> and
+<code>?</code>, and <code>attempt</code> at boundaries. Parallelism is
+data-parallel (<code>parallel_sum</code>, <code>parallel_map</code>)
+rather than shared-memory threads; the HTTP server handles one
+connection at a time. Strings are bytes; only <code>chars</code>,
+<code>char_count</code>, <code>chr</code>, <code>ord</code> are
+code-point aware. Call depth is limited to 100,000 frames (in native
+builds too, with a 512 MB stack); value nesting (lists inside lists...)
+is limited to 2,000 levels for printing and comparison.</p>
+</body>
+</html>

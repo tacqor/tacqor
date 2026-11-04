@@ -1,0 +1,9 @@
+flowchart TB
+    OP["Checked operation<br/>index · overflow · unwrap · assert · fail()"] --> ERR{fails?}
+    ERR -->|no| CONT[continue]
+    ERR -->|yes| INATT{"inside attempt(fn)?"}
+    INATT -->|yes| RES["Err(message)<br/>stack unwound to the attempt frame"]
+    INATT -->|no| TB["file:line:col: runtime error: message<br/>+ traceback (in f, in g, ...)<br/>exit status 1"]
+    EXP["Expected failures"] --> OR["return Option / Result"]
+    OR --> Q["? propagates None / Err"]
+    OR --> M["match Some/None · Ok/Err<br/>(exhaustiveness checked)"]

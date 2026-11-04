@@ -1,0 +1,56 @@
+# A small command-line to-do app that stores its data as JSON.
+#   tacqor run examples/todo.tq -- add "buy milk"
+#   tacqor run examples/todo.tq -- list
+#   tacqor run examples/todo.tq -- done 1
+import std.json
+
+const FILE = "todo.json"
+
+def load() -> list[json.Json]:
+    if not file_exists(FILE):
+        return []
+    match json.parse(read_text(FILE)):
+        case Ok(doc):
+            return doc.items
+        case Err(problem):
+            eprint(f"could not read {FILE}: {problem}")
+            exit(1)
+
+def save(items: list[json.Json]):
+    write_text(FILE, json.encode(json.array(items)))
+
+def main():
+    let arguments = args()
+    if len(arguments) == 0:
+        print("usage: todo add TEXT | list | done NUMBER")
+        return
+    var items = load()
+    match arguments[0]:
+        case "add":
+            let entry = json.object()
+            json.set(entry, "text", json.string(join(arguments[1:], " ")))
+            json.set(entry, "done", json.boolean(False))
+            push(items, entry)
+            save(items)
+            print(f"added #{len(items)}")
+        case "list":
+            for i in range(len(items)):
+                let text = unwrap(unwrap(items[i].get("text")).as_text())
+                let finished = unwrap(unwrap(items[i].get("done")).as_bool())
+                var mark = " "
+                if finished:
+                    mark = "x"
+                print(f"{i + 1}. [{mark}] {text}")
+        case "done":
+            match parse_int(arguments[1]):
+                case Some(number):
+                    if number < 1 or number > len(items):
+                        print("no such item")
+                    else:
+                        json.set(items[number - 1], "done", json.boolean(True))
+                        save(items)
+                        print(f"completed #{number}")
+                case None:
+                    print("done needs a number")
+        case _:
+            print("unknown command " + arguments[0])
