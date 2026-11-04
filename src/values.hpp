@@ -29,6 +29,9 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
+#if defined(_MSC_VER)
+#pragma comment(lib, "ws2_32.lib")  // Winsock, for the TCP builtins; also covers natively compiled programs
+#endif
 #else
 #include <arpa/inet.h>
 #include <netdb.h>

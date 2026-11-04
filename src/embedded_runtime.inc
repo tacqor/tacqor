@@ -198,6 +198,9 @@ void build_native(const Program& program, const std::filesystem::path& output);
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
+#if defined(_MSC_VER)
+#pragma comment(lib, "ws2_32.lib")  // Winsock, for the TCP builtins; also covers natively compiled programs
+#endif
 #else
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -296,10 +299,10 @@ inline std::string read_text(std::istream& input, std::size_t limit) {
 
 // ---------------------------------------------------------------------------
 // Values: 16 bytes, immediates inline, heap objects intrusively reference counted.
-// ---------------------------------------------------------------------------
+// ----------)tacqor_runtime",
+R"tacqor_runtime(-----------------------------------------------------------------
 
-enum class Tag : std::uint8_t { unit, integer, floating, boolean, text,)tacqor_runtime",
-R"tacqor_runtime( list, dict, object, function, variant };
+enum class Tag : std::uint8_t { unit, integer, floating, boolean, text, list, dict, object, function, variant };
 
 // Reference counts are not atomic: heap values are never shared between threads. parallel_sum
 // workers receive only an i64 and return an i64, and the string constants they can reach are
@@ -596,11 +599,11 @@ inline ClosureObj& closure_of(const Value& v) {
     return *static_cast<ClosureObj*>(v.o);
 }
 inline VariantObj& variant_of(const Value& v) {
-    if (v.tag != Tag::variant) throw std::runtime_error("invalid bytecode value type (expected Option or Result)");
+    if (v.tag != Tag::variant) throw)tacqor_runtime",
+R"tacqor_runtime( std::runtime_error("invalid bytecode value type (expected Option or Result)");
     return *static_cast<VariantObj*>(v.o);
 }
-inline Value )tacqor_runtime",
-R"tacqor_runtime(make_variant(bool which, Value payload, bool is_result = false) {
+inline Value make_variant(bool which, Value payload, bool is_result = false) {
     auto* variant = new VariantObj;
     variant->which = which;
     variant->is_result = is_result;
@@ -896,11 +899,11 @@ inline void format(std::string& out, const Value& value, const std::vector<Struc
             out += '[';
             bool first = true;
             const auto& list = list_of(value);
-            for (std::size_t i = 0; i < list.size(); ++i) {
+            for (std::size_t i = 0; i < list.size()tacqor_runtime",
+R"tacqor_runtime(); ++i) {
                 if (!first) out += ", ";
                 first = false;
-                format(out, list.get(i), structs, true, )tacqor_runtime",
-R"tacqor_runtime(depth + 1);
+                format(out, list.get(i), structs, true, depth + 1);
             }
             out += ']';
             break;
@@ -1195,14 +1198,14 @@ constexpr int builtin_arity[] = {
     1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
     1, 1, 1, 2, 2,
     // 1.1
-    2, 1, 1, 0, 0,
+    2, 1, 1,)tacqor_runtime",
+R"tacqor_runtime( 0, 0,
     // 1.2
     1, 1, 2, 2, 2, 1, 1, 0, 1,
 };
 
 inline std::mt19937_64& random_engine() {
-    static std::mt19937_64 engine(std::rand)tacqor_runtime",
-R"tacqor_runtime(om_device{}());
+    static std::mt19937_64 engine(std::random_device{}());
     return engine;
 }
 
@@ -1463,9 +1466,9 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             std::vector<Value> parts;
             std::size_t start = 0;
             for (;;) {
-                const auto found = text.find(separator, start);
-                parts.push_back(make_text(text.substr(start, found == std::string::npos ? std::strin)tacqor_runtime",
-R"tacqor_runtime(g::npos : found - start)));
+                const auto)tacqor_runtime",
+R"tacqor_runtime( found = text.find(separator, start);
+                parts.push_back(make_text(text.substr(start, found == std::string::npos ? std::string::npos : found - start)));
                 if (found == std::string::npos) break;
                 start = found + separator.size();
             }
@@ -1701,10 +1704,10 @@ R"tacqor_runtime(g::npos : found - start)));
         case Builtin::asin: return std::asin(float_of(args[0]));
         case Builtin::acos: return std::acos(float_of(args[0]));
         case Builtin::atan: return std::atan(float_of(args[0]));
-        case Builtin::atan2: return std::atan2(float_of(args[0]), float_of(args[1]));
+        case Builtin::atan2: return std::atan2(float_of(args)tacqor_runtime",
+R"tacqor_runtime([0]), float_of(args[1]));
         case Builtin::exp: return std::exp(float_of(args[0]));
-        case Builtin::log: return std::log(float_)tacqor_runtime",
-R"tacqor_runtime(of(args[0]));
+        case Builtin::log: return std::log(float_of(args[0]));
         case Builtin::log2: return std::log2(float_of(args[0]));
         case Builtin::log10: return std::log10(float_of(args[0]));
         case Builtin::sum: {

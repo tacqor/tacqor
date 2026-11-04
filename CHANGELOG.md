@@ -14,6 +14,7 @@ All notable changes to Tacqor. Versions follow `MAJOR.MINOR.PATCH`: a minor rele
 - Logo, social preview and README badges.
 
 **Fixes**
+- Windows: the Winsock library is now linked (`#pragma comment(lib, "ws2_32.lib")` for MSVC, `-lws2_32` for MinGW native builds, and in `build-windows.cmd`), which the first CI run on a real Windows machine caught as unresolved `__imp_accept`/`__imp_bind`/… symbols.
 - The switch-dispatch VM and the native generator handle the `Op::count` sentinel, so `-Werror -Wswitch` builds are clean; `static_assert`s tie the dispatch table and the disassembler's name table to the opcode count.
 
 ## 1.2.0 — 2026-11-04

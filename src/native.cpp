@@ -991,7 +991,7 @@ void build_native(const Program& program, const std::filesystem::path& output) {
     const bool msvc = compiler.find("cl") != std::string::npos && compiler.find("clang") == std::string::npos;
     const std::string command = msvc
         ? quote(compiler) + " /nologo /std:c++17 /EHsc /O2 /w " + quote(staged.string()) + " /Fe:" + quote(absolute.string())
-        : quote(compiler) + " -std=c++17 -O3 -pthread -w " + quote(staged.string()) + " -o " + quote(absolute.string());
+        : quote(compiler) + " -std=c++17 -O3 -pthread -w " + quote(staged.string()) + " -o " + quote(absolute.string()) + " -lws2_32";
 #else
     if (compiler.empty()) compiler = "c++";
     const std::string command = quote(compiler) + " -std=c++17 -O3 -pthread -w " + quote(staged.string()) + " -o " + quote(absolute.string());

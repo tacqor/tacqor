@@ -108,6 +108,12 @@ reporting.</li>
 </ul>
 <p><strong>Fixes</strong></p>
 <ul>
+<li>Windows: the Winsock library is now linked
+(<code>#pragma comment(lib, "ws2_32.lib")</code> for MSVC,
+<code>-lws2_32</code> for MinGW native builds, and in
+<code>build-windows.cmd</code>), which the first CI run on a real
+Windows machine caught as unresolved
+<code>__imp_accept</code>/<code>__imp_bind</code>/… symbols.</li>
 <li>The switch-dispatch VM and the native generator handle the
 <code>Op::count</code> sentinel, so <code>-Werror -Wswitch</code> builds
 are clean; <code>static_assert</code>s tie the dispatch table and the
