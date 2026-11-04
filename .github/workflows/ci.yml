@@ -14,7 +14,7 @@ jobs:
     name: Linux (GCC) — build, suite, docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build
         run: make -j2
       - name: Full suite (VM, bytecode, embedded executables, native)
@@ -31,7 +31,7 @@ jobs:
     name: Linux — AddressSanitizer + UBSan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build with sanitizers
         run: make CXXFLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer"
       - name: Full suite under sanitizers
@@ -44,7 +44,7 @@ jobs:
     name: Linux (Clang) — switch dispatch, pedantic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build the switch-dispatch variant that MSVC uses
         run: make CXX=clang++ CXXFLAGS="-O2 -Wall -Wextra -Wpedantic -Werror -DTACQOR_NO_THREADED"
       - run: make test
@@ -53,7 +53,7 @@ jobs:
     name: macOS (Clang)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: make -j3
       - run: make test
 
@@ -62,7 +62,7 @@ jobs:
     runs-on: windows-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build with MSVC
         shell: cmd

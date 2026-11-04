@@ -27,7 +27,7 @@ jobs:
       - name: Resolve tag
         id: meta
         run: echo "tag=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ steps.meta.outputs.tag }}
       - name: Build static binary
@@ -59,7 +59,7 @@ jobs:
     runs-on: macos-latest
     needs: linux-x64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.linux-x64.outputs.tag }}
       - run: make CXXFLAGS="-O3"
@@ -78,7 +78,7 @@ jobs:
     needs: linux-x64
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.linux-x64.outputs.tag }}
       - uses: ilammy/msvc-dev-cmd@v1
