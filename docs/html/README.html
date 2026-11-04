@@ -444,9 +444,14 @@ unaffected.</li>
 <p>Linux x64 one-liner once a release is published:
 <code>curl -fsSL https://tacqor.github.io/tacqor/get.sh | sh</code>
 (downloads the latest release and runs its <code>install.sh</code>).</p>
-<p>On Windows 11 use the Linux x64 build from an Ubuntu terminal in WSL.
-<code>build --native</code> needs a C++17 compiler on <code>PATH</code>
-(<code>c++</code>, or set <code>CXX</code>); without one,
+<p>On Windows, download <code>tacqor-vX.Y.Z-windows-x64.zip</code> from
+the <a href="https://github.com/tacqor/tacqor/releases/latest">latest
+release</a>, unzip it anywhere (it contains <code>tacqor.exe</code> and
+the <code>std</code> library side by side), and add that folder to your
+<code>PATH</code>; or use the Linux x64 build from an Ubuntu terminal in
+WSL. <code>build --native</code> needs a C++17 compiler on
+<code>PATH</code> (<code>c++</code>, or <code>cl</code> from a Visual
+Studio Developer prompt; or set <code>CXX</code>); without one,
 <code>build</code> still produces a self-contained executable with the
 embedded VM.</p>
 <p><strong>VS Code:</strong> install

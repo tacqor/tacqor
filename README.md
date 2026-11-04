@@ -109,7 +109,7 @@ chmod +x linux-x64/tacqor
 
 Linux x64 one-liner once a release is published: `curl -fsSL https://tacqor.github.io/tacqor/get.sh | sh` (downloads the latest release and runs its `install.sh`).
 
-On Windows 11 use the Linux x64 build from an Ubuntu terminal in WSL. `build --native` needs a C++17 compiler on `PATH` (`c++`, or set `CXX`); without one, `build` still produces a self-contained executable with the embedded VM.
+On Windows, download `tacqor-vX.Y.Z-windows-x64.zip` from the [latest release](https://github.com/tacqor/tacqor/releases/latest), unzip it anywhere (it contains `tacqor.exe` and the `std` library side by side), and add that folder to your `PATH`; or use the Linux x64 build from an Ubuntu terminal in WSL. `build --native` needs a C++17 compiler on `PATH` (`c++`, or `cl` from a Visual Studio Developer prompt; or set `CXX`); without one, `build` still produces a self-contained executable with the embedded VM.
 
 **VS Code:** install `Tacqor_Live_Scanner_1.2.1.vsix` (Extensions: Install from VSIX...), open any `.tq` file, and see type errors and warnings in Problems as you type.
 
