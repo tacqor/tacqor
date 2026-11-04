@@ -9,7 +9,7 @@
 
 ## Reporting a vulnerability
 
-Report security issues privately to the maintainer — **security contact: _add your email or private issue form here before publishing_** — not in the public issue tracker. Include the Tacqor version, platform, a reproducing program or input, and what the impact is. You will receive an acknowledgement within a few days and a fix or a mitigation plan before any public disclosure; credit is given in `CHANGELOG.md` unless you ask otherwise.
+Report security issues privately through GitHub's vulnerability reporting form — **[Report a vulnerability](https://github.com/tacqor/tacqor/security/advisories/new)** — not in the public issue tracker. The report is visible only to the maintainers until a fix is published. Include the Tacqor version, platform, a reproducing program or input, and what the impact is. You will receive an acknowledgement within a few days and a fix or a mitigation plan before any public disclosure; credit is given in `CHANGELOG.md` unless you ask otherwise.
 
 ## What counts as a security issue
 

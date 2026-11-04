@@ -2,6 +2,20 @@
 
 All notable changes to Tacqor. Versions follow `MAJOR.MINOR.PATCH`: a minor release may add language features and standard-library functions; it does not remove or change the meaning of existing programs. The bytecode format is versioned separately (`docs/BYTECODE.md` §8) and may change in any minor release; recompile `.tqb` files when upgrading.
 
+## Unreleased
+
+**Project infrastructure**
+- Website at https://tacqor.github.io/tacqor/ (landing page, HTML edition of every document, diagrams), deployed by `.github/workflows/pages.yml`.
+- Continuous integration (`.github/workflows/ci.yml`): GCC build with the full suite and documentation-snippet verification, Clang `-Werror` build of the switch-dispatch VM, AddressSanitizer/UBSan run, macOS build, MSVC build (non-blocking), embedded-runtime freshness check.
+- Release automation (`.github/workflows/release.yml`): static Linux x64 binary, macOS and Windows builds, standalone package, VS Code extension and SHA-256 sums attached to each `v*` tag.
+- Issue forms, pull request template, `CODEOWNERS`, Dependabot for Actions, `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CITATION.cff`, `.editorconfig`, `.gitattributes` (`.tq` files highlighted as Python on GitHub).
+- `SECURITY.md` now points to GitHub private vulnerability reporting.
+- Remote installer `docs/get.sh` (`curl -fsSL https://tacqor.github.io/tacqor/get.sh | sh`).
+- Logo, social preview and README badges.
+
+**Fixes**
+- The switch-dispatch VM and the native generator handle the `Op::count` sentinel, so `-Werror -Wswitch` builds are clean; `static_assert`s tie the dispatch table and the disassembler's name table to the opcode count.
+
 ## 1.2.0 — 2026-11-04
 
 Production-readiness release.

@@ -1,3 +1,12 @@
+<p align="center"><a href="https://tacqor.github.io/tacqor/"><img src="docs/assets/logo.svg" alt="Tacqor" width="260"></a></p>
+
+<p align="center">
+<a href="https://github.com/tacqor/tacqor/actions/workflows/ci.yml"><img src="https://github.com/tacqor/tacqor/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="https://github.com/tacqor/tacqor/releases/latest"><img src="https://img.shields.io/github/v/release/tacqor/tacqor?label=release" alt="Latest release"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0b8a7a.svg" alt="MIT license"></a>
+<a href="https://tacqor.github.io/tacqor/"><img src="https://img.shields.io/badge/docs-tacqor.github.io-0f2a3f.svg" alt="Documentation"></a>
+</p>
+
 # Tacqor 1.2
 
 Tacqor is a statically typed programming language with Python's syntax, Rust's discipline, and two ways to run: a fast bytecode VM, or native machine code through the system C++ compiler. One executable checks, tests, compiles, runs, and packages programs, and doubles as a REPL; a standard library ships as Tacqor source; a VS Code extension scans code as you type.
@@ -51,7 +60,7 @@ Read `TOUR.md` for a guided introduction, `LANGUAGE.md` for the reference, and `
 
 ## Documentation
 
-`docs/INDEX.md` maps the whole set. The short version:
+Everything is online at **[tacqor.github.io/tacqor](https://tacqor.github.io/tacqor/)** — the [whitepaper](https://tacqor.github.io/tacqor/html/WHITEPAPER.html), the tour, the references and the guides as web pages. In the repository, `docs/INDEX.md` maps the whole set. The short version:
 
 | | |
 |---|---|
@@ -98,6 +107,8 @@ chmod +x linux-x64/tacqor
 ./linux-x64/tacqor add https://example.com/someone/somelib.git
 ```
 
+Linux x64 one-liner once a release is published: `curl -fsSL https://tacqor.github.io/tacqor/get.sh | sh` (downloads the latest release and runs its `install.sh`).
+
 On Windows 11 use the Linux x64 build from an Ubuntu terminal in WSL. `build --native` needs a C++17 compiler on `PATH` (`c++`, or set `CXX`); without one, `build` still produces a self-contained executable with the embedded VM.
 
 **VS Code:** install `Tacqor_Live_Scanner_1.2.0.vsix` (Extensions: Install from VSIX...), open any `.tq` file, and see type errors and warnings in Problems as you type.
@@ -116,6 +127,19 @@ docs/                whitepaper, architecture, specification, bytecode reference
 benchmarks/          the programs behind docs/PERFORMANCE.md, with run.sh
 tools/               doc tooling: verify_docs.py (compiles every snippet), build_html.py (HTML edition of the docs)
 ```
+
+## Project
+
+| | |
+|---|---|
+| Website | https://tacqor.github.io/tacqor/ |
+| Releases | https://github.com/tacqor/tacqor/releases — Linux x64 static binary, macOS and Windows builds, the standalone package, the VS Code extension, SHA-256 sums |
+| Questions | [Discussions](https://github.com/tacqor/tacqor/discussions) · [`SUPPORT.md`](SUPPORT.md) |
+| Bugs and proposals | [Issues](https://github.com/tacqor/tacqor/issues/new/choose) |
+| Security | [`SECURITY.md`](SECURITY.md) — private reporting |
+| Contributing | [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) |
+| Citing | [`CITATION.cff`](CITATION.cff) |
+| CI | Linux (GCC, Clang, sanitizers), macOS, Windows; every documentation snippet compiled and run on each push |
 
 ## Build from source
 

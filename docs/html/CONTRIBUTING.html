@@ -137,10 +137,12 @@ change</a></li>
 <li><a href="#5-code-style" id="toc-5-code-style">5. Code style</a></li>
 <li><a href="#6-commit-messages" id="toc-6-commit-messages">6. Commit
 messages</a></li>
-<li><a href="#7-review" id="toc-7-review">7. Review</a></li>
-<li><a href="#8-reporting-bugs" id="toc-8-reporting-bugs">8. Reporting
+<li><a href="#7-continuous-integration"
+id="toc-7-continuous-integration">7. Continuous integration</a></li>
+<li><a href="#8-review" id="toc-8-review">8. Review</a></li>
+<li><a href="#9-reporting-bugs" id="toc-9-reporting-bugs">9. Reporting
 bugs</a></li>
-<li><a href="#9-license" id="toc-9-license">9. License</a></li>
+<li><a href="#10-license" id="toc-10-license">10. License</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -320,21 +322,37 @@ explains the why and names the issue.</p>
 A `let lists = ...` inside a function that imports std.lists failed with
 &quot;name is a module&quot;. Shadowing is harmless because module members are
 always reached through the qualified form. Fixes #42.</code></pre>
-<h2 id="7-review">7. Review</h2>
+<h2 id="7-continuous-integration">7. Continuous integration</h2>
+<p>Every push and pull request runs
+<code>.github/workflows/ci.yml</code>: a GCC build with the full suite
+and every documentation snippet, a Clang build of the switch-dispatch
+variant with <code>-Werror</code>, the suite under AddressSanitizer and
+UndefinedBehaviorSanitizer, a macOS build with the suite, and an MSVC
+build with a smoke test (non-blocking until the Windows port is fully
+verified). A check that <code>src/embedded_runtime.inc</code> is up to
+date fails the build if the headers changed without regenerating it.</p>
+<p>Pushing a tag <code>vX.Y.Z</code> runs
+<code>.github/workflows/release.yml</code>, which builds the static
+Linux binary, the macOS and Windows binaries, the standalone package and
+checksums, and attaches them to the release for that tag (creating the
+release if it does not exist). Changes under <code>docs/</code> on
+<code>main</code> redeploy the website through
+<code>.github/workflows/pages.yml</code>.</p>
+<h2 id="8-review">8. Review</h2>
 <p>A maintainer reviews every pull request for: correctness across all
 four backends, diagnostics for every new failure path, documentation,
 test coverage, and fit with the design principles. Reviews are about the
 code, not the author; comments are expected to be specific and
 actionable. Two approvals are needed for language changes, one for
 everything else.</p>
-<h2 id="8-reporting-bugs">8. Reporting bugs</h2>
+<h2 id="9-reporting-bugs">9. Reporting bugs</h2>
 <p>Include the Tacqor version (<code>tacqor --version</code>), the
 platform, the smallest program that reproduces the problem, the exact
 command, and the full output. A crash (not a diagnostic) in any tool is
 always a bug worth reporting even without a minimal program.
 Security-relevant bugs go through <code>SECURITY.md</code>, not the
 public tracker.</p>
-<h2 id="9-license">9. License</h2>
+<h2 id="10-license">10. License</h2>
 <p>By contributing you agree that your contribution is licensed under
 the project's license (<code>LICENSE</code>).</p>
 </body>

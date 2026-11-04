@@ -61,6 +61,7 @@ nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; 
 <ul>
 <li><a href="#changelog" id="toc-changelog">Changelog</a>
 <ul>
+<li><a href="#unreleased" id="toc-unreleased">Unreleased</a></li>
 <li><a href="#120--2026-11-04" id="toc-120--2026-11-04">1.2.0 —
 2026-11-04</a></li>
 <li><a href="#110" id="toc-110">1.1.0</a></li>
@@ -78,6 +79,40 @@ features and standard-library functions; it does not remove or change
 the meaning of existing programs. The bytecode format is versioned
 separately (<code>docs/BYTECODE.md</code> §8) and may change in any
 minor release; recompile <code>.tqb</code> files when upgrading.</p>
+<h2 id="unreleased">Unreleased</h2>
+<p><strong>Project infrastructure</strong></p>
+<ul>
+<li>Website at <a
+href="https://tacqor.github.io/tacqor/">https://tacqor.github.io/tacqor/</a>
+(landing page, HTML edition of every document, diagrams), deployed by
+<code>.github/workflows/pages.yml</code>.</li>
+<li>Continuous integration (<code>.github/workflows/ci.yml</code>): GCC
+build with the full suite and documentation-snippet verification, Clang
+<code>-Werror</code> build of the switch-dispatch VM,
+AddressSanitizer/UBSan run, macOS build, MSVC build (non-blocking),
+embedded-runtime freshness check.</li>
+<li>Release automation (<code>.github/workflows/release.yml</code>):
+static Linux x64 binary, macOS and Windows builds, standalone package,
+VS Code extension and SHA-256 sums attached to each <code>v*</code>
+tag.</li>
+<li>Issue forms, pull request template, <code>CODEOWNERS</code>,
+Dependabot for Actions, <code>CODE_OF_CONDUCT.md</code>,
+<code>SUPPORT.md</code>, <code>CITATION.cff</code>,
+<code>.editorconfig</code>, <code>.gitattributes</code>
+(<code>.tq</code> files highlighted as Python on GitHub).</li>
+<li><code>SECURITY.md</code> now points to GitHub private vulnerability
+reporting.</li>
+<li>Remote installer <code>docs/get.sh</code>
+(<code>curl -fsSL https://tacqor.github.io/tacqor/get.sh | sh</code>).</li>
+<li>Logo, social preview and README badges.</li>
+</ul>
+<p><strong>Fixes</strong></p>
+<ul>
+<li>The switch-dispatch VM and the native generator handle the
+<code>Op::count</code> sentinel, so <code>-Werror -Wswitch</code> builds
+are clean; <code>static_assert</code>s tie the dispatch table and the
+disassembler's name table to the opcode count.</li>
+</ul>
 <h2 id="120--2026-11-04">1.2.0 — 2026-11-04</h2>
 <p>Production-readiness release.</p>
 <p><strong>Language</strong></p>

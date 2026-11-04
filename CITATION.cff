@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use Tacqor or cite its design, please cite the whitepaper as below."
+title: "Tacqor: A Statically Typed Language with Python's Syntax and Native Speed"
+type: software
+authors:
+  - name: "The Tacqor Authors"
+version: 1.2.0
+date-released: 2026-11-04
+license: MIT
+repository-code: "https://github.com/tacqor/tacqor"
+url: "https://tacqor.github.io/tacqor/"
+abstract: "Tacqor is a general-purpose programming language that combines the readability of Python, the static guarantees of a Rust-style type system and error model, and native execution speed. A single executable checks, tests, compiles, packages and runs programs on a bytecode virtual machine or as machine code produced through the system C++ compiler, with identical semantics on both paths."
+keywords:
+  - programming language
+  - compiler
+  - virtual machine
+  - static typing
+  - Option and Result types
+preferred-citation:
+  type: report
+  title: "Tacqor: A Statically Typed Language with Python's Syntax and Native Speed (Whitepaper, version 1.2)"
+  authors:
+    - name: "The Tacqor Authors"
+  year: 2026
+  month: 11
+  url: "https://tacqor.github.io/tacqor/html/WHITEPAPER.html"

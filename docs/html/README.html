@@ -134,12 +134,22 @@ id="toc-documentation">Documentation</a></li>
 id="toc-production-readiness">Production readiness</a></li>
 <li><a href="#run-it" id="toc-run-it">Run it</a></li>
 <li><a href="#layout" id="toc-layout">Layout</a></li>
+<li><a href="#project" id="toc-project">Project</a></li>
 <li><a href="#build-from-source" id="toc-build-from-source">Build from
 source</a></li>
 <li><a href="#history" id="toc-history">History</a></li>
 </ul></li>
 </ul>
 </nav>
+<p align="center"><a href="https://tacqor.github.io/tacqor/"><img src="../assets/logo.svg" alt="Tacqor" width="260"></a></p>
+
+<p align="center">
+<a href="https://github.com/tacqor/tacqor/actions/workflows/ci.yml"><img src="https://github.com/tacqor/tacqor/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="https://github.com/tacqor/tacqor/releases/latest"><img src="https://img.shields.io/github/v/release/tacqor/tacqor?label=release" alt="Latest release"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0b8a7a.svg" alt="MIT license"></a>
+<a href="https://tacqor.github.io/tacqor/"><img src="https://img.shields.io/badge/docs-tacqor.github.io-0f2a3f.svg" alt="Documentation"></a>
+</p>
+
 <h1 id="tacqor-12">Tacqor 1.2</h1>
 <p>Tacqor is a statically typed programming language with Python's
 syntax, Rust's discipline, and two ways to run: a fast bytecode VM, or
@@ -276,7 +286,12 @@ out-of-range indexes / empty loops / always-failing asserts</td>
 <code>LANGUAGE.md</code> for the reference, and <code>STDLIB.md</code>
 for the library.</p>
 <h2 id="documentation">Documentation</h2>
-<p><code>docs/INDEX.md</code> maps the whole set. The short version:</p>
+<p>Everything is online at <strong><a
+href="https://tacqor.github.io/tacqor/">tacqor.github.io/tacqor</a></strong>
+— the <a
+href="https://tacqor.github.io/tacqor/html/WHITEPAPER.html">whitepaper</a>,
+the tour, the references and the guides as web pages. In the repository,
+<code>docs/INDEX.md</code> maps the whole set. The short version:</p>
 <table>
 <tbody>
 <tr class="odd">
@@ -426,6 +441,9 @@ unaffected.</li>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">./linux-x64/tacqor</span> new myproject</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">./linux-x64/tacqor</span> repl</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">./linux-x64/tacqor</span> add https://example.com/someone/somelib.git</span></code></pre></div>
+<p>Linux x64 one-liner once a release is published:
+<code>curl -fsSL https://tacqor.github.io/tacqor/get.sh | sh</code>
+(downloads the latest release and runs its <code>install.sh</code>).</p>
 <p>On Windows 11 use the Linux x64 build from an Ubuntu terminal in WSL.
 <code>build --native</code> needs a C++17 compiler on <code>PATH</code>
 (<code>c++</code>, or set <code>CXX</code>); without one,
@@ -446,6 +464,53 @@ editor/              the VS Code extension source
 docs/                whitepaper, architecture, specification, bytecode reference, cookbook, guides; docs/diagrams/ (SVG + PNG)
 benchmarks/          the programs behind docs/PERFORMANCE.md, with run.sh
 tools/               doc tooling: verify_docs.py (compiles every snippet), build_html.py (HTML edition of the docs)</code></pre>
+<h2 id="project">Project</h2>
+<table>
+<tbody>
+<tr class="odd">
+<td>Website</td>
+<td><a
+href="https://tacqor.github.io/tacqor/">https://tacqor.github.io/tacqor/</a></td>
+</tr>
+<tr class="even">
+<td>Releases</td>
+<td><a
+href="https://github.com/tacqor/tacqor/releases">https://github.com/tacqor/tacqor/releases</a>
+— Linux x64 static binary, macOS and Windows builds, the standalone
+package, the VS Code extension, SHA-256 sums</td>
+</tr>
+<tr class="odd">
+<td>Questions</td>
+<td><a
+href="https://github.com/tacqor/tacqor/discussions">Discussions</a> · <a
+href="SUPPORT.md"><code>SUPPORT.md</code></a></td>
+</tr>
+<tr class="even">
+<td>Bugs and proposals</td>
+<td><a
+href="https://github.com/tacqor/tacqor/issues/new/choose">Issues</a></td>
+</tr>
+<tr class="odd">
+<td>Security</td>
+<td><a href="SECURITY.html"><code>SECURITY.md</code></a> — private
+reporting</td>
+</tr>
+<tr class="even">
+<td>Contributing</td>
+<td><a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a> · <a
+href="CODE_OF_CONDUCT.md"><code>CODE_OF_CONDUCT.md</code></a></td>
+</tr>
+<tr class="odd">
+<td>Citing</td>
+<td><a href="CITATION.cff"><code>CITATION.cff</code></a></td>
+</tr>
+<tr class="even">
+<td>CI</td>
+<td>Linux (GCC, Clang, sanitizers), macOS, Windows; every documentation
+snippet compiled and run on each push</td>
+</tr>
+</tbody>
+</table>
 <h2 id="build-from-source">Build from source</h2>
 <p><code>make</code> (Linux/macOS, any C++17 compiler; add
 <code>CXXFLAGS="-O3 -static"</code> for a portable binary), then

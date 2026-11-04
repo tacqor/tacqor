@@ -1,6 +1,6 @@
 # Tacqor Documentation
 
-Everything in the distribution, by audience. Start with the first table if you are new.
+Everything in the distribution, by audience. Start with the first table if you are new. All of it is also online at [tacqor.github.io/tacqor](https://tacqor.github.io/tacqor/).
 
 ## Learn
 

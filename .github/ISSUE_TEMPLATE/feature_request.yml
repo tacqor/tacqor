@@ -1,0 +1,33 @@
+name: Feature proposal
+description: Propose a language feature, library function or tool change.
+labels: ["proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Proposals are weighed against the design principles in docs/WHITEPAPER.md §2: a feature should remove more complexity from user programs than it adds to the language. ROADMAP.md lists what is already planned and what is deliberately not.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What is hard or impossible to express today? Show the program you want to write.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: The proposal
+      description: Syntax and semantics, with examples. How does it interact with generics, traits, `Option`/`Result`, the native backend?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: How can it be done with the language as it is, and why is that not enough?
+  - type: textarea
+    id: prior
+    attributes:
+      label: Prior art
+      description: How do Python, Rust, Go or others handle this?

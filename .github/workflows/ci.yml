@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux (GCC) — build, suite, docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: make -j2
+      - name: Full suite (VM, bytecode, embedded executables, native)
+        run: make test
+      - name: Verify every documentation snippet
+        run: python3 -I tools/verify_docs.py . ./tacqor docs/COOKBOOK.md docs/FROM_PYTHON.md docs/FROM_RUST.md docs/FAQ.md docs/STYLE.md docs/WHITEPAPER.md docs/SPECIFICATION.md
+      - name: Embedded runtime is up to date
+        run: |
+          cp src/embedded_runtime.inc /tmp/committed.inc
+          rm src/embedded_runtime.inc && make src/embedded_runtime.inc
+          cmp /tmp/committed.inc src/embedded_runtime.inc || { echo "src/embedded_runtime.inc is stale: run make and commit it"; exit 1; }
+
+  sanitizers:
+    name: Linux — AddressSanitizer + UBSan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with sanitizers
+        run: make CXXFLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer"
+      - name: Full suite under sanitizers
+        env:
+          ASAN_OPTIONS: detect_leaks=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: make test
+
+  portable-dispatch:
+    name: Linux (Clang) — switch dispatch, pedantic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the switch-dispatch variant that MSVC uses
+        run: make CXX=clang++ CXXFLAGS="-O2 -Wall -Wextra -Wpedantic -Werror -DTACQOR_NO_THREADED"
+      - run: make test
+
+  macos:
+    name: macOS (Clang)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make -j3
+      - run: make test
+
+  windows:
+    name: Windows (MSVC) — build and smoke
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build with MSVC
+        shell: cmd
+        run: build-windows.cmd
+      - name: Smoke
+        shell: cmd
+        run: |
+          tacqor.exe --version
+          tacqor.exe check examples\primes.tq
+          tacqor.exe run examples\primes.tq
+          tacqor.exe test tests\unit_tests.tq

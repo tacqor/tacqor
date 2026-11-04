@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or help
+    url: https://github.com/tacqor/tacqor/discussions
+    about: Ask how to do something, or show what you built.
+  - name: Security report
+    url: https://github.com/tacqor/tacqor/security/advisories/new
+    about: Report a vulnerability privately.

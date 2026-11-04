@@ -1,0 +1,17 @@
+* text=auto eol=lf
+*.cmd text eol=crlf
+
+# Tacqor sources: highlight with Python's grammar on GitHub (closest match) and count them as the main language.
+*.tq linguist-language=Python linguist-detectable=true
+
+# Generated or vendored content should not dominate the language statistics.
+src/embedded_runtime.inc linguist-generated=true
+docs/html/** linguist-generated=true
+docs/diagrams/*.svg linguist-generated=true
+benchmarks/** linguist-documentation=true
+tests/**/*.expected linguist-generated=true
+
+# Binaries
+*.vsix binary
+*.png binary
+linux-x64/tacqor binary

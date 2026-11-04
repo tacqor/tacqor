@@ -85,14 +85,20 @@ A `let lists = ...` inside a function that imports std.lists failed with
 always reached through the qualified form. Fixes #42.
 ```
 
-## 7. Review
+## 7. Continuous integration
+
+Every push and pull request runs `.github/workflows/ci.yml`: a GCC build with the full suite and every documentation snippet, a Clang build of the switch-dispatch variant with `-Werror`, the suite under AddressSanitizer and UndefinedBehaviorSanitizer, a macOS build with the suite, and an MSVC build with a smoke test (non-blocking until the Windows port is fully verified). A check that `src/embedded_runtime.inc` is up to date fails the build if the headers changed without regenerating it.
+
+Pushing a tag `vX.Y.Z` runs `.github/workflows/release.yml`, which builds the static Linux binary, the macOS and Windows binaries, the standalone package and checksums, and attaches them to the release for that tag (creating the release if it does not exist). Changes under `docs/` on `main` redeploy the website through `.github/workflows/pages.yml`.
+
+## 8. Review
 
 A maintainer reviews every pull request for: correctness across all four backends, diagnostics for every new failure path, documentation, test coverage, and fit with the design principles. Reviews are about the code, not the author; comments are expected to be specific and actionable. Two approvals are needed for language changes, one for everything else.
 
-## 8. Reporting bugs
+## 9. Reporting bugs
 
 Include the Tacqor version (`tacqor --version`), the platform, the smallest program that reproduces the problem, the exact command, and the full output. A crash (not a diagnostic) in any tool is always a bug worth reporting even without a minimal program. Security-relevant bugs go through `SECURITY.md`, not the public tracker.
 
-## 9. License
+## 10. License
 
 By contributing you agree that your contribution is licensed under the project's license (`LICENSE`).

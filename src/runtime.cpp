@@ -191,6 +191,7 @@ void VM::execute(std::size_t stop_depth) {
 #ifdef TACQOR_THREADED
         // Threaded dispatch: one indirect jump per instruction. The table order must match enum Op.
         static const void* const table[] = { &&op_push_integer, &&op_push_float, &&op_push_boolean, &&op_push_text, &&op_push_unit, &&op_load, &&op_store, &&op_discard, &&op_make_list, &&op_make_dict, &&op_make_object, &&op_get_field, &&op_set_field, &&op_index, &&op_set_index, &&op_slice, &&op_length, &&op_contains, &&op_add, &&op_subtract, &&op_multiply, &&op_divide, &&op_modulo, &&op_negate, &&op_fadd, &&op_fsubtract, &&op_fmultiply, &&op_fdivide, &&op_fmodulo, &&op_fnegate, &&op_concat, &&op_equal, &&op_not_equal, &&op_less, &&op_less_equal, &&op_greater, &&op_greater_equal, &&op_invert, &&op_jump, &&op_jump_false, &&op_jump_true, &&op_jump_unless, &&op_load2, &&op_load_integer, &&op_add_store, &&op_subtract_store, &&op_multiply_store, &&op_jump_unless_locals, &&op_loop_init, &&op_loop_next, &&op_iter_next, &&op_call, &&op_reduce, &&op_builtin, &&op_return_value, &&op_finish, &&op_push_function, &&op_make_closure, &&op_call_value, &&op_make_variant, &&op_variant_which, &&op_variant_payload, &&op_call_trait, &&op_parallel, &&op_bit_and, &&op_bit_or, &&op_bit_xor, &&op_shift_left, &&op_shift_right, &&op_bit_not, &&op_try_call };
+        static_assert(sizeof(table) / sizeof(table[0]) == static_cast<std::size_t>(Op::count), "every opcode needs a dispatch label");
 #define CASE(name) op_##name:
 #define DISPATCH() do { ins_ptr = ip++; goto *table[static_cast<unsigned char>(ins_ptr->op)]; } while (0)
         const Instruction* ins_ptr = nullptr;
@@ -615,6 +616,8 @@ void VM::execute(std::size_t stop_depth) {
                     DISPATCH();
                 }
 #ifndef TACQOR_THREADED
+                case Op::count:
+                    throw std::logic_error("invalid bytecode opcode");  // rejected by the verifier before execution
             }
         }
 #endif

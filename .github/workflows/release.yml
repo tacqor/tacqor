@@ -1,0 +1,96 @@
+name: Release
+
+# Builds the release artifacts and attaches them to the GitHub release for a tag.
+# Runs automatically when a v* tag is pushed; can also be run by hand for an existing tag
+# (Actions → Release → Run workflow → tag), which is how assets are added to a release that
+# was created from the web interface.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build and attach assets to (e.g. v1.2.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  linux-x64:
+    name: Linux x64 (static)
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - name: Resolve tag
+        id: meta
+        run: echo "tag=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.tag }}
+      - name: Build static binary
+        run: make CXXFLAGS="-O3 -static" && cp tacqor linux-x64/tacqor
+      - name: Suite against the release binary
+        run: sh tests/smoke.sh ./linux-x64/tacqor
+      - name: Package
+        run: |
+          TAG=${{ steps.meta.outputs.tag }}
+          rm -rf .embed tacqor
+          mkdir -p /tmp/out
+          # Standalone distribution (binary, std, examples, docs, tests, extension)
+          mkdir -p "/tmp/stage/Tacqor_${TAG#v}" && cp -R . "/tmp/stage/Tacqor_${TAG#v}/" && rm -rf "/tmp/stage/Tacqor_${TAG#v}/.git" "/tmp/stage/Tacqor_${TAG#v}/.github"
+          (cd /tmp/stage && zip -q -r -X "/tmp/out/Tacqor_${TAG#v}_Standalone.zip" "Tacqor_${TAG#v}")
+          # Binary-only archive
+          tar -C linux-x64 -czf "/tmp/out/tacqor-${TAG}-linux-x64.tar.gz" tacqor
+          cp Tacqor_Live_Scanner_*.vsix /tmp/out/
+          (cd /tmp/out && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt)
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=${{ steps.meta.outputs.tag }}
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Tacqor ${TAG#v}" --notes-from-tag
+          gh release upload "$TAG" /tmp/out/* --repo "$GITHUB_REPOSITORY" --clobber
+
+  macos-arm64:
+    name: macOS arm64
+    runs-on: macos-latest
+    needs: linux-x64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.linux-x64.outputs.tag }}
+      - run: make CXXFLAGS="-O3"
+      - run: sh tests/smoke.sh ./tacqor
+      - name: Package and attach
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=${{ needs.linux-x64.outputs.tag }}
+          tar -czf "tacqor-${TAG}-macos-arm64.tar.gz" tacqor
+          gh release upload "$TAG" "tacqor-${TAG}-macos-arm64.tar.gz" --repo "$GITHUB_REPOSITORY" --clobber
+
+  windows-x64:
+    name: Windows x64 (MSVC)
+    runs-on: windows-latest
+    needs: linux-x64
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.linux-x64.outputs.tag }}
+      - uses: ilammy/msvc-dev-cmd@v1
+      - shell: cmd
+        run: build-windows.cmd
+      - shell: cmd
+        run: tacqor.exe --version && tacqor.exe run examples\primes.tq
+      - name: Package and attach
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ needs.linux-x64.outputs.tag }}"
+          Compress-Archive -Path tacqor.exe, std -DestinationPath "tacqor-$tag-windows-x64.zip" -Force
+          gh release upload $tag "tacqor-$tag-windows-x64.zip" --repo $env:GITHUB_REPOSITORY --clobber
