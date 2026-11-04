@@ -49,17 +49,6 @@ jobs:
         run: make CXX=clang++ CXXFLAGS="-O2 -Wall -Wextra -Wpedantic -Werror -DTACQOR_NO_THREADED"
       - run: make test
 
-  macos:
-    name: macOS (Clang)
-    runs-on: macos-latest
-    # GitHub's hosted macOS runners are capacity-limited; a job that is never acquired must not mark the push red.
-    continue-on-error: true
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v7
-      - run: make -j3
-      - run: make test
-
   windows:
     name: Windows (MSVC) — build and smoke
     runs-on: windows-latest

@@ -327,16 +327,20 @@ always reached through the qualified form. Fixes #42.</code></pre>
 <code>.github/workflows/ci.yml</code>: a GCC build with the full suite
 and every documentation snippet, a Clang build of the switch-dispatch
 variant with <code>-Werror</code>, the suite under AddressSanitizer and
-UndefinedBehaviorSanitizer, a macOS build with the suite, and an MSVC
-build with a smoke test on Windows (the macOS job is non-blocking
-because GitHub's hosted macOS runners are capacity-limited). A check
-that <code>src/embedded_runtime.inc</code> is up to date fails the build
-if the headers changed without regenerating it.</p>
+UndefinedBehaviorSanitizer, and an MSVC build with a smoke test on
+Windows. The macOS build runs in its own workflow
+(<code>.github/workflows/macos.yml</code>, on every push and tag and
+weekly) because GitHub's hosted macOS runners are capacity-limited and a
+refused runner must not colour the CI badge. A check that
+<code>src/embedded_runtime.inc</code> is up to date fails the build if
+the headers changed without regenerating it.</p>
 <p>Pushing a tag <code>vX.Y.Z</code> runs
 <code>.github/workflows/release.yml</code>, which builds the static
-Linux binary, the macOS and Windows binaries, the standalone package and
-checksums, and attaches them to the release for that tag (creating the
-release if it does not exist). Changes under <code>docs/</code> on
+Linux binary, the Windows binary, the standalone package and checksums,
+and attaches them to the release for that tag (creating the release if
+it does not exist, with notes taken from the <code>CHANGELOG.md</code>
+section for that version); the macOS workflow adds its binary when a
+runner is available. Changes under <code>docs/</code> on
 <code>main</code> redeploy the website through
 <code>.github/workflows/pages.yml</code>.</p>
 <h2 id="8-review">8. Review</h2>

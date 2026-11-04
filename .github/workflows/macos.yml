@@ -1,0 +1,35 @@
+name: macOS
+
+# GitHub's hosted macOS runners are capacity-limited and are regularly refused for this organization
+# ("The job was not acquired by Runner"), so the macOS build lives in its own workflow: it runs on every
+# push and tag and weekly, but its outcome does not colour the CI badge or the Release run.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos-arm64:
+    name: macOS arm64 (Clang) — build, suite, release asset on tags
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - run: make -j3
+      - run: make test
+      - name: Attach to the release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          tar -czf "tacqor-${TAG}-macos-arm64.tar.gz" tacqor
+          for i in 1 2 3 4 5 6; do gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 && break; sleep 30; done
+          gh release upload "$TAG" "tacqor-${TAG}-macos-arm64.tar.gz" --repo "$GITHUB_REPOSITORY" --clobber

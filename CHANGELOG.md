@@ -2,6 +2,10 @@
 
 All notable changes to Tacqor. Versions follow `MAJOR.MINOR.PATCH`: a minor release may add language features and standard-library functions; it does not remove or change the meaning of existing programs. The bytecode format is versioned separately (`docs/BYTECODE.md` §8) and may change in any minor release; recompile `.tqb` files when upgrading.
 
+## Unreleased
+
+- The macOS build moves to its own workflow (`macos.yml`) so GitHub's refused macOS runners no longer mark CI or Release runs as failed; it still attaches a macOS binary to tagged releases when a runner is available.
+
 ## 1.2.1 — 2026-11-04
 
 Patch release: the first release built and verified on a real Windows machine, with the project infrastructure that ships with a public repository.

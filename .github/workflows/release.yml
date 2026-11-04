@@ -56,26 +56,6 @@ jobs:
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "Tacqor ${TAG#v}" --notes-file /tmp/notes.md
           gh release upload "$TAG" /tmp/out/* --repo "$GITHUB_REPOSITORY" --clobber
 
-  macos-arm64:
-    name: macOS arm64
-    runs-on: macos-latest
-    needs: linux-x64
-    continue-on-error: true
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ needs.linux-x64.outputs.tag }}
-      - run: make CXXFLAGS="-O3"
-      - run: sh tests/smoke.sh ./tacqor
-      - name: Package and attach
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          TAG=${{ needs.linux-x64.outputs.tag }}
-          tar -czf "tacqor-${TAG}-macos-arm64.tar.gz" tacqor
-          gh release upload "$TAG" "tacqor-${TAG}-macos-arm64.tar.gz" --repo "$GITHUB_REPOSITORY" --clobber
-
   windows-x64:
     name: Windows x64 (MSVC)
     runs-on: windows-latest

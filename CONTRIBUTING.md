@@ -87,9 +87,9 @@ always reached through the qualified form. Fixes #42.
 
 ## 7. Continuous integration
 
-Every push and pull request runs `.github/workflows/ci.yml`: a GCC build with the full suite and every documentation snippet, a Clang build of the switch-dispatch variant with `-Werror`, the suite under AddressSanitizer and UndefinedBehaviorSanitizer, a macOS build with the suite, and an MSVC build with a smoke test on Windows (the macOS job is non-blocking because GitHub's hosted macOS runners are capacity-limited). A check that `src/embedded_runtime.inc` is up to date fails the build if the headers changed without regenerating it.
+Every push and pull request runs `.github/workflows/ci.yml`: a GCC build with the full suite and every documentation snippet, a Clang build of the switch-dispatch variant with `-Werror`, the suite under AddressSanitizer and UndefinedBehaviorSanitizer, and an MSVC build with a smoke test on Windows. The macOS build runs in its own workflow (`.github/workflows/macos.yml`, on every push and tag and weekly) because GitHub's hosted macOS runners are capacity-limited and a refused runner must not colour the CI badge. A check that `src/embedded_runtime.inc` is up to date fails the build if the headers changed without regenerating it.
 
-Pushing a tag `vX.Y.Z` runs `.github/workflows/release.yml`, which builds the static Linux binary, the macOS and Windows binaries, the standalone package and checksums, and attaches them to the release for that tag (creating the release if it does not exist). Changes under `docs/` on `main` redeploy the website through `.github/workflows/pages.yml`.
+Pushing a tag `vX.Y.Z` runs `.github/workflows/release.yml`, which builds the static Linux binary, the Windows binary, the standalone package and checksums, and attaches them to the release for that tag (creating the release if it does not exist, with notes taken from the `CHANGELOG.md` section for that version); the macOS workflow adds its binary when a runner is available. Changes under `docs/` on `main` redeploy the website through `.github/workflows/pages.yml`.
 
 ## 8. Review
 
