@@ -140,12 +140,23 @@ struct Function {
     std::vector<Instruction> code;
 };
 
+// A function that calls into a C symbol. The native backend emits a direct call; the bytecode
+// VM runs the function's synthesised body, which reports that a native build is required. Not
+// serialised into .tqb (foreign calls are a native-build feature), so build --native works from
+// source, which is the documented path.
+struct ForeignFunction {
+    std::uint32_t function;      // index into Program::functions
+    std::string symbol;          // C symbol to call
+    std::string library;         // library to link (-l<name>); empty means none
+};
+
 struct Program {
     std::vector<TypeInfo> types;      // index 0 is always unit
     std::vector<StructInfo> structs;
     std::vector<TraitInfo> traits;
     std::vector<Function> functions;
     std::vector<std::string> texts;
+    std::vector<ForeignFunction> foreign;
     std::uint32_t entry = 0;
 };
 

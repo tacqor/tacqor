@@ -1,5 +1,6 @@
 # build outputs
 /tacqor
+/tacqor-dev
 /tacqor.exe
 /.embed/
 *.o

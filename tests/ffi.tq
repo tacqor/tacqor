@@ -1,0 +1,13 @@
+# C FFI: call libm and libc directly. Built with `tacqor build --native`.
+extern def sqrt(x: f64) -> f64 from "m"
+extern def pow(base: f64, exp: f64) -> f64 from "m"
+extern def llabs(n: i64) -> i64
+extern def strlen(s: str) -> i64
+extern def getenv(name: str) -> str
+
+def main():
+    print(sqrt(144.0))                      # 12.0
+    print(pow(3.0, 4.0))                     # 81.0
+    print(llabs(-7))                         # 7
+    print(strlen("tacqor"))                  # 6
+    print("env:" + getenv("TACQOR_FFI_SMOKE"))

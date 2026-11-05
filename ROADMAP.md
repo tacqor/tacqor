@@ -27,7 +27,8 @@ What is planned, in rough priority order, and what is deliberately not planned. 
 
 ## 1.6 — ecosystem
 
-- **Foreign function interface** for calling C from native builds (`extern def` declarations, scalar and string arguments), and a VM path through `dlopen` for the same declarations.
+The **foreign function interface** landed in 1.3: `extern def` declarations call C from native builds, marshalling scalar (`i64`, `f64`, `bool`) and string arguments and results, with `from "lib"` naming a library to link. Still to come: a VM path through `dlopen` for the same declarations (today a foreign call under the bytecode VM reports that a native build is required), and pointer/struct arguments.
+
 - **Package index.** A simple registry file format (`name → git URL + commit`) that `tacqor add` can resolve, with lockfile semantics (`tacqor.lock`) and checksum verification.
 - **Standard library growth:** `std.csv`, `std.time` (calendar formatting), `std.path`, `std.regex` (a small backtracking-free engine), `std.args` (command-line parsing), `std.random` distributions, `std.http` TLS via the platform's library.
 - **Windows and macOS binaries** in the release, built and tested in CI; ARM64 Linux.
@@ -46,7 +47,7 @@ Request-level concurrency landed in 1.3: `parallel_run` runs a share-nothing wor
 - **Exceptions.** `Result`, `?` and `attempt` are the error model.
 - **Implicit conversions, operator overloading, macros.** Each adds non-local reasoning to every line of code that uses it.
 - **Null.** `Option` is the only representation of absence.
-- **Unsafe blocks or raw pointers.** The FFI will be the only unchecked boundary and will be explicit at the declaration.
+- **Unsafe blocks or raw pointers.** The FFI is the only unchecked boundary, and it is explicit at the `extern def` declaration.
 - **A garbage collector that replaces reference counting.** Deterministic destruction is a feature.
 
 ## How priorities are set

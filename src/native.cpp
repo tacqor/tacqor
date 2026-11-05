@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <optional>
+#include <set>
 #include <sstream>
 #include <unordered_set>
 
@@ -89,6 +90,42 @@ class Generator {
             case CT::B: return "(" + expr + ").b";
             default: return expr;
         }
+    }
+    // --- C FFI ------------------------------------------------------------
+    const ForeignFunction* foreign_of(std::uint32_t id) const {
+        for (const auto& f : program.foreign) if (f.function == id) return &f;
+        return nullptr;
+    }
+    // The C type a marshalable Tacqor type crosses the boundary as.
+    static const char* c_type(TypeId t) {
+        if (t == type_int) return "long long";
+        if (t == type_float) return "double";
+        if (t == type_bool) return "int";          // widest portable convention for a C truth value
+        return "const char*";                       // str
+    }
+    // Emit the wrapper that marshals Tacqor values to C, calls the symbol, and marshals back.
+    void emit_foreign(std::uint32_t id, const ForeignFunction& f) {
+        const auto& fn = program.functions[id];
+        const auto result = fn.result == type_unit ? std::string("void") : std::string(cname(ctype(fn.result)));
+        out << "static " << result << " " << function_name(id) << "(";
+        for (std::size_t p = 0; p < fn.params.size(); ++p) {
+            out << (p ? ", " : "") << cname(ctype(fn.params[p])) << " " << local_var(p);
+        }
+        out << ") {\n    ";
+        std::string call = f.symbol + "(";
+        for (std::size_t p = 0; p < fn.params.size(); ++p) {
+            const auto t = fn.params[p];
+            const auto arg = t == type_text ? "text_of(" + local_var(p) + ").c_str()"
+                           : t == type_bool ? "(" + local_var(p) + " ? 1 : 0)"
+                           : local_var(p);
+            call += (p ? ", " : "") + arg;
+        }
+        call += ")";
+        if (fn.result == type_unit) out << "(void)(" << call << ");\n";
+        else if (fn.result == type_text) out << "const char* r_ = " << call << "; return make_text(r_ ? std::string(r_) : std::string());\n";
+        else if (fn.result == type_bool) out << "return (" << call << ") != 0;\n";
+        else out << "return (" << cname(ctype(fn.result)) << ")(" << call << ");\n";
+        out << "}\n\n";
     }
     static std::string literal(const std::string& text) {
         std::string result = "\"";
@@ -197,6 +234,7 @@ class Generator {
     };
 
     void function(std::uint32_t id) {
+        if (const auto* f = foreign_of(id)) { emit_foreign(id, *f); return; }
         const auto& fn = program.functions[id];
         const auto& code = fn.code;
         std::vector<bool> is_target(code.size() + 1, false);
@@ -924,6 +962,16 @@ public:
             << "    if (closure.function >= " << program.functions.size() << " || arities[closure.function] != count) throw std::runtime_error(\"function value called with the wrong number of arguments\");\n"
             << "    return thunks[closure.function](args, closure);\n"
             << "}\n\n";
+        // Prototypes for every distinct C symbol the program calls.
+        std::set<std::string> declared_symbols;
+        for (const auto& f : program.foreign) {
+            if (!declared_symbols.insert(f.symbol).second) continue;
+            const auto& fn = program.functions[f.function];
+            out << "extern \"C\" " << (fn.result == type_unit ? "void" : c_type(fn.result)) << " " << f.symbol << "(";
+            for (std::size_t p = 0; p < fn.params.size(); ++p) out << (p ? ", " : "") << c_type(fn.params[p]);
+            out << ");\n";
+        }
+        if (!program.foreign.empty()) out << "\n";
         for (std::size_t id = 0; id < program.functions.size(); ++id) function(static_cast<std::uint32_t>(id));
         out << "}  // namespace tacqor\n\n"
             << "int main(int argc, char** argv) {\n"
@@ -1006,15 +1054,23 @@ void build_native(const Program& program, const std::filesystem::path& output) {
     std::string compiler;
     if (const char* configured = std::getenv("TACQOR_CXX")) compiler = configured;
     else if (const char* configured = std::getenv("CXX")) compiler = configured;
+    // Libraries named by `from "..."` on extern declarations, each linked once.
+    std::set<std::string> libraries;
+    for (const auto& f : program.foreign) if (!f.library.empty()) libraries.insert(f.library);
+    std::string libs_posix, libs_msvc;
+    for (const auto& lib : libraries) {
+        libs_posix += " -l" + lib;
+        libs_msvc += " " + lib + ".lib";
+    }
 #if defined(_WIN32)
     if (compiler.empty()) compiler = "cl";
     const bool msvc = compiler.find("cl") != std::string::npos && compiler.find("clang") == std::string::npos;
     const std::string command = msvc
-        ? quote(compiler) + " /nologo /std:c++17 /EHsc /O2 /w " + quote(staged.string()) + " /Fe:" + quote(absolute.string())
-        : quote(compiler) + " -std=c++17 -O3 -pthread -w " + quote(staged.string()) + " -o " + quote(absolute.string()) + " -lws2_32";
+        ? quote(compiler) + " /nologo /std:c++17 /EHsc /O2 /w " + quote(staged.string()) + " /Fe:" + quote(absolute.string()) + libs_msvc
+        : quote(compiler) + " -std=c++17 -O3 -pthread -w " + quote(staged.string()) + " -o " + quote(absolute.string()) + " -lws2_32" + libs_posix;
 #else
     if (compiler.empty()) compiler = "c++";
-    const std::string command = quote(compiler) + " -std=c++17 -O3 -pthread -w " + quote(staged.string()) + " -o " + quote(absolute.string());
+    const std::string command = quote(compiler) + " -std=c++17 -O3 -pthread -w " + quote(staged.string()) + " -o " + quote(absolute.string()) + libs_posix;
 #endif
     const int status = std::system(command.c_str());
     if (status != 0) {

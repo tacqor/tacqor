@@ -190,11 +190,18 @@ concurrency it does have is share-nothing by design —
 <code>parallel_run</code> and <code>http.serve_concurrent</code>). See
 <code>ROADMAP.md</code>.</p>
 <h3 id="can-i-call-c-code">Can I call C code?</h3>
-<p>Not directly. <code>run(command)</code> and
-<code>run_capture(command)</code> run external programs; TCP sockets
-talk to services. A foreign-function interface is on the roadmap. In the
-meantime, <code>tacqor emit</code> gives you the C++ for a program,
-which can be linked with other C++ by hand.</p>
+<p>Yes, from native builds. An <code>extern def</code> declaration names
+a C function, and a <code>tacqor build --native</code> binary calls it
+directly — <code>extern def sqrt(x: f64) -&gt; f64 from "m"</code> links
+libm and calls <code>sqrt</code>. Arguments and results marshal across
+the boundary as scalars (<code>i64</code>, <code>f64</code>,
+<code>bool</code>) and strings (<code>str</code> ↔︎
+<code>const char*</code>); pointers and structs are not supported yet.
+Under the bytecode VM a foreign call reports that a native build is
+required (a <code>dlopen</code> path for the VM is on the roadmap).
+<code>run(command)</code> and <code>run_capture(command)</code> run
+external programs, and TCP sockets talk to services, for anything
+outside that boundary.</p>
 <h3 id="why-does-the-repl-repeat-side-effects">Why does the REPL repeat
 side effects?</h3>
 <p>Because Tacqor compiles whole programs: the REPL recompiles and
