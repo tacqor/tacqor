@@ -7,7 +7,7 @@
 <a href="https://tacqor.github.io/tacqor/"><img src="https://img.shields.io/badge/docs-tacqor.github.io-0f2a3f.svg" alt="Documentation"></a>
 </p>
 
-# Tacqor 1.2
+# Tacqor
 
 Tacqor is a statically typed programming language with Python's syntax, Rust's discipline, and two ways to run: a fast bytecode VM, or native machine code through the system C++ compiler. One executable checks, tests, compiles, runs, and packages programs, and doubles as a REPL; a standard library ships as Tacqor source; a VS Code extension scans code as you type.
 
@@ -36,6 +36,14 @@ def main():
             print(problem)
     print(total(accounts, fn(a: Account) => a.balance))
 ```
+
+## Why Tacqor exists
+
+Software keeps repeating the same expensive move: you prototype in **Python** because it is fast to write, then rewrite in **Rust**, **Go**, or **C++** for production because Python is too slow to ship. The rewrite means learning a very different language and maintaining two codebases for a single idea.
+
+Tacqor exists to erase that rewrite — to be one language you can both prototype *and* ship in. It gives you Python's syntax and Rust's discipline in a language that compiles to native machine code, so the thing you prototype is already the thing you ship. Static types catch mistakes before the program runs; `Option`, `Result` and `?` make failure explicit without exceptions; there is no garbage collector and no borrow checker to learn; and the whole toolchain is one small static binary with no runtime to install. The goal is not to beat a systems language on raw speed — it is to get most of the way there for a fraction of the difficulty, in a language you can read on day one.
+
+It is a strong fit for command-line tools, back-end and network services, data pipelines, developer tooling, and anything that must ship as a single fast binary — see [`docs/USE_CASES.md`](docs/USE_CASES.md). It is deliberately not a language for GUIs, mobile, browser front ends, or numerical/AI workloads today.
 
 ## What is in the language
 

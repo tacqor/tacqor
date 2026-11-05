@@ -123,8 +123,10 @@ nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; 
 <div class="docnav"><a href="index.html">Tacqor documentation</a></div>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#tacqor-12" id="toc-tacqor-12">Tacqor 1.2</a>
+<li><a href="#tacqor" id="toc-tacqor">Tacqor</a>
 <ul>
+<li><a href="#why-tacqor-exists" id="toc-why-tacqor-exists">Why Tacqor
+exists</a></li>
 <li><a href="#what-is-in-the-language"
 id="toc-what-is-in-the-language">What is in the language</a></li>
 <li><a href="#documentation"
@@ -150,7 +152,7 @@ source</a></li>
 <a href="https://tacqor.github.io/tacqor/"><img src="https://img.shields.io/badge/docs-tacqor.github.io-0f2a3f.svg" alt="Documentation"></a>
 </p>
 
-<h1 id="tacqor-12">Tacqor 1.2</h1>
+<h1 id="tacqor">Tacqor</h1>
 <p>Tacqor is a statically typed programming language with Python's
 syntax, Rust's discipline, and two ways to run: a fast bytecode VM, or
 native machine code through the system C++ compiler. One executable
@@ -180,6 +182,30 @@ def main():
         case Err(problem):
             print(problem)
     print(total(accounts, fn(a: Account) =&gt; a.balance))</code></pre>
+<h2 id="why-tacqor-exists">Why Tacqor exists</h2>
+<p>Software keeps repeating the same expensive move: you prototype in
+<strong>Python</strong> because it is fast to write, then rewrite in
+<strong>Rust</strong>, <strong>Go</strong>, or <strong>C++</strong> for
+production because Python is too slow to ship. The rewrite means
+learning a very different language and maintaining two codebases for a
+single idea.</p>
+<p>Tacqor exists to erase that rewrite — to be one language you can both
+prototype <em>and</em> ship in. It gives you Python's syntax and Rust's
+discipline in a language that compiles to native machine code, so the
+thing you prototype is already the thing you ship. Static types catch
+mistakes before the program runs; <code>Option</code>,
+<code>Result</code> and <code>?</code> make failure explicit without
+exceptions; there is no garbage collector and no borrow checker to
+learn; and the whole toolchain is one small static binary with no
+runtime to install. The goal is not to beat a systems language on raw
+speed — it is to get most of the way there for a fraction of the
+difficulty, in a language you can read on day one.</p>
+<p>It is a strong fit for command-line tools, back-end and network
+services, data pipelines, developer tooling, and anything that must ship
+as a single fast binary — see <a
+href="USE_CASES.html"><code>docs/USE_CASES.md</code></a>. It is
+deliberately not a language for GUIs, mobile, browser front ends, or
+numerical/AI workloads today.</p>
 <h2 id="what-is-in-the-language">What is in the language</h2>
 <table>
 <thead>
