@@ -63,7 +63,9 @@ Two layers: **built-in functions** (implemented in the runtime, available everyw
 ### Parallelism
 `parallel_sum(count, workers, mapper) -> i64` and `parallel_map(count, workers, mapper) -> list[i64]` — mapper is any `fn(i64) -> i64` (named function or closure capturing only numbers/bools); see the language reference.
 
-`parallel_run(workers, task) -> i64` — runs `task(worker_index)` on `workers` threads at once (1–64), each thread with its own VM, and returns once every task has returned (for a server loop, that is never). This is the share-nothing building block behind `http.serve_concurrent`: a worker owns everything it allocates, so the task may capture only scalars and function values (enforced at compile time for an inline task, at runtime otherwise), and any shared state goes through a file or a database. See the language reference.
+`parallel_run(workers, task) -> i64` — runs `task(worker_index)` on `workers` threads at once (1–64), each thread with its own VM, and returns once every task has returned (for a server loop, that is never). This is the share-nothing building block behind `http.serve_concurrent`: a worker owns everything it allocates, so the task may capture only scalars and function values (enforced at compile time for an inline task, at runtime otherwise), and any shared state goes through a channel, a file, or a database. See the language reference.
+
+Channels pass messages between workers: `channel() -> i64` makes one (the handle is a scalar, so a task may capture it); `channel_send(ch, message: str)` enqueues a copy; `channel_recv(ch) -> Option[str]` blocks for a message (`Some`) or returns `None` once the channel is closed and drained; `channel_try_recv(ch) -> Option[str]` never blocks; `channel_close(ch)` ends the stream. Messages cross as copies, so nothing on the heap is shared. The `std.channels` module wraps these.
 
 ### Memory
 `gc_collect() -> i64` runs the cycle collector and returns the number of objects freed; `gc_count() -> i64` is the number of tracked containers.
@@ -108,6 +110,9 @@ Dates and times in UTC, built on `unix_time()`. `from_unix(seconds) -> DateTime`
 
 ### `std.random`
 Typed conveniences over the built-in generator (call `seed(n)` first for a reproducible stream). `fraction() -> f64` in [0, 1); `integer(lo, hi)` inclusive; `below(n)` in [0, n-1]; `dice(sides)` in [1, sides]; `boolean(p)` true with probability `p`. On lists: `choice(items) -> Option[T]` (None if empty), `shuffle(items) -> list[T]` (a new list, Fisher-Yates), `sample(items, k) -> list[T]` (k distinct elements).
+
+### `std.channels`
+Message channels between the workers of a `parallel_run` pool (see the Parallelism built-ins above). `make() -> i64`, `send(ch, message)`, `recv(ch) -> Option[str]` (blocks; `None` when closed and drained), `try_recv(ch) -> Option[str]` (non-blocking), `close(ch)`. Messages are strings — use `std.json` for structure — and cross as copies, so no object is shared between threads.
 
 ### `std.os`
 The environment and path names (file and process I/O is already in the built-ins). `env_or(name, fallback)` reads an environment variable with a default. Path helpers treat `/`-separated strings: `join(a, b)` (absolute `b` wins), `basename(path)`, `dirname(path)`, `extname(path)` (e.g. `".gz"`, `""` when none, and a leading dot is not an extension), `stem(path)` (basename without extension).

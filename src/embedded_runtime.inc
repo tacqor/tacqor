@@ -121,6 +121,8 @@ enum class Builtin : std::uint8_t {
     // 1.2
     tcp_listen, tcp_accept, tcp_connect, tcp_read, tcp_write, tcp_close,
     run_capture, unix_time, hash,
+    // 1.3 — value channels between workers
+    channel, channel_send, channel_recv, channel_try_recv, channel_close,
     count,  // sentinel
 };
 
@@ -193,7 +195,9 @@ int run_lsp(const std::vector<std::filesystem::path>& search);
 #include <exception>
 #include <fstream>
 #include <cerrno>
+#include <condition_variable>
 #include <cstdio>
+#include <deque>
 #include <functional>
 #include <iostream>
 #include <limits>
@@ -292,12 +296,12 @@ inline Int shift_left(Int a, Int b) {
     return static_cast<Int>(static_cast<std::uint64_t>(a) << b);  // wrapping, like Rust's wrapping_shl
 }
 inline Int shift_right(Int a, Int b) {
-    if (b < 0 || b > 63) throw std::runtime_error("shift count must be between 0 and 63");
+    if ()tacqor_runtime",
+R"tacqor_runtime(b < 0 || b > 63) throw std::runtime_error("shift count must be between 0 and 63");
     return a >> b;  // arithmetic shift: the sign is kept
 }
 
-inline std::string read)tacqor_runtime",
-R"tacqor_runtime(_text(std::istream& input, std::size_t limit) {
+inline std::string read_text(std::istream& input, std::size_t limit) {
     std::string result;
     char buffer[65536];
     while (input) {
@@ -591,10 +595,10 @@ struct ObjectObj : Obj {
 struct ClosureObj : Obj {
     std::uint32_t function = 0;
     std::vector<Value> captures;
-    ClosureObj() { gc_track(this); }
+    ClosureObj() { gc_track(th)tacqor_runtime",
+R"tacqor_runtime(is); }
     void each_child(const std::function<void(Value&)>& visit) override { for (auto& item : captures) visit(item); }
-    void clear_children() override { capture)tacqor_runtime",
-R"tacqor_runtime(s.clear(); }
+    void clear_children() override { captures.clear(); }
 };
 
 // Option and Result values: `which` is 1 for Some/Ok and 0 for None/Err.
@@ -879,12 +883,12 @@ inline bool equal(const Value& a, const Value& b, int depth = 0) {
 inline int compare(const Value& a, const Value& b) {
     if (a.tag != b.tag) throw std::runtime_error("invalid comparison types");
     switch (a.tag) {
-        case Tag::integer: return a.i < b.i ? -1 : a.i > b.i;
+        case Tag::integer: return a.i < b.i ? -1 : a.i > b.)tacqor_runtime",
+R"tacqor_runtime(i;
         case Tag::floating: return a.f < b.f ? -1 : a.f > b.f;
         case Tag::boolean: return a.b < b.b ? -1 : a.b > b.b;
         case Tag::text: {
-            c)tacqor_runtime",
-R"tacqor_runtime(onst int order = text_of(a).compare(text_of(b));
+            const int order = text_of(a).compare(text_of(b));
             return order < 0 ? -1 : order > 0;
         }
         default: throw std::runtime_error("values of this type cannot be ordered");
@@ -1166,12 +1170,12 @@ struct Context;
 inline const Value& dict_at(const Value& dict, const Value& key, const Context& ctx);
 inline Value slice_value(const Value& container, Int lo, Int hi) {
     if (container.tag == Tag::list) {
-        const auto& items = list_of(container);
+        const auto& items = list_of)tacqor_runtime",
+R"tacqor_runtime((container);
         const auto [a, b] = clamp_slice(lo, hi, items.size());
         return {Tag::list, items.slice(a, b)};
     }
-    const auto& text = text_of(contain)tacqor_runtime",
-R"tacqor_runtime(er);
+    const auto& text = text_of(container);
     const auto [a, b] = clamp_slice(lo, hi, text.size());
     return make_text(text.substr(a, b - a));
 }
@@ -1241,6 +1245,8 @@ constexpr int builtin_arity[] = {
     2, 1, 1, 0, 0,
     // 1.2
     1, 1, 2, 2, 2, 1, 1, 0, 1,
+    // 1.3 — channel, channel_send, channel_recv, channel_try_recv, channel_close
+    0, 2, 1, 1, 1,
 };
 
 inline std::mt19937_64& random_engine() {
@@ -1359,6 +1365,77 @@ inline Value tcp_write(Socket s, const std::string& data) {
     return make_variant(true, static_cast<Int>(sent), true);
 }
 
+// --- value channels ---------------------------------------------------------
+// A channel is a thread-safe string queue used to hand messages between workers (see
+// `parallel_run`). Messages cross as string copies — nothing on the Tacqor heap is shared
+// between threads — so the non-atomic reference counting stays sound; structure a message
+// with `std.json` when it is more than text. A channel is named by a small integer handle
+// (a scalar, so a `parallel_run` task may capture it), and the handles index a process-wide
+// registry. Channels live until the program ends.
+struct Channel {
+    std::mutex mutex;
+    std::condition_variable ready;
+    std::deque<std::string> queue;
+    bool closed = false;
+};
+
+inline std::mutex& channel_table_mutex() {
+    static std::mutex m;
+    return m;
+}
+inline std::vector<std::shared_ptr<Channel>>& channel_table() {
+    static std::vector<std::shared_ptr<Channel>> table;
+    return table;
+}
+inline std::shared_ptr<Channel> channel_at(Int handle) {
+    std::lock_guard<std::mutex> guard(channel_table_mutex());
+    auto& table = channel_table();
+    if (handle < 0 || static_cast<std::size_t>(handle) >= table.size()) throw std::runtime_error("invalid channel handle");
+    return table[static_cast<std::size_t>(handle)];
+}
+inline Int channel_make() {
+    std::lock_guard<std::mutex> guard(channel_table_mutex());
+    auto& table = channel_table();
+    table.push_back(std::make_shared<Channel>());
+    return static_cast<Int>(table.size() - 1);
+}
+inline void channel_send_message(Int handle, const std::string& message) {
+    const auto channel = channel_at(handle);
+    {
+        std::lock_guard<std::mutex> guard(channel->mutex);
+        if (channel->closed) throw std::runtime_error("channel_send on a closed channel");
+        channel->queue.push_back(message);  // a copy; the receiver gets its own string
+    }
+    channel->ready.notify_one();
+}
+// Blocks until a message arrives (Some) or the channel is closed and drained (None).
+inline Value channel_receive(Int handle) {
+    const auto channel = channel_at(handle);
+    std::unique_lock<std::mutex> lock(channel->mutex);
+    channel->ready.wait(lock, [&] { return !channel->queue.empty() || channel->closed; });
+    if (channel->queue.empty()) return make_variant(false, Value());  // closed and drained -> None
+    std::string message = std::move(channel->queue.front());
+    channel->queue.pop_front();
+    return make_variant(true, make_text(std::move(message)));
+}
+// Never blocks: Some if a message is waiting, None otherwise.
+inline Value channel_try_receive(Int handle) {
+    const auto channel = channel_at(handle);
+    std::lock_guard<std::mutex> guard(channel->mutex);
+    if (channel->queue.empty()) return make_variant(false, Value());
+    std::string message = std::move(channel->queue.front());
+    channel->queue.pop_front();
+    return make_variant(true, make_text(std::move(message)));
+}
+inline void channel_shut(Int handle) {
+    const auto channel = channel_at(handle);
+    {
+        std::lock_guard<std::mutex> guard(channel->mutex);
+        channel->closed = true;
+    }
+    channel->ready.notify_all();
+}
+
 inline std::string run_capture(const std::string& command) {
 #if defined(_WIN32)
     FILE* pipe = _popen(command.c_str(), "r");
@@ -1390,7 +1467,8 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             line += '\n';
             std::lock_guard<std::mutex> guard(ctx.output_lock);
             ctx.output << line;
-            if (!ctx.output) throw std::runtime_error("could not write output");
+   )tacqor_runtime",
+R"tacqor_runtime(         if (!ctx.output) throw std::runtime_error("could not write output");
             return {};
         }
         case Builtin::argc: return checked_size(ctx.arguments.size());
@@ -1456,8 +1534,7 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             const auto order = compare(args[0], args[1]);
             return (which == Builtin::min) == (order <= 0) ? args[0] : args[1];
         }
-        case Builtin::sqrt: return std::sqrt(float_of(args[0]))tacqor_runtime",
-R"tacqor_runtime();
+        case Builtin::sqrt: return std::sqrt(float_of(args[0]));
         case Builtin::pow: return std::pow(float_of(args[0]), float_of(args[1]));
         case Builtin::floor: return float_to_int(std::floor(float_of(args[0])));
         case Builtin::ceil: return float_to_int(std::ceil(float_of(args[0])));
@@ -1625,7 +1702,8 @@ R"tacqor_runtime();
             if (!input) throw std::runtime_error("could not open file: " + path);
             const auto content = read_text(input, text_limit);
             std::vector<Value> lines;
-            std::size_t start = 0;
+            std::siz)tacqor_runtime",
+R"tacqor_runtime(e_t start = 0;
             while (start < content.size()) {
                 auto end = content.find('\n', start);
                 if (end == std::string::npos) end = content.size();
@@ -1698,8 +1776,7 @@ R"tacqor_runtime();
         case Builtin::write: case Builtin::eprint: {
             const auto text = value_text(args[0], ctx);
             std::lock_guard<std::mutex> guard(ctx.output_lock);
-    )tacqor_runtime",
-R"tacqor_runtime(        if (which == Builtin::write) ctx.output << text;
+            if (which == Builtin::write) ctx.output << text;
             else {
                 ctx.output.flush();
                 std::cerr << text << '\n';
@@ -1828,6 +1905,11 @@ R"tacqor_runtime(        if (which == Builtin::write) ctx.output << text;
         case Builtin::tcp_read: return tcp_read(socket_of(args[0]), int_of(args[1]));
         case Builtin::tcp_write: return tcp_write(socket_of(args[0]), text_of(args[1]));
         case Builtin::tcp_close: socket_close(socket_of(args[0])); return {};
+        case Builtin::channel: return channel_make();
+        case Builtin::channel_send: channel_send_message(int_of(args[0]), text_of(args[1])); return {};
+        case Builtin::channel_recv: return channel_receive(int_of(args[0]));
+        case Builtin::channel_try_recv: return channel_try_receive(int_of(args[0]));
+        case Builtin::channel_close: channel_shut(int_of(args[0])); return {};
         case Builtin::run_capture: ctx.output.flush(); return make_text(run_capture(text_of(args[0])));
         case Builtin::unix_time:
             return static_cast<Int>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
@@ -1846,7 +1928,8 @@ R"tacqor_runtime(        if (which == Builtin::write) ctx.output << text;
 // capture values that need no reference counting.
 inline void parallel_check(const Value& mapper) {
     for (const auto& captured : closure_of(mapper).captures) {
-        if (captured.heap()) throw std::runtime_error("a parallel mapper may only capture i64, f64, or bool values");
+        if (captured.heap()) th)tacqor_runtime",
+R"tacqor_runtime(row std::runtime_error("a parallel mapper may only capture i64, f64, or bool values");
     }
 }
 

@@ -9,6 +9,7 @@ All notable changes to Tacqor. Versions follow `MAJOR.MINOR.PATCH`: a minor rele
 Concurrency release. Tacqor can now use more than one core for request handling, within the bounds its memory model allows.
 
 **Language**
+- Channels pass string messages between workers without a file: `channel()` returns a handle (a scalar, so a `parallel_run` task can capture it), `channel_send`/`channel_recv` (blocking, `Option[str]`)/`channel_try_recv`/`channel_close` move copies through a thread-safe queue, so nothing on the heap is shared. Wrapped by the new `std.channels` module (`make`/`send`/`recv`/`try_recv`/`close`). Clean under ASan/UBSan.
 - `parallel_run(workers, task)` runs `task(worker_index)` on up to 64 OS threads at once, each thread with its own VM and value stack. It is the share-nothing counterpart to `parallel_sum`/`parallel_map`: a worker owns every object it allocates, so nothing on the heap is touched by two threads at once and the non-atomic reference counting stays sound. The task may capture only scalars and function values; the compiler enforces this for an inline task, and a runtime check backs it up when the task is bound to a name first. Any other shared state goes through a file or a database. See `docs/SPECIFICATION.md` §6.9 and `LANGUAGE.md`.
 
 **Standard library**

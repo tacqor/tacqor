@@ -1,0 +1,35 @@
+# Standard library: message channels between workers. Import with `import std.channels`.
+#
+# A channel is a thread-safe queue of string messages for handing data between the workers of
+# a `parallel_run` pool (or `http.serve_concurrent`). Messages cross as copies, so nothing on
+# the heap is shared between threads and the share-nothing rule holds; use `std.json` to put
+# structure in a message. A channel is a small integer handle — a scalar — so a worker task
+# may capture it even under the parallel-capture rule.
+#
+#   let jobs = channels.make()
+#   let task = fn(w: i64):
+#       match channels.recv(jobs):
+#           case Some(job): handle(job)
+#           case None: pass                 # the channel was closed and drained
+#   parallel_run(4, task)
+
+# A fresh channel handle.
+def make() -> i64:
+    return channel()
+
+# Enqueue a message (a copy). Errors if the channel is closed.
+def send(ch: i64, message: str):
+    channel_send(ch, message)
+
+# Block until a message is available (Some) or the channel is closed and drained (None).
+def recv(ch: i64) -> Option[str]:
+    return channel_recv(ch)
+
+# Take a message if one is waiting right now, without blocking.
+def try_recv(ch: i64) -> Option[str]:
+    return channel_try_recv(ch)
+
+# Close the channel: future sends error, pending receivers wake, and `recv` returns None once
+# the queue is drained.
+def close(ch: i64):
+    channel_close(ch)

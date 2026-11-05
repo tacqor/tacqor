@@ -402,6 +402,8 @@ constexpr BuiltinSpec builtins[] = {
     {"tcp_listen", Builtin::tcp_listen, 1}, {"tcp_accept", Builtin::tcp_accept, 1}, {"tcp_connect", Builtin::tcp_connect, 2},
     {"tcp_read", Builtin::tcp_read, 2}, {"tcp_write", Builtin::tcp_write, 2}, {"tcp_close", Builtin::tcp_close, 1},
     {"run_capture", Builtin::run_capture, 1}, {"unix_time", Builtin::unix_time, 0}, {"hash", Builtin::hash, 1},
+    {"channel", Builtin::channel, 0}, {"channel_send", Builtin::channel_send, 2}, {"channel_recv", Builtin::channel_recv, 1},
+    {"channel_try_recv", Builtin::channel_try_recv, 1}, {"channel_close", Builtin::channel_close, 1},
 };
 
 const BuiltinSpec* builtin_named(std::string_view name) {
@@ -1819,6 +1821,11 @@ class Compiler {
             case Builtin::run_capture: arg(0, type_text); return done(type_text);
             case Builtin::unix_time: return done(type_int);
             case Builtin::hash: arg(0, type_text); return done(type_int);
+            case Builtin::channel: return done(type_int);
+            case Builtin::channel_send: arg(0, type_int); arg(1, type_text); return done(type_unit);
+            case Builtin::channel_recv: arg(0, type_int); return done(option_of(type_text));
+            case Builtin::channel_try_recv: arg(0, type_int); return done(option_of(type_text));
+            case Builtin::channel_close: arg(0, type_int); return done(type_unit);
             case Builtin::count: break;
         }
         // Single-argument text builtins that return text.

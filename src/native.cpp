@@ -225,6 +225,9 @@ class Generator {
                 return find_type({Kind::result, type_int, type_text, {}});
             case Builtin::tcp_read: return find_type({Kind::result, type_text, type_text, {}});
             case Builtin::tcp_close: return type_unit;
+            case Builtin::channel: return type_int;
+            case Builtin::channel_send: case Builtin::channel_close: return type_unit;
+            case Builtin::channel_recv: case Builtin::channel_try_recv: return find_type({Kind::option, type_text, 0, {}});
             case Builtin::run_capture: return type_text;
             case Builtin::count: break;
         }
