@@ -35,7 +35,7 @@ for rel, name in docs.items():
         return m.group(0)
     text = re.sub(r"\[([^\]]+)\]\(((?:\.\./|docs/)?[A-Za-z_]+\.md)(#[^)]*)?\)", link, text)
     text = re.sub(r"\[([^\]]+)\]\(\.\./LICENSE\)", r"\1", text)
-    text = text.replace('src="docs/assets/', 'src="../assets/').replace("](docs/assets/", "](../assets/")
+    text = text.replace('src="docs/assets/', 'src="../assets/').replace("](docs/assets/", "](../assets/").replace('srcset="docs/assets/', 'srcset="../assets/')
     html_body = subprocess.run(["pandoc", "-f", "gfm", "-t", "html5", "--toc", "--toc-depth=2", "--standalone",
                                 "--metadata", f"pagetitle=Tacqor — {name}", "--css", "x.css"],
                                input=text, capture_output=True, text=True, check=True, cwd=src.parent).stdout
