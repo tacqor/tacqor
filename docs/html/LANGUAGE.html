@@ -716,7 +716,7 @@ result cross the boundary.</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> sqrt(x: f64) <span class="op">-&gt;</span> f64 <span class="im">from</span> <span class="st">&quot;m&quot;</span>            <span class="co"># links libm, calls C&#39;s sqrt</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> llabs(n: i64) <span class="op">-&gt;</span> i64                     <span class="co"># libc; no library to name</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> getenv(name: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>                 <span class="co"># str crosses as const char*</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> c_strlen(s: <span class="bu">str</span>) <span class="op">-&gt;</span> i64 <span class="op">=</span> <span class="st">&quot;strlen&quot;</span>       <span class="co"># = renames the C symbol</span></span></code></pre></div>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> to_int(s: <span class="bu">str</span>) <span class="op">-&gt;</span> i64 <span class="op">=</span> <span class="st">&quot;atoll&quot;</span>          <span class="co"># = renames the C symbol</span></span></code></pre></div>
 <p><code>from "name"</code> names a library to link
 (<code>-lname</code>, or <code>name.lib</code> on MSVC); omit it for
 libc and libm symbols that link by default. <code>= "symbol"</code>

@@ -295,7 +295,7 @@ if command -v "${CXX:-c++}" >/dev/null 2>&1; then
     test "$(TACQOR_FFI_SMOKE=ok "$temp/ffi_native")" = "12.0
 81.0
 7
-6
+1234
 env:ok"
     "$tool" build --native "$temp/cycles.tq" -o "$temp/cycles_native"
     test "$("$temp/cycles_native")" = "True"
