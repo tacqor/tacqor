@@ -87,3 +87,36 @@ def test_channels():
     testing.assert_eq(received, 20)
     # recv on a closed, drained channel is None; try_recv never blocks.
     testing.assert_true(not is_some(channels.try_recv(ch)), "try_recv on a drained channel is None")
+
+def test_bulk_numeric():
+    # 1.4 opt-in wrapping arithmetic: two's-complement wraparound, no overflow trap.
+    testing.assert_eq(wrapping_add(9223372036854775807, 1), 0 - 9223372036854775807 - 1)  # max + 1 -> min
+    testing.assert_eq(wrapping_sub(0 - 9223372036854775807 - 1, 1), 9223372036854775807)   # min - 1 -> max
+    testing.assert_eq(wrapping_mul(9223372036854775807, 2), 0 - 2)                          # max * 2 -> -2
+
+    # 1.4 SIMD-friendly float bulk ops.
+    let xs: list[f64] = [1.0, 2.0, 3.0, 4.0]
+    let ys: list[f64] = [10.0, 20.0, 30.0, 40.0]
+    testing.assert_eq(dot(xs, ys), 300.0)
+    testing.assert_eq(vadd(xs, ys), [11.0, 22.0, 33.0, 44.0])
+    testing.assert_eq(vmul(xs, ys), [10.0, 40.0, 90.0, 160.0])
+    testing.assert_eq(vscale(xs, 2.0), [2.0, 4.0, 6.0, 8.0])
+
+    # Same ops over i64 lists stay overflow-checked (exact).
+    let a: list[i64] = [1, 2, 3, 4, 5]
+    let b: list[i64] = [5, 4, 3, 2, 1]
+    testing.assert_eq(dot(a, b), 35)
+    testing.assert_eq(vadd(a, b), [6, 6, 6, 6, 6])
+    testing.assert_eq(vmul(a, b), [5, 8, 9, 8, 5])
+    testing.assert_eq(vscale(a, 10), [10, 20, 30, 40, 50])
+
+    # The flat-array fast paths leave sum / min_of / max_of results unchanged.
+    testing.assert_eq(sum(a), 15)
+    testing.assert_eq(min_of(a), 1)
+    testing.assert_eq(max_of(a), 5)
+    testing.assert_eq(sum([3.5, 1.5, 2.5]), 7.5)
+
+    # dot of empty lists is the identity; a blocked reduction crossing the 8-wide tail is exact.
+    let empty: list[f64] = []
+    testing.assert_eq(dot(empty, empty), 0.0)
+    testing.assert_eq(dot(vscale(fill(10, 1.0), 2.0), fill(10, 3.0)), 60.0)

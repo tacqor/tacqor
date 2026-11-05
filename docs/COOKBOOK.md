@@ -516,6 +516,29 @@ tacqor build --native app.tq -o app && ./app
 
 Scalars (`i64`, `f64`, `bool`) and strings cross the boundary; pointers and structs do not. Use `= "symbol"` when the C name differs from the Tacqor name (`extern def c_abs(n: i64) -> i64 = "llabs"`). A foreign call only runs in a native build — under `tacqor run` it reports that a native build is required.
 
+### Offloading heavy work: the handle pattern (and GPUs)
+
+Because only scalars and strings cross the boundary, bulk data stays on the C side and Tacqor refers to it by an `i64` **handle**. The library allocates a buffer and returns a handle; later calls take that handle and return a scalar. This is the same interface a BLAS, a SIMD kernel, or a CUDA/OpenCL binding presents — `alloc` becomes `cudaMalloc`, a `set` becomes `cudaMemcpy`, and the kernel call launches on the device and copies one scalar back. The Tacqor side does not change when the backend becomes a GPU; only the C file does.
+
+The runnable example is `examples/ffi_offload.tq` with its library `examples/ffi_offload.c`:
+
+```text
+extern def accel_alloc(n: i64) -> i64 from "accel"
+extern def accel_fill(handle: i64, value: f64) from "accel"
+extern def accel_dot(a: i64, b: i64, reps: i64) -> f64 from "accel"
+extern def accel_free(handle: i64) from "accel"
+```
+
+Build the library, then point the native build at it with `TACQOR_CXXFLAGS` (which the native backend folds into the compile verbatim):
+
+```sh
+cc -O3 -fPIC -shared examples/ffi_offload.c -o /tmp/libaccel.so
+TACQOR_CXXFLAGS="-L/tmp -Wl,-rpath,/tmp" tacqor build --native examples/ffi_offload.tq -o offload
+./offload                       # offloaded dot = 9.8304e8
+```
+
+For purely on-CPU numeric work you usually do not need this — the built-in `dot`/`vadd`/`vmul`/`vscale` already vectorize over `list[f64]` (see `PERFORMANCE.md` §4b). The offload pattern earns its keep when the kernel lives in an existing C/CUDA library or must run on a device.
+
 ## 12. Testing
 
 `tests.tq`:

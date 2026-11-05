@@ -1064,6 +1064,8 @@ constexpr int builtin_arity[] = {
     1, 1, 2, 2, 2, 1, 1, 0, 1,
     // 1.3 — channel, channel_send, channel_recv, channel_try_recv, channel_close
     0, 2, 1, 1, 1,
+    // 1.4 — wrapping_add, wrapping_sub, wrapping_mul, dot, vadd, vmul, vscale
+    2, 2, 2, 2, 2, 2, 2,
 };
 
 inline std::mt19937_64& random_engine() {
@@ -1643,20 +1645,34 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
         case Builtin::log10: return std::log10(float_of(args[0]));
         case Builtin::sum: {
             const auto& list = list_of(args[0]);
-            if (list.elem == ListObj::Elem::floating || (list.elem == ListObj::Elem::value && list.size() > 0 && list.get(0).tag == Tag::floating)) {
+            const auto n = list.size();
+            if (list.elem == ListObj::Elem::floating || (list.elem == ListObj::Elem::value && n > 0 && list.get(0).tag == Tag::floating)) {
                 double total = 0;
-                for (std::size_t i = 0; i < list.size(); ++i) total += float_of(list.get(i));
+                // Flat lists sum straight over the contiguous buffer (no per-element boxing),
+                // left to right, so the result is identical to the element-wise path.
+                if (list.elem == ListObj::Elem::floating) { const double* xs = list.floats.data(); for (std::size_t i = 0; i < n; ++i) total += xs[i]; }
+                else for (std::size_t i = 0; i < n; ++i) total += float_of(list.get(i));
                 return total;
             }
             Int total = 0;
-            for (std::size_t i = 0; i < list.size(); ++i) total = arithmetic(Op::add, total, int_of(list.get(i)));
+            if (list.elem == ListObj::Elem::integer) { const Int* xs = list.ints.data(); for (std::size_t i = 0; i < n; ++i) total = arithmetic(Op::add, total, xs[i]); }
+            else for (std::size_t i = 0; i < n; ++i) total = arithmetic(Op::add, total, int_of(list.get(i)));
             return total;
         }
         case Builtin::min_of: case Builtin::max_of: {
             const auto& list = list_of(args[0]);
-            if (list.size() == 0) throw std::runtime_error(std::string(which == Builtin::min_of ? "min_of" : "max_of") + " of an empty list");
+            const auto n = list.size();
+            if (n == 0) throw std::runtime_error(std::string(which == Builtin::min_of ? "min_of" : "max_of") + " of an empty list");
+            // Flat integer lists compare straight over the contiguous buffer (exact, no NaN concerns).
+            if (list.elem == ListObj::Elem::integer) {
+                const Int* xs = list.ints.data();
+                Int best = xs[0];
+                if (which == Builtin::min_of) { for (std::size_t i = 1; i < n; ++i) if (xs[i] < best) best = xs[i]; }
+                else                          { for (std::size_t i = 1; i < n; ++i) if (xs[i] > best) best = xs[i]; }
+                return best;
+            }
             Value best = list.get(0);
-            for (std::size_t i = 1; i < list.size(); ++i) {
+            for (std::size_t i = 1; i < n; ++i) {
                 Value candidate = list.get(i);
                 const auto order = compare(candidate, best);
                 if (which == Builtin::min_of ? order < 0 : order > 0) best = std::move(candidate);
@@ -1679,6 +1695,101 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             const auto count = source.size();
             for (std::size_t i = 0; i < count; ++i) target.push(source.get(i));
             return {};
+        }
+        // 1.4 — opt-in unchecked arithmetic. Wraps modulo 2^64 (two's complement), like C/Rust
+        // wrapping_*; no overflow trap. For hot loops where wraparound is intended and the
+        // overflow check is pure cost.
+        case Builtin::wrapping_add:
+            return static_cast<Int>(static_cast<std::uint64_t>(int_of(args[0])) + static_cast<std::uint64_t>(int_of(args[1])));
+        case Builtin::wrapping_sub:
+            return static_cast<Int>(static_cast<std::uint64_t>(int_of(args[0])) - static_cast<std::uint64_t>(int_of(args[1])));
+        case Builtin::wrapping_mul:
+            return static_cast<Int>(static_cast<std::uint64_t>(int_of(args[0])) * static_cast<std::uint64_t>(int_of(args[1])));
+        // 1.4 — SIMD-friendly bulk numeric ops over contiguous lists. The f64 paths run straight
+        // over the flat backing buffer so the system compiler auto-vectorizes them at -O3. The i64
+        // paths stay overflow-checked (safe, exact) and so do not vectorize — use f64, or wrapping_*
+        // in a hand loop, when you want raw integer throughput.
+        case Builtin::dot: {
+            const auto& a = list_of(args[0]);
+            const auto& b = list_of(args[1]);
+            const auto n = a.size();
+            if (n != b.size()) throw std::runtime_error("dot expects two lists of equal length");
+            const bool floating = a.elem == ListObj::Elem::floating
+                || (a.elem == ListObj::Elem::value && n > 0 && a.get(0).tag == Tag::floating);
+            if (floating) {
+                if (a.elem == ListObj::Elem::floating && b.elem == ListObj::Elem::floating) {
+                    const double* xs = a.floats.data();
+                    const double* ys = b.floats.data();
+                    // Blocked accumulation: a fixed, associative reduction the optimizer vectorizes.
+                    double acc[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+                    std::size_t i = 0;
+                    for (; i + 8 <= n; i += 8)
+                        for (int k = 0; k < 8; ++k) acc[k] += xs[i + k] * ys[i + k];
+                    double total = ((acc[0] + acc[1]) + (acc[2] + acc[3])) + ((acc[4] + acc[5]) + (acc[6] + acc[7]));
+                    for (; i < n; ++i) total += xs[i] * ys[i];
+                    return total;
+                }
+                double total = 0;
+                for (std::size_t i = 0; i < n; ++i) total += float_of(a.get(i)) * float_of(b.get(i));
+                return total;
+            }
+            Int total = 0;
+            for (std::size_t i = 0; i < n; ++i)
+                total = arithmetic(Op::add, total, arithmetic(Op::multiply, int_of(a.get(i)), int_of(b.get(i))));
+            return total;
+        }
+        case Builtin::vadd: case Builtin::vmul: {
+            const auto& a = list_of(args[0]);
+            const auto& b = list_of(args[1]);
+            const auto n = a.size();
+            if (n != b.size()) throw std::runtime_error(std::string(which == Builtin::vadd ? "vadd" : "vmul") + " expects two lists of equal length");
+            const bool floating = a.elem == ListObj::Elem::floating
+                || (a.elem == ListObj::Elem::value && n > 0 && a.get(0).tag == Tag::floating);
+            if (floating) {
+                auto* r = new ListObj(ListObj::Elem::floating);
+                r->floats.resize(n);
+                if (a.elem == ListObj::Elem::floating && b.elem == ListObj::Elem::floating) {
+                    const double* xs = a.floats.data();
+                    const double* ys = b.floats.data();
+                    double* out = r->floats.data();
+                    if (which == Builtin::vadd) for (std::size_t i = 0; i < n; ++i) out[i] = xs[i] + ys[i];
+                    else                        for (std::size_t i = 0; i < n; ++i) out[i] = xs[i] * ys[i];
+                } else {
+                    for (std::size_t i = 0; i < n; ++i)
+                        r->floats[i] = which == Builtin::vadd ? float_of(a.get(i)) + float_of(b.get(i))
+                                                              : float_of(a.get(i)) * float_of(b.get(i));
+                }
+                return {Tag::list, r};
+            }
+            auto* r = new ListObj(ListObj::Elem::integer);
+            r->ints.resize(n);
+            const Op op = which == Builtin::vadd ? Op::add : Op::multiply;
+            for (std::size_t i = 0; i < n; ++i) r->ints[i] = arithmetic(op, int_of(a.get(i)), int_of(b.get(i)));
+            return {Tag::list, r};
+        }
+        case Builtin::vscale: {
+            const auto& a = list_of(args[0]);
+            const auto n = a.size();
+            const bool floating = a.elem == ListObj::Elem::floating
+                || (a.elem == ListObj::Elem::value && n > 0 && a.get(0).tag == Tag::floating);
+            if (floating) {
+                const double k = float_of(args[1]);
+                auto* r = new ListObj(ListObj::Elem::floating);
+                r->floats.resize(n);
+                if (a.elem == ListObj::Elem::floating) {
+                    const double* xs = a.floats.data();
+                    double* out = r->floats.data();
+                    for (std::size_t i = 0; i < n; ++i) out[i] = xs[i] * k;
+                } else {
+                    for (std::size_t i = 0; i < n; ++i) r->floats[i] = float_of(a.get(i)) * k;
+                }
+                return {Tag::list, r};
+            }
+            const Int k = int_of(args[1]);
+            auto* r = new ListObj(ListObj::Elem::integer);
+            r->ints.resize(n);
+            for (std::size_t i = 0; i < n; ++i) r->ints[i] = arithmetic(Op::multiply, int_of(a.get(i)), k);
+            return {Tag::list, r};
         }
         case Builtin::fixed: {
             const auto digits = int_of(args[1]);

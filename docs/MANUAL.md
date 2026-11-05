@@ -468,8 +468,16 @@ Built-ins are always in scope (no import). Grouped by purpose; `T`/`U` denote an
 | `index_of(xs, x) -> i64` | First index of a value, or −1. |
 | `sort(xs)` · `reverse(xs)` · `clear(xs)` | In place; `sort` on `i64`/`f64`/`str`/`bool`. |
 | `fill(xs, x)` · `extend(xs, ys)` | Overwrite all / append another list. |
-| `sum(xs)` | Sum of a list of `i64` or `f64`. |
+| `sum(xs)` | Sum of a list of `i64` or `f64` (reads flat storage directly). |
 | `min_of(xs)` · `max_of(xs)` | Minimum / maximum of a list of `i64`/`f64`/`str` (empty is a runtime error). |
+
+**Bulk numeric (1.4)** — over `list[i64]` or `list[f64]`; both operands the same element type; a length mismatch is a runtime error. The `f64` paths walk the flat backing buffer and auto-vectorize (see `PERFORMANCE.md` §4b); the `i64` paths stay overflow-checked and exact.
+
+| Signature | Description |
+|---|---|
+| `dot(a, b) -> T` | Inner product `Σ aᵢ·bᵢ` (the `f64` form uses a blocked, associative reduction). |
+| `vadd(a, b) -> list[T]` · `vmul(a, b) -> list[T]` | Element-wise sum / product into a new list. |
+| `vscale(xs, k) -> list[T]` | Every element times the scalar `k` (same type as the elements), into a new list. |
 
 **Dicts**
 
@@ -494,6 +502,7 @@ Built-ins are always in scope (no import). Grouped by purpose; `T`/`U` denote an
 | Signature | Description |
 |---|---|
 | `abs(n)` · `min(a, b)` · `max(a, b)` | On `i64`/`f64` (`min`/`max` also `str`). |
+| `wrapping_add(a, b)` · `wrapping_sub(a, b)` · `wrapping_mul(a, b)` | `i64`, two's-complement wraparound, **no overflow check** (1.4) — for hot loops where wraparound is intended. |
 | `sqrt(x)` · `pow(a, b)` | Square root; power (`f64`). |
 | `floor(x)` · `ceil(x)` · `round(x)` | Rounding to `i64`. |
 | `sin cos tan asin acos atan` · `atan2(y, x)` | Trigonometry (`f64`). |

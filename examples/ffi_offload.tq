@@ -1,0 +1,31 @@
+# Offloading heavy numeric work to a compiled library through the C FFI.
+#
+# The data lives in the library, addressed by i64 handles; Tacqor sends scalars and gets a
+# scalar back. This is the same interface a BLAS, a SIMD kernel, or a CUDA/OpenCL binding
+# presents — swap libaccel for a GPU backend and this Tacqor code does not change.
+#
+# Build the library, then the program, pointing the native build at it:
+#   cc -O3 -fPIC -shared examples/ffi_offload.c -o /tmp/libaccel.so
+#   TACQOR_CXXFLAGS="-L/tmp -Wl,-rpath,/tmp" tacqor build --native examples/ffi_offload.tq -o offload
+#   ./offload
+
+extern def accel_alloc(n: i64) -> i64 from "accel"
+extern def accel_fill(handle: i64, value: f64) from "accel"
+extern def accel_scale(handle: i64, k: f64) from "accel"
+extern def accel_dot(a: i64, b: i64, reps: i64) -> f64 from "accel"
+extern def accel_free(handle: i64) from "accel"
+
+def main():
+    let n: i64 = 16384
+    let a: i64 = accel_alloc(n)
+    let b: i64 = accel_alloc(n)
+    accel_fill(a, 1.0)
+    accel_scale(a, 1.5)          # a is now all 1.5
+    accel_fill(b, 2.0)           # b is all 2.0
+
+    # The whole 327 M-multiply-add reduction happens inside the library in one call.
+    let result: f64 = accel_dot(a, b, 20000)
+    print("offloaded dot = " + str(result))     # 9.8304e8
+
+    accel_free(a)
+    accel_free(b)
