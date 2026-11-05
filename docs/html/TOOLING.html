@@ -233,6 +233,20 @@ Commands: <code>:show</code>, <code>:reset</code>,
 recompiled and re-run after each entry with only new output shown, so
 side effects repeat. Compile and runtime errors are printed without
 ending the session; <code>exit(...)</code> does end it.</p>
+<h3 id="tacqor-lsp"><code>tacqor lsp</code></h3>
+<p>Runs a Language Server over stdin/stdout, so any editor with an LSP
+client (VS Code, Neovim, Helix, Emacs, …) gets live diagnostics without
+the VS Code extension. It speaks LSP/JSON-RPC with
+<code>Content-Length</code> framing: it answers <code>initialize</code>
+(advertising full-document sync), and on
+<code>textDocument/didOpen</code> and <code>didChange</code> it
+recompiles the buffer and sends
+<code>textDocument/publishDiagnostics</code> (ranges are 0-based;
+severity 1 = error, 2 = warning), clearing them on
+<code>didClose</code>. It compiles the file as a module (no
+<code>main</code> required). Point your editor's LSP config at
+<code>tacqor lsp</code> for files with the <code>.tq</code> extension.
+Hover, completion and go-to-definition are not implemented yet.</p>
 <h3
 id="tacqor-add-source-name--tacqor-install--tacqor-remove-name"><code>tacqor add SOURCE [NAME]</code>
 · <code>tacqor install</code> · <code>tacqor remove NAME</code></h3>

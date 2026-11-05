@@ -1,6 +1,6 @@
 CXX ?= c++
 CXXFLAGS ?= -O3 -Wall -Wextra -Wpedantic
-SOURCES = src/main.cpp src/compiler.cpp src/runtime.cpp src/artifact.cpp src/native.cpp
+SOURCES = src/main.cpp src/compiler.cpp src/runtime.cpp src/artifact.cpp src/native.cpp src/lsp.cpp
 TARGET ?= tacqor
 
 .PHONY: all test

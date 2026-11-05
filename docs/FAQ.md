@@ -78,7 +78,7 @@ The toolchain is portable C++17: `build-windows.cmd` builds it with MSVC and `ma
 
 ### Is it production ready?
 
-The toolchain has a differential test suite across all four execution modes, runs clean under AddressSanitizer and UndefinedBehaviorSanitizer, and survived 6,100 fuzz cases with no crashes. The language has no planned breaking changes. What it does not have yet: a large ecosystem, an LSP server, a debugger, and shared-memory concurrency (the concurrency it does have is share-nothing by design — `parallel_run` and `http.serve_concurrent`). See `ROADMAP.md`.
+The toolchain has a differential test suite across all four execution modes, runs clean under AddressSanitizer and UndefinedBehaviorSanitizer, and survived 6,100 fuzz cases with no crashes. The language has no planned breaking changes. It also has an LSP server (`tacqor lsp`), so editors beyond VS Code get live diagnostics. What it does not have yet: a large ecosystem, a debugger, richer editor features (hover, go-to-definition), and shared-memory concurrency (the concurrency it does have is share-nothing by design — `parallel_run` and `http.serve_concurrent`). See `ROADMAP.md`.
 
 ### Can I call C code?
 

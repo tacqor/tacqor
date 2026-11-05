@@ -184,9 +184,11 @@ and BSD sockets elsewhere.</p>
 <p>The toolchain has a differential test suite across all four execution
 modes, runs clean under AddressSanitizer and UndefinedBehaviorSanitizer,
 and survived 6,100 fuzz cases with no crashes. The language has no
-planned breaking changes. What it does not have yet: a large ecosystem,
-an LSP server, a debugger, and shared-memory concurrency (the
-concurrency it does have is share-nothing by design —
+planned breaking changes. It also has an LSP server
+(<code>tacqor lsp</code>), so editors beyond VS Code get live
+diagnostics. What it does not have yet: a large ecosystem, a debugger,
+richer editor features (hover, go-to-definition), and shared-memory
+concurrency (the concurrency it does have is share-nothing by design —
 <code>parallel_run</code> and <code>http.serve_concurrent</code>). See
 <code>ROADMAP.md</code>.</p>
 <h3 id="can-i-call-c-code">Can I call C code?</h3>

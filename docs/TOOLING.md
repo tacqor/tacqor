@@ -60,6 +60,10 @@ Create `NAME/` with `main.tq` (a small program using the standard library), `tes
 
 Interactive scratchpad. Enter definitions (`def`, `struct`, `trait`, `import`, `const`) or statements; a lone expression is printed; a line ending in `:` opens a block closed by an empty line. Commands: `:show`, `:reset`, `:quit`/`:q`, `:help`. The session is recompiled and re-run after each entry with only new output shown, so side effects repeat. Compile and runtime errors are printed without ending the session; `exit(...)` does end it.
 
+### `tacqor lsp`
+
+Runs a Language Server over stdin/stdout, so any editor with an LSP client (VS Code, Neovim, Helix, Emacs, …) gets live diagnostics without the VS Code extension. It speaks LSP/JSON-RPC with `Content-Length` framing: it answers `initialize` (advertising full-document sync), and on `textDocument/didOpen` and `didChange` it recompiles the buffer and sends `textDocument/publishDiagnostics` (ranges are 0-based; severity 1 = error, 2 = warning), clearing them on `didClose`. It compiles the file as a module (no `main` required). Point your editor's LSP config at `tacqor lsp` for files with the `.tq` extension. Hover, completion and go-to-definition are not implemented yet.
+
 ### `tacqor add SOURCE [NAME]` · `tacqor install` · `tacqor remove NAME`
 
 Package management in the current directory. `add` copies a folder or `git clone --depth 1`s a URL (anything containing `://`, starting with `git@`, or ending in `.git`) into `packages/NAME` (default name: the last path component without `.git`), strips its `.git`, and records `NAME SOURCE` in `tacqor.pkg`. `install` fetches every manifest entry whose folder is missing. `remove` deletes the folder and the entry. Import a package with `import NAME` (→ `packages/NAME/lib.tq`) or `import NAME.module` (→ `packages/NAME/module.tq`).

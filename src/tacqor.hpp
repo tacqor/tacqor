@@ -179,5 +179,6 @@ void write_artifact(const std::filesystem::path& output, std::string_view bytes,
 std::filesystem::path current_executable(const char* argv0);
 std::string generate_native(const Program& program);
 void build_native(const Program& program, const std::filesystem::path& output);
+int run_lsp(const std::vector<std::filesystem::path>& search);
 
 }  // namespace tacqor

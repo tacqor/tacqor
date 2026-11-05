@@ -178,6 +178,7 @@ void write_artifact(const std::filesystem::path& output, std::string_view bytes,
 std::filesystem::path current_executable(const char* argv0);
 std::string generate_native(const Program& program);
 void build_native(const Program& program, const std::filesystem::path& output);
+int run_lsp(const std::vector<std::filesystem::path>& search);
 
 }  // namespace tacqor
 // Shared value runtime: used by the bytecode VM (runtime.cpp) and embedded verbatim into
@@ -295,9 +296,9 @@ inline Int shift_right(Int a, Int b) {
     return a >> b;  // arithmetic shift: the sign is kept
 }
 
-inline std::string read_text(std::istream& input, std::size_t limit) {
-    std::string)tacqor_runtime",
-R"tacqor_runtime( result;
+inline std::string read)tacqor_runtime",
+R"tacqor_runtime(_text(std::istream& input, std::size_t limit) {
+    std::string result;
     char buffer[65536];
     while (input) {
         input.read(buffer, sizeof(buffer));
@@ -592,11 +593,11 @@ struct ClosureObj : Obj {
     std::vector<Value> captures;
     ClosureObj() { gc_track(this); }
     void each_child(const std::function<void(Value&)>& visit) override { for (auto& item : captures) visit(item); }
-    void clear_children() override { captures.clear(); }
+    void clear_children() override { capture)tacqor_runtime",
+R"tacqor_runtime(s.clear(); }
 };
 
-// Option and Result values: `which` is 1 for )tacqor_runtime",
-R"tacqor_runtime(Some/Ok and 0 for None/Err.
+// Option and Result values: `which` is 1 for Some/Ok and 0 for None/Err.
 struct VariantObj : Obj {
     std::uint8_t which = 0;
     bool is_result = false;
@@ -882,9 +883,9 @@ inline int compare(const Value& a, const Value& b) {
         case Tag::floating: return a.f < b.f ? -1 : a.f > b.f;
         case Tag::boolean: return a.b < b.b ? -1 : a.b > b.b;
         case Tag::text: {
-            const int order = text_of(a).compare(text_of(b));
-            re)tacqor_runtime",
-R"tacqor_runtime(turn order < 0 ? -1 : order > 0;
+            c)tacqor_runtime",
+R"tacqor_runtime(onst int order = text_of(a).compare(text_of(b));
+            return order < 0 ? -1 : order > 0;
         }
         default: throw std::runtime_error("values of this type cannot be ordered");
     }
@@ -1169,10 +1170,10 @@ inline Value slice_value(const Value& container, Int lo, Int hi) {
         const auto [a, b] = clamp_slice(lo, hi, items.size());
         return {Tag::list, items.slice(a, b)};
     }
-    const auto& text = text_of(container);
+    const auto& text = text_of(contain)tacqor_runtime",
+R"tacqor_runtime(er);
     const auto [a, b] = clamp_slice(lo, hi, text.size());
-)tacqor_runtime",
-R"tacqor_runtime(    return make_text(text.substr(a, b - a));
+    return make_text(text.substr(a, b - a));
 }
 inline Int length_of(const Value& value) {
     if (value.tag == Tag::text) return checked_size(text_of(value).size());
@@ -1455,9 +1456,9 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             const auto order = compare(args[0], args[1]);
             return (which == Builtin::min) == (order <= 0) ? args[0] : args[1];
         }
-        case Builtin::sqrt: return std::sqrt(float_of(args[0]));
-        case Builtin::pow: return std::pow(float_of(args[0]))tacqor_runtime",
-R"tacqor_runtime(, float_of(args[1]));
+        case Builtin::sqrt: return std::sqrt(float_of(args[0]))tacqor_runtime",
+R"tacqor_runtime();
+        case Builtin::pow: return std::pow(float_of(args[0]), float_of(args[1]));
         case Builtin::floor: return float_to_int(std::floor(float_of(args[0])));
         case Builtin::ceil: return float_to_int(std::ceil(float_of(args[0])));
         case Builtin::round: return float_to_int(std::round(float_of(args[0])));
@@ -1697,9 +1698,9 @@ R"tacqor_runtime(, float_of(args[1]));
         case Builtin::write: case Builtin::eprint: {
             const auto text = value_text(args[0], ctx);
             std::lock_guard<std::mutex> guard(ctx.output_lock);
-            if (which == Builtin::write) ctx.output << text;
-      )tacqor_runtime",
-R"tacqor_runtime(      else {
+    )tacqor_runtime",
+R"tacqor_runtime(        if (which == Builtin::write) ctx.output << text;
+            else {
                 ctx.output.flush();
                 std::cerr << text << '\n';
             }

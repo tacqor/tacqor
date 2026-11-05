@@ -4,7 +4,7 @@ What is planned, in rough priority order, and what is deliberately not planned. 
 
 ## 1.3 — developer experience
 
-- **Language server (LSP).** `tacqor diagnose` already provides diagnostics; an LSP server would add go-to-definition, hover types, completion and rename, reusing the compiler's symbol tables. Editors other than VS Code would get full support for free.
+- **Language server (LSP).** Shipped in 1.3: `tacqor lsp` speaks LSP over stdio and publishes live diagnostics (errors and warnings) to any editor with an LSP client, not just VS Code. Still to add, reusing the compiler's symbol tables: go-to-definition, hover types, completion and rename.
 - **Formatter.** `tacqor fmt` implementing `docs/STYLE.md`, round-tripping comments.
 - **Debugger.** Breakpoints, stepping and variable inspection in the VM, driven over a simple text protocol so editors can integrate it; a source-line map already exists in the bytecode.
 - **Test runner improvements.** Filtering by name, timing per test, `--fail-fast`, discovering `test_*.tq` files in a folder.
