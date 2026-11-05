@@ -237,10 +237,14 @@ constexpr auto high = std::numeric_limits<Int>::max();
 
 #if defined(__GNUC__) || defined(__clang__)
 #define TACQOR_BUILTIN_OVERFLOW 1
-#if !defined(TACQOR_NO_THREADED)
-#define TACQOR_THREADED 1
-#pragma GCC diagnostic ignored "-Wpedantic"  // computed goto is a GCC/Clang extension used on purpose
 #endif
+// Threaded (computed-goto) dispatch is a GCC extension. Clang — including Apple Clang — rejects an
+// indirect goto that can jump into the scope of a variable with a non-trivial destructor, and the
+// dispatch loop declares such variables (Value) in its arms, so only real GCC uses it. Clang and
+// everything else use the switch-based dispatch; the differential test suite proves the two agree.
+#if defined(__GNUC__) && !defined(__clang__) && !defined(TACQOR_NO_THREADED)
+#define TACQOR_THREADED 1
+#pragma GCC diagnostic ignored "-Wpedantic"  // computed goto is a GCC extension used on purpose
 #endif
 
 inline Int arithmetic(Op op, Int a, Int b) {
@@ -284,7 +288,8 @@ inline Int arithmetic(Op op, Int a, Int b) {
             if (b == 0) throw std::domain_error("modulo by zero");
             if (b == -1) return 0;
             const auto remainder = a % b;
-            return remainder && ((remainder < 0) != (b < 0)) ? remainder + b : remainder;
+            return rema)tacqor_runtime",
+R"tacqor_runtime(inder && ((remainder < 0) != (b < 0)) ? remainder + b : remainder;
         }
         default: throw std::logic_error("invalid arithmetic opcode");
     }
@@ -296,8 +301,7 @@ inline Int shift_left(Int a, Int b) {
     return static_cast<Int>(static_cast<std::uint64_t>(a) << b);  // wrapping, like Rust's wrapping_shl
 }
 inline Int shift_right(Int a, Int b) {
-    if ()tacqor_runtime",
-R"tacqor_runtime(b < 0 || b > 63) throw std::runtime_error("shift count must be between 0 and 63");
+    if (b < 0 || b > 63) throw std::runtime_error("shift count must be between 0 and 63");
     return a >> b;  // arithmetic shift: the sign is kept
 }
 
@@ -585,7 +589,8 @@ struct ListObj : Obj {
 
 struct ObjectObj : Obj {
     std::uint32_t type = 0;
-    std::vector<Value> fields;
+    std::ve)tacqor_runtime",
+R"tacqor_runtime(ctor<Value> fields;
     ObjectObj() { gc_track(this); }
     void each_child(const std::function<void(Value&)>& visit) override { for (auto& item : fields) visit(item); }
     void clear_children() override { fields.clear(); }
@@ -595,8 +600,7 @@ struct ObjectObj : Obj {
 struct ClosureObj : Obj {
     std::uint32_t function = 0;
     std::vector<Value> captures;
-    ClosureObj() { gc_track(th)tacqor_runtime",
-R"tacqor_runtime(is); }
+    ClosureObj() { gc_track(this); }
     void each_child(const std::function<void(Value&)>& visit) override { for (auto& item : captures) visit(item); }
     void clear_children() override { captures.clear(); }
 };
@@ -872,7 +876,8 @@ inline bool equal(const Value& a, const Value& b, int depth = 0) {
         case Tag::variant: {
             const auto& x = variant_of(a);
             const auto& y = variant_of(b);
-            if (x.which != y.which) return false;
+          )tacqor_runtime",
+R"tacqor_runtime(  if (x.which != y.which) return false;
             if (x.payload.tag != y.payload.tag) return false;
             return x.payload.tag == Tag::unit || equal(x.payload, y.payload, depth + 1);
         }
@@ -883,8 +888,7 @@ inline bool equal(const Value& a, const Value& b, int depth = 0) {
 inline int compare(const Value& a, const Value& b) {
     if (a.tag != b.tag) throw std::runtime_error("invalid comparison types");
     switch (a.tag) {
-        case Tag::integer: return a.i < b.i ? -1 : a.i > b.)tacqor_runtime",
-R"tacqor_runtime(i;
+        case Tag::integer: return a.i < b.i ? -1 : a.i > b.i;
         case Tag::floating: return a.f < b.f ? -1 : a.f > b.f;
         case Tag::boolean: return a.b < b.b ? -1 : a.b > b.b;
         case Tag::text: {
@@ -1161,7 +1165,8 @@ inline void list_set_bool(const Value& list, Int index, bool value) {
     if (items.elem == ListObj::Elem::boolean) items.bools[i] = value; else items.values[i].b = value;
 }
 inline void list_push(const Value& list, Value value) { list_of(list).push(std::move(value)); }
-inline Value list_pop(const Value& list) { return list_of(list).pop(); }
+inline Value list_pop(const Value& list) { return)tacqor_runtime",
+R"tacqor_runtime( list_of(list).pop(); }
 inline Value text_at(const Value& text, Int index) {
     const auto& s = text_of(text);
     return make_text(std::string(1, s[checked_index(index, s.size(), "string")]));
@@ -1170,8 +1175,7 @@ struct Context;
 inline const Value& dict_at(const Value& dict, const Value& key, const Context& ctx);
 inline Value slice_value(const Value& container, Int lo, Int hi) {
     if (container.tag == Tag::list) {
-        const auto& items = list_of)tacqor_runtime",
-R"tacqor_runtime((container);
+        const auto& items = list_of(container);
         const auto [a, b] = clamp_slice(lo, hi, items.size());
         return {Tag::list, items.slice(a, b)};
     }
@@ -1456,7 +1460,8 @@ inline std::string run_capture(const std::string& command) {
     ::pclose(pipe);
 #endif
     return out;
-}
+)tacqor_runtime",
+R"tacqor_runtime(}
 
 // Runs a builtin on `args` (builtin_arity[which] values) and returns its result (unit for procedures).
 inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
@@ -1467,8 +1472,7 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             line += '\n';
             std::lock_guard<std::mutex> guard(ctx.output_lock);
             ctx.output << line;
-   )tacqor_runtime",
-R"tacqor_runtime(         if (!ctx.output) throw std::runtime_error("could not write output");
+            if (!ctx.output) throw std::runtime_error("could not write output");
             return {};
         }
         case Builtin::argc: return checked_size(ctx.arguments.size());
@@ -1694,7 +1698,8 @@ R"tacqor_runtime(         if (!ctx.output) throw std::runtime_error("could not w
         case Builtin::seed: random_engine().seed(static_cast<std::uint64_t>(int_of(args[0]))); return {};
         case Builtin::file_exists: {
             std::error_code ignored;
-            return std::filesystem::exists(std::filesystem::u8path(text_of(args[0])), ignored);
+            return std::filesystem::e)tacqor_runtime",
+R"tacqor_runtime(xists(std::filesystem::u8path(text_of(args[0])), ignored);
         }
         case Builtin::read_lines: {
             const auto& path = text_of(args[0]);
@@ -1702,8 +1707,7 @@ R"tacqor_runtime(         if (!ctx.output) throw std::runtime_error("could not w
             if (!input) throw std::runtime_error("could not open file: " + path);
             const auto content = read_text(input, text_limit);
             std::vector<Value> lines;
-            std::siz)tacqor_runtime",
-R"tacqor_runtime(e_t start = 0;
+            std::size_t start = 0;
             while (start < content.size()) {
                 auto end = content.find('\n', start);
                 if (end == std::string::npos) end = content.size();
@@ -1917,7 +1921,8 @@ R"tacqor_runtime(e_t start = 0;
             // 64-bit FNV-1a, folded into the non-negative range so it can be used as a list index.
             std::uint64_t h = 14695981039346656037ULL;
             for (const unsigned char ch : text_of(args[0])) { h ^= ch; h *= 1099511628211ULL; }
-            return static_cast<Int>(h & 0x7FFFFFFFFFFFFFFFULL);
+            return s)tacqor_runtime",
+R"tacqor_runtime(tatic_cast<Int>(h & 0x7FFFFFFFFFFFFFFFULL);
         }
         case Builtin::count: break;
     }
@@ -1928,8 +1933,7 @@ R"tacqor_runtime(e_t start = 0;
 // capture values that need no reference counting.
 inline void parallel_check(const Value& mapper) {
     for (const auto& captured : closure_of(mapper).captures) {
-        if (captured.heap()) th)tacqor_runtime",
-R"tacqor_runtime(row std::runtime_error("a parallel mapper may only capture i64, f64, or bool values");
+        if (captured.heap()) throw std::runtime_error("a parallel mapper may only capture i64, f64, or bool values");
     }
 }
 

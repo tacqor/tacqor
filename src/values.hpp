@@ -54,10 +54,14 @@ constexpr auto high = std::numeric_limits<Int>::max();
 
 #if defined(__GNUC__) || defined(__clang__)
 #define TACQOR_BUILTIN_OVERFLOW 1
-#if !defined(TACQOR_NO_THREADED)
-#define TACQOR_THREADED 1
-#pragma GCC diagnostic ignored "-Wpedantic"  // computed goto is a GCC/Clang extension used on purpose
 #endif
+// Threaded (computed-goto) dispatch is a GCC extension. Clang — including Apple Clang — rejects an
+// indirect goto that can jump into the scope of a variable with a non-trivial destructor, and the
+// dispatch loop declares such variables (Value) in its arms, so only real GCC uses it. Clang and
+// everything else use the switch-based dispatch; the differential test suite proves the two agree.
+#if defined(__GNUC__) && !defined(__clang__) && !defined(TACQOR_NO_THREADED)
+#define TACQOR_THREADED 1
+#pragma GCC diagnostic ignored "-Wpedantic"  // computed goto is a GCC extension used on purpose
 #endif
 
 inline Int arithmetic(Op op, Int a, Int b) {
