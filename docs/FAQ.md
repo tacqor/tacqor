@@ -82,7 +82,7 @@ The toolchain has a differential test suite across all four execution modes, run
 
 ### Can I call C code?
 
-Not directly. `run(command)` and `run_capture(command)` run external programs; TCP sockets talk to services. A foreign-function interface is on the roadmap. In the meantime, `tacqor emit` gives you the C++ for a program, which can be linked with other C++ by hand.
+Yes, from native builds. An `extern def` declaration names a C function, and a `tacqor build --native` binary calls it directly — `extern def sqrt(x: f64) -> f64 from "m"` links libm and calls `sqrt`. Arguments and results marshal across the boundary as scalars (`i64`, `f64`, `bool`) and strings (`str` ↔ `const char*`); pointers and structs are not supported yet. Under the bytecode VM a foreign call reports that a native build is required (a `dlopen` path for the VM is on the roadmap). `run(command)` and `run_capture(command)` run external programs, and TCP sockets talk to services, for anything outside that boundary.
 
 ### Why does the REPL repeat side effects?
 

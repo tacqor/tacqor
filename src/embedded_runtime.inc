@@ -139,12 +139,23 @@ struct Function {
     std::vector<Instruction> code;
 };
 
+// A function that calls into a C symbol. The native backend emits a direct call; the bytecode
+// VM runs the function's synthesised body, which reports that a native build is required. Not
+// serialised into .tqb (foreign calls are a native-build feature), so build --native works from
+// source, which is the documented path.
+struct ForeignFunction {
+    std::uint32_t function;      // index into Program::functions
+    std::string symbol;          // C symbol to call
+    std::string library;         // library to link (-l<name>); empty means none
+};
+
 struct Program {
     std::vector<TypeInfo> types;      // index 0 is always unit
     std::vector<StructInfo> structs;
     std::vector<TraitInfo> traits;
     std::vector<Function> functions;
     std::vector<std::string> texts;
+    std::vector<ForeignFunction> foreign;
     std::uint32_t entry = 0;
 };
 
@@ -285,7 +296,8 @@ inline Int shift_right(Int a, Int b) {
 }
 
 inline std::string read_text(std::istream& input, std::size_t limit) {
-    std::string result;
+    std::string)tacqor_runtime",
+R"tacqor_runtime( result;
     char buffer[65536];
     while (input) {
         input.read(buffer, sizeof(buffer));
@@ -299,8 +311,7 @@ inline std::string read_text(std::istream& input, std::size_t limit) {
 
 // ---------------------------------------------------------------------------
 // Values: 16 bytes, immediates inline, heap objects intrusively reference counted.
-// ----------)tacqor_runtime",
-R"tacqor_runtime(-----------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 enum class Tag : std::uint8_t { unit, integer, floating, boolean, text, list, dict, object, function, variant };
 
@@ -584,7 +595,8 @@ struct ClosureObj : Obj {
     void clear_children() override { captures.clear(); }
 };
 
-// Option and Result values: `which` is 1 for Some/Ok and 0 for None/Err.
+// Option and Result values: `which` is 1 for )tacqor_runtime",
+R"tacqor_runtime(Some/Ok and 0 for None/Err.
 struct VariantObj : Obj {
     std::uint8_t which = 0;
     bool is_result = false;
@@ -599,8 +611,7 @@ inline ClosureObj& closure_of(const Value& v) {
     return *static_cast<ClosureObj*>(v.o);
 }
 inline VariantObj& variant_of(const Value& v) {
-    if (v.tag != Tag::variant) throw)tacqor_runtime",
-R"tacqor_runtime( std::runtime_error("invalid bytecode value type (expected Option or Result)");
+    if (v.tag != Tag::variant) throw std::runtime_error("invalid bytecode value type (expected Option or Result)");
     return *static_cast<VariantObj*>(v.o);
 }
 inline Value make_variant(bool which, Value payload, bool is_result = false) {
@@ -872,7 +883,8 @@ inline int compare(const Value& a, const Value& b) {
         case Tag::boolean: return a.b < b.b ? -1 : a.b > b.b;
         case Tag::text: {
             const int order = text_of(a).compare(text_of(b));
-            return order < 0 ? -1 : order > 0;
+            re)tacqor_runtime",
+R"tacqor_runtime(turn order < 0 ? -1 : order > 0;
         }
         default: throw std::runtime_error("values of this type cannot be ordered");
     }
@@ -887,8 +899,7 @@ inline void ListObj::sort() {
     }
 }
 
-inline std::string format_float(doub)tacqor_runtime",
-R"tacqor_runtime(le value) {
+inline std::string format_float(double value) {
     if (std::isnan(value)) return "nan";
     if (std::isinf(value)) return value < 0 ? "-inf" : "inf";
     char buffer[64];
@@ -1160,7 +1171,8 @@ inline Value slice_value(const Value& container, Int lo, Int hi) {
     }
     const auto& text = text_of(container);
     const auto [a, b] = clamp_slice(lo, hi, text.size());
-    return make_text(text.substr(a, b - a));
+)tacqor_runtime",
+R"tacqor_runtime(    return make_text(text.substr(a, b - a));
 }
 inline Int length_of(const Value& value) {
     if (value.tag == Tag::text) return checked_size(text_of(value).size());
@@ -1171,8 +1183,7 @@ inline bool contains_value(const Value& item, const Value& container) {
     if (container.tag == Tag::list) {
         const auto& items = list_of(container);
         if (items.elem == ListObj::Elem::integer) return std::find(items.ints.begin(), items.ints.end(), item.i) != items.ints.end();
-       )tacqor_runtime",
-R"tacqor_runtime( for (std::size_t i = 0; i < items.size(); ++i) if (equal(items.get(i), item)) return true;
+        for (std::size_t i = 0; i < items.size(); ++i) if (equal(items.get(i), item)) return true;
         return false;
     }
     if (container.tag == Tag::text) return text_of(container).find(text_of(item)) != std::string::npos;
@@ -1445,7 +1456,8 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             return (which == Builtin::min) == (order <= 0) ? args[0] : args[1];
         }
         case Builtin::sqrt: return std::sqrt(float_of(args[0]));
-        case Builtin::pow: return std::pow(float_of(args[0]), float_of(args[1]));
+        case Builtin::pow: return std::pow(float_of(args[0]))tacqor_runtime",
+R"tacqor_runtime(, float_of(args[1]));
         case Builtin::floor: return float_to_int(std::floor(float_of(args[0])));
         case Builtin::ceil: return float_to_int(std::ceil(float_of(args[0])));
         case Builtin::round: return float_to_int(std::round(float_of(args[0])));
@@ -1454,8 +1466,7 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
         case Builtin::insert: {
             auto& list = list_of(args[0]);
             list.insert(checked_index(int_of(args[1]), list.size() + 1, "list"), std::move(args[2]));
-            return )tacqor_runtime",
-R"tacqor_runtime({};
+            return {};
         }
         case Builtin::remove_at: {
             auto& list = list_of(args[0]);
@@ -1687,7 +1698,8 @@ R"tacqor_runtime({};
             const auto text = value_text(args[0], ctx);
             std::lock_guard<std::mutex> guard(ctx.output_lock);
             if (which == Builtin::write) ctx.output << text;
-            else {
+      )tacqor_runtime",
+R"tacqor_runtime(      else {
                 ctx.output.flush();
                 std::cerr << text << '\n';
             }
@@ -1701,8 +1713,7 @@ R"tacqor_runtime({};
         }
         case Builtin::char_count: return checked_size(utf8_chars(text_of(args[0])).size());
         case Builtin::repeat: {
-            const au)tacqor_runtime",
-R"tacqor_runtime(to& text = text_of(args[0]);
+            const auto& text = text_of(args[0]);
             const auto count = int_of(args[1]);
             if (count < 0) throw std::runtime_error("repeat expects a non-negative count");
             if (static_cast<std::uint64_t>(count) * text.size() > text_limit) throw std::runtime_error("text exceeds the size limit");

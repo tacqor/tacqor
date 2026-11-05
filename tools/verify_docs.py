@@ -12,7 +12,7 @@ for doc in docs:
             continue
         first = body.lstrip().split("\n", 1)[0]
         line = text[:m.start()].count("\n") + 1
-        if not re.match(r"(import |def |struct |trait |const |#!)", first) or "def " not in body:
+        if not re.match(r"(import |def |struct |trait |const |extern |#!)", first) or "def " not in body:
             skipped += 1
             continue
         with tempfile.TemporaryDirectory() as tmp:
@@ -21,7 +21,7 @@ for doc in docs:
             env = dict(os.environ, TACQOR_HOME=str(root))
             needs_main = "def main" in body
             cmd = [str(tacqor), "check" if not needs_main else "run", str(path)]
-            if needs_main and ("tcp_" in body or "http." in body or "input()" in body or "args()" in body or "sleep_ms" in body or "run(" in body or "serve" in body):
+            if needs_main and ("tcp_" in body or "http." in body or "input()" in body or "args()" in body or "sleep_ms" in body or "run(" in body or "serve" in body or "extern " in body):
                 cmd = [str(tacqor), "check", str(path)]
             r = subprocess.run(cmd, cwd=tmp, capture_output=True, text=True, timeout=60, env=env)
             label = f"{doc.name}:{line}"
