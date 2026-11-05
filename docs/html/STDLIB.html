@@ -438,6 +438,38 @@ bodies up to 8 MB.</p>
 <code>assert_some(option) -&gt; T</code>,
 <code>assert_ok(result) -&gt; T</code>. Failures report the values
 involved.</p>
+<h3 id="stdtime"><code>std.time</code></h3>
+<p>Dates and times in UTC, built on <code>unix_time()</code>.
+<code>from_unix(seconds) -&gt; DateTime</code> and
+<code>now() -&gt; DateTime</code> convert an epoch time to a
+<code>DateTime { year, month, day, hour, minute, second, weekday }</code>
+(weekday 0=Sunday); <code>to_unix(dt)</code> is the inverse. Formatting:
+<code>iso(dt)</code> (<code>"2026-11-04T20:27:05Z"</code>),
+<code>date_string(dt)</code>, <code>time_string(dt)</code>,
+<code>weekday_name(dt)</code>, <code>month_name(dt)</code>. Calendar
+helpers: <code>is_leap(year)</code>,
+<code>days_in_month(year, month)</code>,
+<code>days_from_civil(year, month, day)</code>. No time-zone database —
+everything is UTC.</p>
+<h3 id="stdrandom"><code>std.random</code></h3>
+<p>Typed conveniences over the built-in generator (call
+<code>seed(n)</code> first for a reproducible stream).
+<code>fraction() -&gt; f64</code> in [0, 1);
+<code>integer(lo, hi)</code> inclusive; <code>below(n)</code> in [0,
+n-1]; <code>dice(sides)</code> in [1, sides]; <code>boolean(p)</code>
+true with probability <code>p</code>. On lists:
+<code>choice(items) -&gt; Option[T]</code> (None if empty),
+<code>shuffle(items) -&gt; list[T]</code> (a new list, Fisher-Yates),
+<code>sample(items, k) -&gt; list[T]</code> (k distinct elements).</p>
+<h3 id="stdos"><code>std.os</code></h3>
+<p>The environment and path names (file and process I/O is already in
+the built-ins). <code>env_or(name, fallback)</code> reads an environment
+variable with a default. Path helpers treat <code>/</code>-separated
+strings: <code>join(a, b)</code> (absolute <code>b</code> wins),
+<code>basename(path)</code>, <code>dirname(path)</code>,
+<code>extname(path)</code> (e.g. <code>".gz"</code>, <code>""</code>
+when none, and a leading dot is not an extension),
+<code>stem(path)</code> (basename without extension).</p>
 <p>* <code>capitalize</code> lives in <code>std.strings</code>.</p>
 </body>
 </html>

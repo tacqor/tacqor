@@ -1,0 +1,77 @@
+# Standard library: environment and paths. Import with `import std.os`.
+#
+# File and process access is already in the built-ins (`read_text`, `write_text`,
+# `read_lines`, `file_exists`, `list_dir`, `make_dir`, `delete_file`, `run`,
+# `run_capture`, `env`, `args`). This module adds the ergonomic layer on top:
+# reading the environment with a fallback, and the usual path-name manipulations.
+# Paths are treated as '/'-separated byte strings.
+
+# The value of an environment variable, or `fallback` when it is unset.
+def env_or(name: str, fallback: str) -> str:
+    match env(name):
+        case Some(value):
+            return value
+        case None:
+            return fallback
+
+# Byte index of the last '/', or -1 if there is none.
+def last_slash(path: str) -> i64:
+    var cut = -1
+    var i = 0
+    while i < len(path):
+        if path[i:i + 1] == "/":
+            cut = i
+        i = i + 1
+    return cut
+
+# Join two path components with a single '/'. An empty part is ignored; an absolute
+# second part (leading '/') replaces the first.
+def join(a: str, b: str) -> str:
+    if len(b) == 0:
+        return a
+    if len(a) == 0 or b[0:1] == "/":
+        return b
+    if a[len(a) - 1:len(a)] == "/":
+        return a + b
+    return a + "/" + b
+
+# The final component: basename("/etc/hosts") == "hosts".
+def basename(path: str) -> str:
+    return path[last_slash(path) + 1:]
+
+# Everything before the final component: dirname("/etc/hosts") == "/etc",
+# dirname("/etc") == "/", dirname("hosts") == "".
+def dirname(path: str) -> str:
+    let cut = last_slash(path)
+    if cut < 0:
+        return ""
+    if cut == 0:
+        return "/"
+    return path[0:cut]
+
+# Byte index of the extension's '.', or -1. A leading dot (a hidden file) is not an
+# extension, and a '.' in a parent directory does not count.
+def ext_dot(path: str) -> i64:
+    let base = basename(path)
+    var dot = -1
+    var i = 1
+    while i < len(base):
+        if base[i:i + 1] == ".":
+            dot = i
+        i = i + 1
+    if dot < 0:
+        return -1
+    return last_slash(path) + 1 + dot
+
+# The extension including the dot: extname("photo.tar.gz") == ".gz"; "" when there is none.
+def extname(path: str) -> str:
+    let dot = ext_dot(path)
+    if dot < 0:
+        return ""
+    return path[dot:]
+
+# The final component without its extension: stem("/a/photo.png") == "photo".
+def stem(path: str) -> str:
+    let base = basename(path)
+    let ext = extname(path)
+    return base[0:len(base) - len(ext)]

@@ -1,0 +1,123 @@
+# Standard library: dates and times (UTC). Import with `import std.time`.
+#
+# Everything is built on `unix_time()` (seconds since 1970-01-01 UTC). The calendar
+# conversions use Howard Hinnant's days<->civil algorithm, which is exact for every
+# date the epoch can represent. There is no time-zone database: these are UTC.
+
+const SECONDS_PER_DAY = 86400
+const SECONDS_PER_HOUR = 3600
+const SECONDS_PER_MINUTE = 60
+
+struct DateTime:
+    year: i64
+    month: i64          # 1..12
+    day: i64            # 1..31
+    hour: i64           # 0..23
+    minute: i64         # 0..59
+    second: i64         # 0..59
+    weekday: i64        # 0=Sunday .. 6=Saturday
+
+def is_leap(year: i64) -> bool:
+    if year % 4 != 0:
+        return False
+    if year % 100 != 0:
+        return True
+    return year % 400 == 0
+
+def days_in_month(year: i64, month: i64) -> i64:
+    if month == 2:
+        if is_leap(year):
+            return 29
+        return 28
+    if month == 4 or month == 6 or month == 9 or month == 11:
+        return 30
+    return 31
+
+# Days since the Unix epoch for a civil (year, month, day), per Hinnant.
+def days_from_civil(year: i64, month: i64, day: i64) -> i64:
+    var y = year
+    if month <= 2:
+        y = y - 1
+    let era = y // 400
+    let yoe = y - era * 400
+    var mp = month + 9
+    if month > 2:
+        mp = month - 3
+    let doy = (153 * mp + 2) // 5 + day - 1
+    let doe = yoe * 365 + yoe // 4 - yoe // 100 + doy
+    return era * 146097 + doe - 719468
+
+# Convert seconds since the epoch to a DateTime (UTC).
+def from_unix(seconds: i64) -> DateTime:
+    var days = seconds // SECONDS_PER_DAY
+    var rem = seconds - days * SECONDS_PER_DAY
+    if rem < 0:
+        rem = rem + SECONDS_PER_DAY
+        days = days - 1
+    let hour = rem // SECONDS_PER_HOUR
+    let minute = (rem % SECONDS_PER_HOUR) // SECONDS_PER_MINUTE
+    let second = rem % SECONDS_PER_MINUTE
+
+    let z = days + 719468
+    let era = z // 146097
+    let doe = z - era * 146097
+    let yoe = (doe - doe // 1460 + doe // 36524 - doe // 146096) // 365
+    let y = yoe + era * 400
+    let doy = doe - (365 * yoe + yoe // 4 - yoe // 100)
+    let mp = (5 * doy + 2) // 153
+    let day = doy - (153 * mp + 2) // 5 + 1
+    var month = mp + 3
+    if mp >= 10:
+        month = mp - 9
+    var year = y
+    if month <= 2:
+        year = y + 1
+
+    var weekday = (days + 4) % 7       # 1970-01-01 was a Thursday; +4 shifts to Sunday=0
+    if weekday < 0:
+        weekday = weekday + 7
+    return DateTime(year, month, day, hour, minute, second, weekday)
+
+# The current moment, UTC.
+def now() -> DateTime:
+    return from_unix(unix_time())
+
+# Seconds since the epoch for a DateTime (the inverse of from_unix).
+def to_unix(dt: DateTime) -> i64:
+    let days = days_from_civil(dt.year, dt.month, dt.day)
+    return days * SECONDS_PER_DAY + dt.hour * SECONDS_PER_HOUR + dt.minute * SECONDS_PER_MINUTE + dt.second
+
+def pad2(n: i64) -> str:
+    if n < 10:
+        return "0" + str(n)
+    return str(n)
+
+def pad4(n: i64) -> str:
+    if n < 10:
+        return "000" + str(n)
+    if n < 100:
+        return "00" + str(n)
+    if n < 1000:
+        return "0" + str(n)
+    return str(n)
+
+# "2026-11-04"
+def date_string(dt: DateTime) -> str:
+    return pad4(dt.year) + "-" + pad2(dt.month) + "-" + pad2(dt.day)
+
+# "20:27:05"
+def time_string(dt: DateTime) -> str:
+    return pad2(dt.hour) + ":" + pad2(dt.minute) + ":" + pad2(dt.second)
+
+# ISO 8601 in UTC, e.g. "2026-11-04T20:27:05Z"
+def iso(dt: DateTime) -> str:
+    return date_string(dt) + "T" + time_string(dt) + "Z"
+
+def weekday_name(dt: DateTime) -> str:
+    let names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    return names[dt.weekday]
+
+def month_name(dt: DateTime) -> str:
+    let names = ["January", "February", "March", "April", "May", "June",
+                 "July", "August", "September", "October", "November", "December"]
+    return names[dt.month - 1]
