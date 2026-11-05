@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — USE_CASES</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#what-you-can-build-with-tacqor"
+id="toc-what-you-can-build-with-tacqor">What you can build with
+Tacqor</a>
+<ul>
+<li><a href="#built-for" id="toc-built-for">Built for</a></li>
+<li><a href="#not-a-fit-yet" id="toc-not-a-fit-yet">Not a fit
+(yet)</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="what-you-can-build-with-tacqor">What you can build with
+Tacqor</h1>
+<p>Tacqor is a compiled, statically typed language that ships as one
+small static binary with no runtime to install. That shape — fast
+startup, native speed, Python-like syntax, Rust-style errors,
+share-nothing concurrency, and a C FFI — makes it a strong fit for
+command-line tools, back-end services, and compute, and a poor fit for
+anything that needs a graphical or browser front end. This page lists
+the categories it is built for, the feature behind each, and, honestly,
+what it is not for yet.</p>
+<p>For runnable code, see <a
+href="COOKBOOK.html"><code>COOKBOOK.md</code></a>; for the full feature
+reference, <a href="LANGUAGE.html"><code>../LANGUAGE.md</code></a> and
+<a href="STDLIB.html"><code>../STDLIB.md</code></a>.</p>
+<h2 id="built-for">Built for</h2>
+<h3 id="1-command-line-tools-and-utilities">1. Command-line tools and
+utilities</h3>
+<p>Arguments (<code>args</code>, <code>arg</code>), standard
+input/output (<code>input</code>, <code>print</code>,
+<code>eprint</code>), exit codes (<code>exit</code>), and full file I/O.
+Converters, formatters, text processors, calculators, report generators
+— anything with a terminal interface. One static binary means it runs
+anywhere with no install step.</p>
+<h3 id="2-http-apis-and-web-services-back-ends">2. HTTP APIs and web
+services (back ends)</h3>
+<p><code>std.http</code> is an HTTP/1.1 server and client with routing,
+<code>std.json</code> for payloads, and
+<code>http.serve_concurrent(port, workers, handler)</code> for a worker
+pool that handles many requests at once. REST APIs, microservices,
+webhook receivers, internal dashboards' back ends. (Plain
+<code>http://</code>; put a reverse proxy in front for TLS.)</p>
+<h3 id="3-network-servers-and-clients">3. Network servers and
+clients</h3>
+<p>Blocking TCP primitives (<code>tcp_listen</code>,
+<code>tcp_accept</code>, <code>tcp_connect</code>,
+<code>tcp_read</code>, <code>tcp_write</code>, <code>tcp_close</code>).
+Chat servers, custom wire protocols, proxies, port probes, health
+checkers — anything that speaks a socket.</p>
+<h3 id="4-concurrent-and-parallel-compute">4. Concurrent and parallel
+compute</h3>
+<p><code>parallel_sum</code> and <code>parallel_map</code> run a
+function over an index range on up to 64 threads with deterministic
+results; <code>parallel_run</code> is a share-nothing worker pool;
+<strong>channels</strong> (<code>std.channels</code>) pass messages
+between workers. CPU-bound batch jobs, simulations, fan-out/fan-in
+pipelines.</p>
+<h3 id="5-data-processing-and-pipelines-etl">5. Data processing and
+pipelines (ETL)</h3>
+<p>Read files and lines, parse (<code>std.json</code>, string tools),
+transform — with <code>parallel_map</code> when the work is big — and
+write results back out. Log processing, data cleaning, format
+conversion, aggregation and rollups.</p>
+<h3 id="6-developer-tooling">6. Developer tooling</h3>
+<p>The toolchain is itself the proof of concept. Linters, formatters,
+code generators, test runners (<code>tacqor test</code>), build and
+release scripts, and editor integrations — the compiler already exposes
+machine-readable diagnostics (<code>tacqor diagnose</code>) and a
+language server (<code>tacqor lsp</code>).</p>
+<h3 id="7-parsers-interpreters-compilers-and-dsls">7. Parsers,
+interpreters, compilers and DSLs</h3>
+<p>Traits, generics, closures, pattern matching (<code>match</code>) and
+<code>Result</code>/<code>?</code> make language work comfortable.
+Config-language processors, expression evaluators, template engines,
+small interpreters, transpilers.</p>
+<h3 id="8-system-automation-and-scripting">8. System automation and
+scripting</h3>
+<p><code>run</code> and <code>run_capture</code> execute shell commands;
+the file builtins and <code>std.os</code> handle paths and the
+filesystem; <code>std.time</code> handles dates. Glue scripts, deploy
+helpers, backup and housekeeping jobs, cron tasks (schedule the binary
+from the OS).</p>
+<h3 id="9-scientific-and-numerical-computing">9. Scientific and
+numerical computing</h3>
+<p><code>std.math</code> (trigonometry, <code>exp</code>,
+<code>log</code>, <code>sqrt</code>, <code>pow</code>), 64-bit floats
+and checked 64-bit integers, exact parallel reductions, and — via the
+FFI — C numeric libraries such as BLAS or GSL for the heavy lifting.</p>
+<h3 id="10-c-ecosystem-bridges-ffi">10. C-ecosystem bridges (FFI)</h3>
+<p><code>extern def</code> links and calls any C library from a native
+build: SQLite, zlib, libcurl, crypto and compression libraries, and
+more. This is how a young language reuses the entire C ecosystem instead
+of reimplementing it. (Scalars and strings cross the boundary today; see
+<a href="LANGUAGE.html"><code>../LANGUAGE.md</code></a> §13.)</p>
+<h3 id="11-bots-webhooks-and-api-integrations">11. Bots, webhooks and
+API integrations</h3>
+<p>The HTTP client (<code>get</code>, <code>post</code>,
+<code>request</code>), <code>std.json</code>, and TCP are enough to call
+third-party APIs and receive callbacks. Chat bots (over a service's HTTP
+API), polling agents, notification senders, integration glue between
+systems.</p>
+<h3 id="12-text-based-games-and-simulations">12. Text-based games and
+simulations</h3>
+<p>State, logic, loops and randomness (<code>std.random</code>) with no
+graphics dependency. Roguelikes, cellular automata, board-game engines,
+puzzle generators and solvers, teaching simulations.</p>
+<h3 id="13-self-contained-distributable-binaries">13. Self-contained
+distributable binaries</h3>
+<p>Every program compiles to a single executable of a few megabytes with
+no runtime to install (<code>tacqor build</code> embeds the VM;
+<code>tacqor build --native</code> produces machine code). Ideal for
+internal tools you hand to teammates, utilities that must "just run,"
+and anything distributed to machines you do not control.</p>
+<h2 id="not-a-fit-yet">Not a fit (yet)</h2>
+<ul>
+<li><strong>Graphical desktop apps</strong> and <strong>mobile
+apps</strong> — there are no windowing or graphics bindings (reachable
+only through the C FFI to a GUI library, with real effort).</li>
+<li><strong>Web front ends</strong> — Tacqor compiles to native code and
+bytecode, not WebAssembly or JavaScript, so it builds the <em>back
+end</em>, not code that runs in a browser.</li>
+<li><strong>Native HTTPS/TLS</strong> — the HTTP stack is
+<code>http://</code> only; terminate TLS at a reverse proxy.</li>
+<li><strong>GPU compute</strong>, <strong>asynchronous / non-blocking
+I/O</strong> (concurrency is blocking, share-nothing threads), and
+<strong>graphics, audio or video</strong> processing.</li>
+</ul>
+<p>Some of these are deliberate and some are planned — see <a
+href="ROADMAP.html"><code>../ROADMAP.md</code></a>.</p>
+</body>
+</html>

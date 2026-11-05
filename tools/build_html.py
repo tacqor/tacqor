@@ -11,7 +11,7 @@ css = pathlib.Path(__file__).with_name("doc.css").read_text() + """
 docs = {  # markdown path relative to root -> output name
     "docs/WHITEPAPER.md": "WHITEPAPER", "docs/ARCHITECTURE.md": "ARCHITECTURE", "docs/SPECIFICATION.md": "SPECIFICATION",
     "docs/BYTECODE.md": "BYTECODE", "docs/COOKBOOK.md": "COOKBOOK", "docs/STYLE.md": "STYLE", "docs/ERRORS.md": "ERRORS",
-    "docs/TOOLING.md": "TOOLING", "docs/PERFORMANCE.md": "PERFORMANCE", "docs/FAQ.md": "FAQ", "docs/FROM_PYTHON.md": "FROM_PYTHON",
+    "docs/TOOLING.md": "TOOLING", "docs/PERFORMANCE.md": "PERFORMANCE", "docs/FAQ.md": "FAQ", "docs/USE_CASES.md": "USE_CASES", "docs/FROM_PYTHON.md": "FROM_PYTHON",
     "docs/FROM_RUST.md": "FROM_RUST", "docs/INDEX.md": "index", "README.md": "README", "TOUR.md": "TOUR", "LANGUAGE.md": "LANGUAGE",
     "STDLIB.md": "STDLIB", "CHANGELOG.md": "CHANGELOG", "ROADMAP.md": "ROADMAP", "CONTRIBUTING.md": "CONTRIBUTING", "SECURITY.md": "SECURITY",
 }
