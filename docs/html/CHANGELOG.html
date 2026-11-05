@@ -166,6 +166,12 @@ required. See <code>docs/SPECIFICATION.md</code> §12 and
 so GitHub's refused macOS runners no longer mark CI or Release runs as
 failed; it still attaches a macOS binary to tagged releases when a
 runner is available.</li>
+<li>Portability: the computed-goto threaded VM dispatch is now gated to
+real GCC. Clang (including Apple Clang) defines <code>__GNUC__</code>
+but rejects an indirect <code>goto</code> into the scope of a variable
+with a non-trivial destructor, so it uses the switch-based dispatch
+instead — which the differential test suite proves equivalent. Fixes the
+macOS build.</li>
 </ul>
 <h2 id="121--2026-11-04">1.2.1 — 2026-11-04</h2>
 <p>Patch release: the first release built and verified on a real Windows

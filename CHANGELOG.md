@@ -26,6 +26,7 @@ Concurrency release. Tacqor can now use more than one core for request handling,
 
 **Infrastructure**
 - The macOS build moves to its own workflow (`macos.yml`) so GitHub's refused macOS runners no longer mark CI or Release runs as failed; it still attaches a macOS binary to tagged releases when a runner is available.
+- Portability: the computed-goto threaded VM dispatch is now gated to real GCC. Clang (including Apple Clang) defines `__GNUC__` but rejects an indirect `goto` into the scope of a variable with a non-trivial destructor, so it uses the switch-based dispatch instead — which the differential test suite proves equivalent. Fixes the macOS build.
 
 ## 1.2.1 — 2026-11-04
 
