@@ -159,6 +159,11 @@ cd tacqor &amp;&amp; sh install.sh</code></pre>
     </div>
   </div>
 
+  <section id="purpose">
+    <h2>Why Tacqor exists</h2>
+    <p class="sub">Software keeps repeating the same expensive move: you prototype in Python because it is fast to write, then rewrite in Rust, Go, or C++ for production because Python is too slow to ship — learning a very different language and maintaining two codebases for one idea.</p>
+    <p class="sub">Tacqor exists to erase that rewrite. It gives you Python's syntax and Rust's discipline in a single language that compiles to native machine code, so the thing you prototype is already the thing you ship. Static types catch mistakes before the program runs, <code>Option</code>/<code>Result</code>/<code>?</code> make failure explicit without exceptions, there is no garbage collector and no borrow checker to learn, and the whole toolchain is one small static binary with no runtime to install. The goal is not to beat a systems language on raw speed — it is to get most of the way there for a fraction of the difficulty, in a language you can read on day one.</p>
+  </section>
   <section id="why">
     <h2>What you get</h2>
     <p class="sub">A small language with a complete toolchain. Nothing to configure, no package to install before the first program runs.</p>
