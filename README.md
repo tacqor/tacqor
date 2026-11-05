@@ -64,7 +64,7 @@ Everything is online at **[tacqor.github.io/tacqor](https://tacqor.github.io/tac
 
 | | |
 |---|---|
-| Learn | `TOUR.md` · `docs/COOKBOOK.md` · `docs/FROM_PYTHON.md` · `docs/FROM_RUST.md` · `docs/FAQ.md` |
+| Learn | `TOUR.md` · `docs/USE_CASES.md` · `docs/COOKBOOK.md` · `docs/FROM_PYTHON.md` · `docs/FROM_RUST.md` · `docs/FAQ.md` |
 | Reference | `LANGUAGE.md` · `STDLIB.md` · `docs/SPECIFICATION.md` · `docs/ERRORS.md` · `docs/TOOLING.md` · `docs/STYLE.md` · `docs/PERFORMANCE.md` |
 | Design | `docs/WHITEPAPER.md` (with 17 figures in `docs/diagrams/`) · `docs/ARCHITECTURE.md` · `docs/BYTECODE.md` |
 | Project | `CHANGELOG.md` · `ROADMAP.md` · `CONTRIBUTING.md` · `SECURITY.md` · `LICENSE` |

@@ -8,6 +8,7 @@ Everything in the distribution, by audience. Start with the first table if you a
 |---|---|---|
 | [`../README.md`](../README.md) | Overview, install, first program, project layout | First contact |
 | [`../TOUR.md`](../TOUR.md) | The language in twenty minutes, by example | Learning the language |
+| [`USE_CASES.md`](USE_CASES.md) | What you can build with Tacqor, by category — CLIs, HTTP services, network servers, parallel compute, data pipelines, dev tooling, interpreters, C bridges, and what it is not for yet | Deciding if it fits your project |
 | [`COOKBOOK.md`](COOKBOOK.md) | Complete, runnable programs for everyday tasks: files, text, data structures, errors, closures, structs and traits, JSON, HTTP, parallelism, tests, deployment | You know what you want to build |
 | [`FROM_PYTHON.md`](FROM_PYTHON.md) | Migration guide: what carries over, what changes, idioms side by side, library map | Coming from Python |
 | [`FROM_RUST.md`](FROM_RUST.md) | Migration guide: the shared error model, what the ownership-free design changes, idioms side by side | Coming from Rust |
