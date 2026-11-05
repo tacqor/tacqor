@@ -1,4 +1,4 @@
-<p align="center"><a href="https://tacqor.github.io/tacqor/"><img src="docs/assets/logo.svg" alt="Tacqor" width="260"></a></p>
+<p align="center"><a href="https://tacqor.github.io/tacqor/"><img src="docs/assets/logo.png" alt="Tacqor" width="150"></a></p>
 
 <p align="center">
 <a href="https://github.com/tacqor/tacqor/actions/workflows/ci.yml"><img src="https://github.com/tacqor/tacqor/actions/workflows/ci.yml/badge.svg" alt="CI"></a>

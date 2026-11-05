@@ -5,6 +5,7 @@
   "version": "1.2.1",
   "publisher": "tacqor-local",
   "engines": {"vscode": "^1.85.0"},
+  "icon": "icon.png",
   "main": "./extension.js",
   "activationEvents": ["onLanguage:tacqor", "onCommand:tacqor.restartScanner"],
   "extensionKind": ["workspace"],
