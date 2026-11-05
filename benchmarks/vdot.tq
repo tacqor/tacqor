@@ -1,0 +1,12 @@
+# dot() builtin — vectorized inner product over list[f64].
+# Cache-resident working set (two 16 K-element vectors ≈ 256 KB), so this measures compute,
+# not memory bandwidth. 16384 × 20000 = 327 M multiply-adds. Compare with vdot_hand.tq.
+def main():
+    let n: i64 = 16384
+    let xs: list[f64] = vscale(fill(n, 1.0), 1.5)
+    let ys: list[f64] = fill(n, 2.0)
+    let reps: i64 = 20000
+    var acc: f64 = 0.0
+    for r in range(reps):
+        acc = acc + dot(xs, ys)
+    print(str(acc))

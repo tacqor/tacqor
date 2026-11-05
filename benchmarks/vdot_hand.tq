@@ -1,0 +1,14 @@
+# The same inner product written as an index loop in Tacqor source — bounds-checked indexing,
+# no vectorization. The honest "before" for the dot() builtin. Same answer as vdot.tq.
+def main():
+    let n: i64 = 16384
+    let xs: list[f64] = vscale(fill(n, 1.0), 1.5)
+    let ys: list[f64] = fill(n, 2.0)
+    let reps: i64 = 20000
+    var acc: f64 = 0.0
+    for r in range(reps):
+        var s: f64 = 0.0
+        for i in range(n):
+            s = s + xs[i] * ys[i]
+        acc = acc + s
+    print(str(acc))

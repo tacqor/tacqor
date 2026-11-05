@@ -54,6 +54,28 @@ Ratios:
 | `closures` | — | 4× faster | 1.5× faster |
 | `objs` | — | 5× faster | 3.7× faster |
 
+## 4b. Bulk numeric ops (1.4)
+
+The 1.4 bulk ops (`dot`, `vadd`, `vmul`, `vscale`) run their `f64` work straight over a list's flat backing buffer, so the system compiler auto-vectorizes them. The benchmark is a 16,384-element `f64` inner product repeated 20,000 times (327 M multiply-adds), with the working set small enough to stay in cache so the measurement is compute, not memory bandwidth. Reproduce with `sh benchmarks/numeric.sh`.
+
+Seconds, lower is better. Same machine as §2 (2 vCPUs, GCC 13.3, CPython 3.13), best of three.
+
+| Target | Time | vs. hand loop | vs. CPython |
+|---|---|---|---|
+| CPython 3 (no numpy) | 36.9 | — | 1× |
+| Tacqor hand index loop (native) | 1.96 | 1× | 19× |
+| **Tacqor `dot()` native, portable** | **0.114** | **17×** | **324×** |
+| **Tacqor `dot()` native, `-march=native`** | **0.058** | **34×** | **636×** |
+| C++ `-O3`, scalar | 0.089 | — | — |
+| C++ `-O3 -march=native` (ceiling) | 0.059 | — | — |
+
+With the host CPU targeted (`TACQOR_CXXFLAGS="-march=native"`), `dot()` reaches **the hand-tuned C++ ceiling** (0.058 vs. 0.059 s) — the builtin's loop compiles to the same AVX code — and runs **34× faster than the identical inner product written as a Tacqor index loop**. The gap is not the arithmetic: the hand loop pays a bounds check and a `Value`-boundary on every element access, which the builtin skips by walking the raw `double` buffer. Even the portable build (no `-march`, SSE2 only) is 17× over the hand loop.
+
+Two honest caveats:
+
+- **Large arrays are memory-bandwidth bound.** When the operands do not fit in cache (e.g. two 5 M-element vectors ≈ 80 MB), a single-pass `dot` is limited by how fast memory can be read, not by the ALU; there the builtin is ≈ 4× over the hand loop and at the hardware's streaming ceiling, which no language beats. The big multiples above are for cache-resident, compute-bound work — the shape of a tiled kernel.
+- **The `i64` paths stay overflow-checked**, so they do not vectorize (a checked add is not associative the way the vectorizer needs). For raw integer throughput use `f64`, or `wrapping_add`/`wrapping_sub`/`wrapping_mul` in a hand loop, which wrap modulo 2⁶⁴ with no check.
+
 ## 5. Where the time goes
 
 **`loop` and `fib`** — the native backend keeps `i64` values in C++ locals (registers after optimization); overflow checks compile to `__builtin_*_overflow`, which the compiler lowers to a flag test. The remaining difference to C++ is the per-call `DepthGuard` (one increment, one compare, one decrement) and the runtime-error plumbing each function carries. The VM pays dispatch (one indirect jump per instruction), operand decoding and stack traffic; superinstructions (`add_store`, `jump_unless_locals`, `loop_next`) cut the instruction count by roughly a third on such loops.
@@ -100,6 +122,8 @@ See `ARCHITECTURE.md` §5 and figure 03.
 | Build large strings with `join` on a list rather than repeated `+` | `+` copies; `join` allocates once. |
 | Reuse a dictionary instead of rebuilding it; precompute keys that are reused | Each fresh key is an allocation plus a hash. |
 | Use `parallel_sum` / `parallel_map` for independent per-element work on large inputs | Scales across cores; mapper closures may capture only scalars. |
+| Reach for the bulk ops (`dot`, `vadd`, `vmul`, `vscale`) on `list[f64]` instead of an index loop | They walk the flat buffer and auto-vectorize — up to ~34× over the equivalent hand loop, C++-class with `-march=native` (§4b). |
+| Build releases with `TACQOR_CXXFLAGS="-march=native"` when the deploy target's CPU is known | Unlocks AVX for the bulk ops; roughly halves their time. Omit it for portable binaries. |
 | Avoid deep recursion where a loop will do | Calls are cheap but not free; recursion depth is bounded (see `SPECIFICATION.md` limits). |
 | Let the collector run; do not create reference cycles you do not need | Acyclic garbage is freed immediately by refcounting; cycles wait for the collector. |
 
@@ -125,9 +149,10 @@ Native build time is the system C++ compiler at `-O3` on the generated source pl
 ```sh
 sh benchmarks/run.sh                 # uses ./tacqor or linux-x64/tacqor
 sh benchmarks/run.sh /path/to/tacqor
+sh benchmarks/numeric.sh             # the 1.4 bulk-op table in §4b
 ```
 
-The script builds every benchmark with every toolchain it finds (`c++`, `rustc`, `python3` are optional) and prints a table of best-of-three times. Run it three times and take the minimum of each cell to reproduce the table in §4.
+`run.sh` builds every benchmark with every toolchain it finds (`c++`, `rustc`, `python3` are optional) and prints a table of best-of-three times; run it three times and take the minimum of each cell to reproduce §4. `numeric.sh` builds the `dot()` benchmark portable and with `-march=native`, alongside the hand loop and the C++/CPython references, to reproduce §4b.
 
 ## 11. Known gaps and planned work
 
