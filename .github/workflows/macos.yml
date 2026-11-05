@@ -1,15 +1,13 @@
 name: macOS
 
 # GitHub's hosted macOS runners are capacity-limited and are regularly refused for this organization
-# ("The job was not acquired by Runner"), so the macOS build lives in its own workflow: it runs on every
-# push and tag and weekly, but its outcome does not colour the CI badge or the Release run.
+# ("The job was not acquired by Runner"), which marks the run failed and emails the owner. So the macOS
+# build runs only when it matters — on release tags (to attach the macOS binary) and on demand — not on
+# every push or on a schedule. Clang portability is covered day to day by the Linux Clang job in CI.
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-  schedule:
-    - cron: "17 6 * * 1"
   workflow_dispatch:
 
 permissions:

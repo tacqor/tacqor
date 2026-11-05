@@ -4,3 +4,8 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    # Collapse every action bump into a single monthly PR instead of one per action.
+    open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns: ["*"]
