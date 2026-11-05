@@ -122,6 +122,8 @@ enum class Builtin : std::uint8_t {
     // 1.2
     tcp_listen, tcp_accept, tcp_connect, tcp_read, tcp_write, tcp_close,
     run_capture, unix_time, hash,
+    // 1.3 — value channels between workers
+    channel, channel_send, channel_recv, channel_try_recv, channel_close,
     count,  // sentinel
 };
 

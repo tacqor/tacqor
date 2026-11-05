@@ -5,6 +5,7 @@ import std.math
 import std.time
 import std.random
 import std.os
+import std.channels
 
 def test_lists():
     testing.assert_eq(lists.map([1, 2, 3], fn(x: i64) => x * x), [1, 4, 9])
@@ -65,3 +66,24 @@ def test_os():
     testing.assert_eq(os.join("/a/b", "c.txt"), "/a/b/c.txt")
     testing.assert_eq(os.join("/a", "/x"), "/x")             # absolute second part wins
     testing.assert_eq(os.env_or("TACQOR_DEFINITELY_UNSET", "fallback"), "fallback")
+
+def test_channels():
+    # Four workers each send five messages to one channel, concurrently; after closing it,
+    # draining yields exactly 20. This also exercises the thread-safe queue under contention.
+    let ch = channels.make()
+    let task = fn(w: i64):
+        for i in range(5):
+            channels.send(ch, "w" + str(w) + "-" + str(i))
+    parallel_run(4, task)
+    channels.close(ch)
+    var received = 0
+    var draining = True
+    while draining:
+        match channels.recv(ch):
+            case Some(message):
+                received = received + 1
+            case None:
+                draining = False
+    testing.assert_eq(received, 20)
+    # recv on a closed, drained channel is None; try_recv never blocks.
+    testing.assert_true(not is_some(channels.try_recv(ch)), "try_recv on a drained channel is None")

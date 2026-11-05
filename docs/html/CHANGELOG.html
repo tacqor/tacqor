@@ -89,6 +89,15 @@ minor release; recompile <code>.tqb</code> files when upgrading.</p>
 request handling, within the bounds its memory model allows.</p>
 <p><strong>Language</strong></p>
 <ul>
+<li>Channels pass string messages between workers without a file:
+<code>channel()</code> returns a handle (a scalar, so a
+<code>parallel_run</code> task can capture it),
+<code>channel_send</code>/<code>channel_recv</code> (blocking,
+<code>Option[str]</code>)/<code>channel_try_recv</code>/<code>channel_close</code>
+move copies through a thread-safe queue, so nothing on the heap is
+shared. Wrapped by the new <code>std.channels</code> module
+(<code>make</code>/<code>send</code>/<code>recv</code>/<code>try_recv</code>/<code>close</code>).
+Clean under ASan/UBSan.</li>
 <li><code>parallel_run(workers, task)</code> runs
 <code>task(worker_index)</code> on up to 64 OS threads at once, each
 thread with its own VM and value stack. It is the share-nothing

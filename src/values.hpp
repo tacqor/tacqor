@@ -12,7 +12,9 @@
 #include <exception>
 #include <fstream>
 #include <cerrno>
+#include <condition_variable>
 #include <cstdio>
+#include <deque>
 #include <functional>
 #include <iostream>
 #include <limits>
@@ -1056,6 +1058,8 @@ constexpr int builtin_arity[] = {
     2, 1, 1, 0, 0,
     // 1.2
     1, 1, 2, 2, 2, 1, 1, 0, 1,
+    // 1.3 — channel, channel_send, channel_recv, channel_try_recv, channel_close
+    0, 2, 1, 1, 1,
 };
 
 inline std::mt19937_64& random_engine() {
@@ -1172,6 +1176,77 @@ inline Value tcp_write(Socket s, const std::string& data) {
         sent += static_cast<std::size_t>(chunk);
     }
     return make_variant(true, static_cast<Int>(sent), true);
+}
+
+// --- value channels ---------------------------------------------------------
+// A channel is a thread-safe string queue used to hand messages between workers (see
+// `parallel_run`). Messages cross as string copies — nothing on the Tacqor heap is shared
+// between threads — so the non-atomic reference counting stays sound; structure a message
+// with `std.json` when it is more than text. A channel is named by a small integer handle
+// (a scalar, so a `parallel_run` task may capture it), and the handles index a process-wide
+// registry. Channels live until the program ends.
+struct Channel {
+    std::mutex mutex;
+    std::condition_variable ready;
+    std::deque<std::string> queue;
+    bool closed = false;
+};
+
+inline std::mutex& channel_table_mutex() {
+    static std::mutex m;
+    return m;
+}
+inline std::vector<std::shared_ptr<Channel>>& channel_table() {
+    static std::vector<std::shared_ptr<Channel>> table;
+    return table;
+}
+inline std::shared_ptr<Channel> channel_at(Int handle) {
+    std::lock_guard<std::mutex> guard(channel_table_mutex());
+    auto& table = channel_table();
+    if (handle < 0 || static_cast<std::size_t>(handle) >= table.size()) throw std::runtime_error("invalid channel handle");
+    return table[static_cast<std::size_t>(handle)];
+}
+inline Int channel_make() {
+    std::lock_guard<std::mutex> guard(channel_table_mutex());
+    auto& table = channel_table();
+    table.push_back(std::make_shared<Channel>());
+    return static_cast<Int>(table.size() - 1);
+}
+inline void channel_send_message(Int handle, const std::string& message) {
+    const auto channel = channel_at(handle);
+    {
+        std::lock_guard<std::mutex> guard(channel->mutex);
+        if (channel->closed) throw std::runtime_error("channel_send on a closed channel");
+        channel->queue.push_back(message);  // a copy; the receiver gets its own string
+    }
+    channel->ready.notify_one();
+}
+// Blocks until a message arrives (Some) or the channel is closed and drained (None).
+inline Value channel_receive(Int handle) {
+    const auto channel = channel_at(handle);
+    std::unique_lock<std::mutex> lock(channel->mutex);
+    channel->ready.wait(lock, [&] { return !channel->queue.empty() || channel->closed; });
+    if (channel->queue.empty()) return make_variant(false, Value());  // closed and drained -> None
+    std::string message = std::move(channel->queue.front());
+    channel->queue.pop_front();
+    return make_variant(true, make_text(std::move(message)));
+}
+// Never blocks: Some if a message is waiting, None otherwise.
+inline Value channel_try_receive(Int handle) {
+    const auto channel = channel_at(handle);
+    std::lock_guard<std::mutex> guard(channel->mutex);
+    if (channel->queue.empty()) return make_variant(false, Value());
+    std::string message = std::move(channel->queue.front());
+    channel->queue.pop_front();
+    return make_variant(true, make_text(std::move(message)));
+}
+inline void channel_shut(Int handle) {
+    const auto channel = channel_at(handle);
+    {
+        std::lock_guard<std::mutex> guard(channel->mutex);
+        channel->closed = true;
+    }
+    channel->ready.notify_all();
 }
 
 inline std::string run_capture(const std::string& command) {
@@ -1641,6 +1716,11 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
         case Builtin::tcp_read: return tcp_read(socket_of(args[0]), int_of(args[1]));
         case Builtin::tcp_write: return tcp_write(socket_of(args[0]), text_of(args[1]));
         case Builtin::tcp_close: socket_close(socket_of(args[0])); return {};
+        case Builtin::channel: return channel_make();
+        case Builtin::channel_send: channel_send_message(int_of(args[0]), text_of(args[1])); return {};
+        case Builtin::channel_recv: return channel_receive(int_of(args[0]));
+        case Builtin::channel_try_recv: return channel_try_receive(int_of(args[0]));
+        case Builtin::channel_close: channel_shut(int_of(args[0])); return {};
         case Builtin::run_capture: ctx.output.flush(); return make_text(run_capture(text_of(args[0])));
         case Builtin::unix_time:
             return static_cast<Int>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());

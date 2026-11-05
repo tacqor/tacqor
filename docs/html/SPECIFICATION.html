@@ -448,6 +448,18 @@ and the implementation's reference counting is not atomic. The shared
 task closure and the function values it captures are not freed for the
 remainder of the program. The first error raised by any task propagates
 after all tasks finish.</p>
+<p>Channels pass string messages between threads. <code>channel()</code>
+returns an integer handle naming a thread-safe FIFO queue.
+<code>channel_send(h, m)</code> appends a copy of the string
+<code>m</code> (a runtime error if the channel is closed).
+<code>channel_recv(h)</code> blocks until the queue is non-empty,
+returning <code>Some(message)</code>, or returns <code>None</code> once
+the channel is both closed and empty. <code>channel_try_recv(h)</code>
+returns <code>Some(message)</code> if one is available without blocking
+and <code>None</code> otherwise. <code>channel_close(h)</code> marks the
+channel closed and wakes every blocked receiver. Messages cross as
+copies, so no object is shared between threads; a handle that names no
+channel is a runtime error.</p>
 <hr />
 <h2 id="7-statements">7. Statements</h2>
 <ul>
@@ -488,7 +500,8 @@ list, <code>assert</code> failure, <code>fail(message)</code>,
 conversion failures (<code>int</code>, <code>float</code>,
 <code>chr</code>, <code>ord</code>, <code>from_bytes</code>,
 <code>fixed</code>), invalid worker count, invalid parallel capture
-(including a non-shareable <code>parallel_run</code> task capture),
+(including a non-shareable <code>parallel_run</code> task capture), an
+invalid channel handle, <code>channel_send</code> on a closed channel,
 function nesting beyond 100,000 frames, value nesting beyond 2,000,
 resource limits (text 256 MB, list 256 M elements, stack 4 M values),
 and I/O failures reported by built-ins that do not return

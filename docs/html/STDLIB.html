@@ -312,8 +312,18 @@ returned (for a server loop, that is never). This is the share-nothing
 building block behind <code>http.serve_concurrent</code>: a worker owns
 everything it allocates, so the task may capture only scalars and
 function values (enforced at compile time for an inline task, at runtime
-otherwise), and any shared state goes through a file or a database. See
-the language reference.</p>
+otherwise), and any shared state goes through a channel, a file, or a
+database. See the language reference.</p>
+<p>Channels pass messages between workers:
+<code>channel() -&gt; i64</code> makes one (the handle is a scalar, so a
+task may capture it); <code>channel_send(ch, message: str)</code>
+enqueues a copy; <code>channel_recv(ch) -&gt; Option[str]</code> blocks
+for a message (<code>Some</code>) or returns <code>None</code> once the
+channel is closed and drained;
+<code>channel_try_recv(ch) -&gt; Option[str]</code> never blocks;
+<code>channel_close(ch)</code> ends the stream. Messages cross as
+copies, so nothing on the heap is shared. The <code>std.channels</code>
+module wraps these.</p>
 <h3 id="memory">Memory</h3>
 <p><code>gc_collect() -&gt; i64</code> runs the cycle collector and
 returns the number of objects freed; <code>gc_count() -&gt; i64</code>
@@ -461,6 +471,15 @@ true with probability <code>p</code>. On lists:
 <code>choice(items) -&gt; Option[T]</code> (None if empty),
 <code>shuffle(items) -&gt; list[T]</code> (a new list, Fisher-Yates),
 <code>sample(items, k) -&gt; list[T]</code> (k distinct elements).</p>
+<h3 id="stdchannels"><code>std.channels</code></h3>
+<p>Message channels between the workers of a <code>parallel_run</code>
+pool (see the Parallelism built-ins above).
+<code>make() -&gt; i64</code>, <code>send(ch, message)</code>,
+<code>recv(ch) -&gt; Option[str]</code> (blocks; <code>None</code> when
+closed and drained), <code>try_recv(ch) -&gt; Option[str]</code>
+(non-blocking), <code>close(ch)</code>. Messages are strings — use
+<code>std.json</code> for structure — and cross as copies, so no object
+is shared between threads.</p>
 <h3 id="stdos"><code>std.os</code></h3>
 <p>The environment and path names (file and process I/O is already in
 the built-ins). <code>env_or(name, fallback)</code> reads an environment

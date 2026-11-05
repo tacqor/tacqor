@@ -217,6 +217,27 @@ def main():
     http.serve_concurrent(8080, 8, handle)              # eight workers, share-nothing
 ```
 
+When workers need to hand data to one another rather than go through a file, use a **channel** — a thread-safe queue of string messages. `channel()` returns a handle (a scalar, so a task may capture it); `channel_send(ch, message)` enqueues a copy; `channel_recv(ch) -> Option[str]` blocks until a message arrives (`Some`) or the channel is closed and drained (`None`); `channel_try_recv(ch)` is the non-blocking form; `channel_close(ch)` wakes receivers and ends the stream. Messages cross as copies, so the share-nothing rule still holds — structure a message with `std.json` when it is more than text. `std.channels` wraps these as `make`, `send`, `recv`, `try_recv`, `close`.
+
+```python
+import std.channels
+
+def main():
+    let jobs = channels.make()
+    let worker = fn(w: i64):
+        var running = True
+        while running:
+            match channels.recv(jobs):
+                case Some(job):
+                    print("worker " + str(w) + " took " + job)
+                case None:
+                    running = False              # closed and drained
+    for i in range(20):
+        channels.send(jobs, "job-" + str(i))
+    channels.close(jobs)
+    parallel_run(4, worker)                      # four workers drain the queue
+```
+
 ## 7. Errors and checking
 
 ### Recovering from runtime errors
@@ -289,4 +310,4 @@ The boundary is unchecked: Tacqor cannot verify that the C signature you declare
 
 ## 14. Limits and non-features
 
-No inheritance: traits plus generics and closures cover the same ground without an object hierarchy. No `try`/`except`: use `Result` and `?`, and `attempt` at boundaries. Parallelism is share-nothing rather than shared-memory: `parallel_sum`/`parallel_map` for data-parallel work, `parallel_run` (and `http.serve_concurrent` on top of it) for request-parallel work, with state shared between threads through a file or a database, never a mutable value on the heap. Strings are bytes; only `chars`, `char_count`, `chr`, `ord` are code-point aware. Call depth is limited to 100,000 frames (in native builds too, with a 512 MB stack); value nesting (lists inside lists...) is limited to 2,000 levels for printing and comparison.
+No inheritance: traits plus generics and closures cover the same ground without an object hierarchy. No `try`/`except`: use `Result` and `?`, and `attempt` at boundaries. Parallelism is share-nothing rather than shared-memory: `parallel_sum`/`parallel_map` for data-parallel work, `parallel_run` (and `http.serve_concurrent` on top of it) for request-parallel work, and channels for passing messages between workers — state is shared between threads through a channel, a file, or a database, never a mutable value on the heap. Strings are bytes; only `chars`, `char_count`, `chr`, `ord` are code-point aware. Call depth is limited to 100,000 frames (in native builds too, with a 512 MB stack); value nesting (lists inside lists...) is limited to 2,000 levels for printing and comparison.

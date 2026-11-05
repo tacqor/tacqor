@@ -35,9 +35,10 @@ The **foreign function interface** landed in 1.3: `extern def` declarations call
 
 ## 2.0 — concurrency
 
-Request-level concurrency landed in 1.3: `parallel_run` runs a share-nothing worker pool, and `http.serve_concurrent` serves HTTP on one. What is left for 2.0 is the richer model.
+Request-level concurrency landed in 1.3: `parallel_run` runs a share-nothing worker pool, `http.serve_concurrent` serves HTTP on one, and channels (`std.channels`) pass string messages between workers. What is left for 2.0 is the richer model.
 
-- **Structured concurrency**: tasks with scoped lifetimes and channels for message passing, with the type system ensuring values sent between tasks are either immutable or transferred. This keeps the non-atomic refcount design by never sharing a mutable object across threads — the same rule `parallel_run` and `parallel_map` enforce today, generalized so workers can hand values to one another without going through a file.
+- **Typed channels**: today a channel carries strings (structure a message with `std.json`). A `Channel[T]` generic that transfers an arbitrary value by deep-copying it — keeping the non-atomic-refcount design by never sharing a mutable object across threads — is the next step.
+- **Structured concurrency**: tasks with scoped lifetimes, so a worker pool and its channels have a clear owner and shutdown, rather than living for the whole program.
 - **A sharded allocator** so the per-thread object lock stops being the one point of serialization under heavy allocation.
 - **Non-blocking I/O** so a worker can hold many connections at once rather than one at a time.
 
