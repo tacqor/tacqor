@@ -96,12 +96,17 @@ class Generator {
         for (const auto& f : program.foreign) if (f.function == id) return &f;
         return nullptr;
     }
-    // The C type a marshalable Tacqor type crosses the boundary as.
+    // The C type a marshalable Tacqor type crosses the boundary as, as a parameter.
     static const char* c_type(TypeId t) {
         if (t == type_int) return "long long";
         if (t == type_float) return "double";
         if (t == type_bool) return "int";          // widest portable convention for a C truth value
-        return "const char*";                       // str
+        return "const char*";                       // str argument: a const C string
+    }
+    // As a result. A returned string is char* (the convention of getenv, strchr, strdup, ...),
+    // which also matches the standard headers, so redeclaring such a symbol never conflicts.
+    static const char* c_return_type(TypeId t) {
+        return t == type_text ? "char*" : c_type(t);
     }
     // Emit the wrapper that marshals Tacqor values to C, calls the symbol, and marshals back.
     void emit_foreign(std::uint32_t id, const ForeignFunction& f) {
@@ -967,7 +972,7 @@ public:
         for (const auto& f : program.foreign) {
             if (!declared_symbols.insert(f.symbol).second) continue;
             const auto& fn = program.functions[f.function];
-            out << "extern \"C\" " << (fn.result == type_unit ? "void" : c_type(fn.result)) << " " << f.symbol << "(";
+            out << "extern \"C\" " << (fn.result == type_unit ? "void" : c_return_type(fn.result)) << " " << f.symbol << "(";
             for (std::size_t p = 0; p < fn.params.size(); ++p) out << (p ? ", " : "") << c_type(fn.params[p]);
             out << ");\n";
         }
@@ -1057,10 +1062,14 @@ void build_native(const Program& program, const std::filesystem::path& output) {
     // Libraries named by `from "..."` on extern declarations, each linked once.
     std::set<std::string> libraries;
     for (const auto& f : program.foreign) if (!f.library.empty()) libraries.insert(f.library);
+    // These Unix runtime libraries have no separate import library on MSVC — their symbols live
+    // in the C runtime, which is always linked — so naming them there would fail with "cannot
+    // open file 'NAME.lib'". Drop them on MSVC; keep them (as -lNAME) everywhere else.
+    static const std::set<std::string> msvc_implicit = {"m", "pthread", "dl", "rt", "c"};
     std::string libs_posix, libs_msvc;
     for (const auto& lib : libraries) {
         libs_posix += " -l" + lib;
-        libs_msvc += " " + lib + ".lib";
+        if (!msvc_implicit.count(lib)) libs_msvc += " " + lib + ".lib";
     }
 #if defined(_WIN32)
     if (compiler.empty()) compiler = "cl";

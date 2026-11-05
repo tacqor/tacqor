@@ -280,7 +280,7 @@ An `extern def` declaration names a C function. In a native build (`tacqor build
 extern def sqrt(x: f64) -> f64 from "m"            # links libm, calls C's sqrt
 extern def llabs(n: i64) -> i64                     # libc; no library to name
 extern def getenv(name: str) -> str                 # str crosses as const char*
-extern def c_strlen(s: str) -> i64 = "strlen"       # = renames the C symbol
+extern def to_int(s: str) -> i64 = "atoll"          # = renames the C symbol
 ```
 
 `from "name"` names a library to link (`-lname`, or `name.lib` on MSVC); omit it for libc and libm symbols that link by default. `= "symbol"` gives the C symbol when it differs from the Tacqor name. Only scalars and strings cross the boundary: `i64` as `long long`, `f64` as `double`, `bool` as `int` (0 or 1), and `str` as a NUL-terminated `const char*` — a string argument is passed by pointer into the C function, and a `const char*` result is copied into a Tacqor string (a NULL result becomes `""`). A parameter or result of any other type is a compile-time error. Pointers and structs are not supported yet.
