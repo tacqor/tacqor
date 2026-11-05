@@ -89,12 +89,12 @@ def test_channels():
     testing.assert_true(not is_some(channels.try_recv(ch)), "try_recv on a drained channel is None")
 
 def test_bulk_numeric():
-    # 1.4 opt-in wrapping arithmetic: two's-complement wraparound, no overflow trap.
+    # 1.3 opt-in wrapping arithmetic: two's-complement wraparound, no overflow trap.
     testing.assert_eq(wrapping_add(9223372036854775807, 1), 0 - 9223372036854775807 - 1)  # max + 1 -> min
     testing.assert_eq(wrapping_sub(0 - 9223372036854775807 - 1, 1), 9223372036854775807)   # min - 1 -> max
     testing.assert_eq(wrapping_mul(9223372036854775807, 2), 0 - 2)                          # max * 2 -> -2
 
-    # 1.4 SIMD-friendly float bulk ops.
+    # 1.3 SIMD-friendly float bulk ops.
     let xs: list[f64] = [1.0, 2.0, 3.0, 4.0]
     let ys: list[f64] = [10.0, 20.0, 30.0, 40.0]
     testing.assert_eq(dot(xs, ys), 300.0)

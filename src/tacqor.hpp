@@ -10,7 +10,7 @@
 
 namespace tacqor {
 
-constexpr std::string_view version = "1.4.0";
+constexpr std::string_view version = "1.3.0";
 constexpr std::size_t source_limit = 4'000'000;
 constexpr std::size_t bytecode_limit = 64'000'000;
 constexpr std::size_t value_limit = 65'536;        // locals per function, list literal size
@@ -124,7 +124,7 @@ enum class Builtin : std::uint8_t {
     run_capture, unix_time, hash,
     // 1.3 — value channels between workers
     channel, channel_send, channel_recv, channel_try_recv, channel_close,
-    // 1.4 — opt-in unchecked arithmetic and SIMD-friendly bulk numeric ops
+    // 1.3 — opt-in unchecked arithmetic and SIMD-friendly bulk numeric ops
     wrapping_add, wrapping_sub, wrapping_mul,
     dot, vadd, vmul, vscale,
     count,  // sentinel

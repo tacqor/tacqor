@@ -4,24 +4,9 @@ All notable changes to Tacqor. Versions follow `MAJOR.MINOR.PATCH`: a minor rele
 
 ## Unreleased
 
-## 1.4.0 — unreleased
+## 1.3.0 — 2026-11-05
 
-Performance release. Idiomatic numeric code vectorizes, and the hot-loop escape hatch is explicit.
-
-**Language**
-- SIMD-friendly bulk numeric ops over contiguous lists: `dot(a, b)` (inner product), `vadd(a, b)`/`vmul(a, b)` (element-wise), and `vscale(xs, k)` (scalar multiply), for `list[f64]` and `list[i64]`. The `f64` paths run straight over the flat backing buffer, so the system compiler auto-vectorizes them; on cache-resident data a `dot` over `list[f64]` runs ~18× faster than the equivalent hand-written index loop and within ~1.6× of hand-tuned C++ (see `docs/PERFORMANCE.md` §4b). The `i64` paths stay overflow-checked and exact (so they do not vectorize — use `f64`, or `wrapping_*` in a hand loop, for raw integer throughput). Length mismatches are a runtime error.
-- `wrapping_add`/`wrapping_sub`/`wrapping_mul` for `i64`: two's-complement wraparound with no overflow trap, for the hot loops where wraparound is intended and the overflow check is pure cost. Everything else keeps Tacqor's checked-by-default arithmetic.
-- `sum`, `min_of` and `max_of` now read flat `list[i64]`/`list[f64]` storage directly instead of boxing each element, a transparent speedup with identical results.
-
-**Native backend**
-- `TACQOR_CXXFLAGS` is folded verbatim into the native compile, so a release build can target the host CPU (`TACQOR_CXXFLAGS="-march=native"`) to unlock AVX for the vectorized bulk ops. Builds stay portable by default (no `-march`).
-
-**FFI**
-- Worked offload example (`examples/ffi_offload.tq`) showing heavy numeric work handed to a compiled C routine through `extern def` — the same pattern used to call a BLAS, a SIMD kernel, or a CUDA/OpenCL launcher. See `docs/COOKBOOK.md`.
-
-## 1.3.0 — 2026-11-04
-
-Concurrency release. Tacqor can now use more than one core for request handling, within the bounds its memory model allows.
+Concurrency and performance release. Tacqor can now use more than one core for request handling, within the bounds its memory model allows, and idiomatic numeric code vectorizes.
 
 **Language**
 - Channels pass string messages between workers without a file: `channel()` returns a handle (a scalar, so a `parallel_run` task can capture it), `channel_send`/`channel_recv` (blocking, `Option[str]`)/`channel_try_recv`/`channel_close` move copies through a thread-safe queue, so nothing on the heap is shared. Wrapped by the new `std.channels` module (`make`/`send`/`recv`/`try_recv`/`close`). Clean under ASan/UBSan.
@@ -42,6 +27,13 @@ Concurrency release. Tacqor can now use more than one core for request handling,
 **Infrastructure**
 - The macOS build moves to its own workflow (`macos.yml`) so GitHub's refused macOS runners no longer mark CI or Release runs as failed; it still attaches a macOS binary to tagged releases when a runner is available.
 - Portability: the computed-goto threaded VM dispatch is now gated to real GCC. Clang (including Apple Clang) defines `__GNUC__` but rejects an indirect `goto` into the scope of a variable with a non-trivial destructor, so it uses the switch-based dispatch instead — which the differential test suite proves equivalent. Fixes the macOS build.
+
+**Performance**
+- SIMD-friendly bulk numeric ops over contiguous lists: `dot(a, b)` (inner product), `vadd(a, b)`/`vmul(a, b)` (element-wise), and `vscale(xs, k)` (scalar multiply), for `list[f64]` and `list[i64]`. The `f64` paths run straight over the flat backing buffer, so the system compiler auto-vectorizes them; on cache-resident data a `dot` over `list[f64]` runs ~34× faster than the equivalent hand-written index loop and reaches the hand-tuned C++ ceiling with `-march=native` (see `docs/PERFORMANCE.md` §4b). The `i64` paths stay overflow-checked and exact (so they do not vectorize — use `f64`, or `wrapping_*` in a hand loop, for raw integer throughput). Length mismatches are a runtime error.
+- `wrapping_add`/`wrapping_sub`/`wrapping_mul` for `i64`: two's-complement wraparound with no overflow trap, for the hot loops where wraparound is intended and the overflow check is pure cost. Everything else keeps Tacqor's checked-by-default arithmetic.
+- `sum`, `min_of` and `max_of` now read flat `list[i64]`/`list[f64]` storage directly instead of boxing each element, a transparent speedup with identical results.
+- The native backend folds `TACQOR_CXXFLAGS` verbatim into the compile, so a release build can target the host CPU (`TACQOR_CXXFLAGS="-march=native"`) to unlock AVX for the vectorized bulk ops. Builds stay portable by default (no `-march`).
+- Worked FFI offload example (`examples/ffi_offload.tq`): heavy numeric work handed to a compiled C routine through `extern def` — the same handle pattern used to call a BLAS, a SIMD kernel, or a CUDA/OpenCL launcher. See `docs/COOKBOOK.md` §11.
 
 ## 1.2.1 — 2026-11-04
 

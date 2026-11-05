@@ -1,5 +1,5 @@
 #!/bin/sh
-# Times the 1.4 bulk numeric ops: the dot() builtin against the same inner product written
+# Times the 1.3 bulk numeric ops: the dot() builtin against the same inner product written
 # as a hand loop, plus the C++ and CPython references. Cache-resident data, so this measures
 # compute (vectorization), not memory bandwidth.
 # Usage: sh benchmarks/numeric.sh [path/to/tacqor]

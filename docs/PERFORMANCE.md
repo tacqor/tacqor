@@ -54,9 +54,9 @@ Ratios:
 | `closures` | — | 4× faster | 1.5× faster |
 | `objs` | — | 5× faster | 3.7× faster |
 
-## 4b. Bulk numeric ops (1.4)
+## 4b. Bulk numeric ops (1.3)
 
-The 1.4 bulk ops (`dot`, `vadd`, `vmul`, `vscale`) run their `f64` work straight over a list's flat backing buffer, so the system compiler auto-vectorizes them. The benchmark is a 16,384-element `f64` inner product repeated 20,000 times (327 M multiply-adds), with the working set small enough to stay in cache so the measurement is compute, not memory bandwidth. Reproduce with `sh benchmarks/numeric.sh`.
+The 1.3 bulk ops (`dot`, `vadd`, `vmul`, `vscale`) run their `f64` work straight over a list's flat backing buffer, so the system compiler auto-vectorizes them. The benchmark is a 16,384-element `f64` inner product repeated 20,000 times (327 M multiply-adds), with the working set small enough to stay in cache so the measurement is compute, not memory bandwidth. Reproduce with `sh benchmarks/numeric.sh`.
 
 Seconds, lower is better. Same machine as §2 (2 vCPUs, GCC 13.3, CPython 3.13), best of three.
 
@@ -149,7 +149,7 @@ Native build time is the system C++ compiler at `-O3` on the generated source pl
 ```sh
 sh benchmarks/run.sh                 # uses ./tacqor or linux-x64/tacqor
 sh benchmarks/run.sh /path/to/tacqor
-sh benchmarks/numeric.sh             # the 1.4 bulk-op table in §4b
+sh benchmarks/numeric.sh             # the 1.3 bulk-op table in §4b
 ```
 
 `run.sh` builds every benchmark with every toolchain it finds (`c++`, `rustc`, `python3` are optional) and prints a table of best-of-three times; run it three times and take the minimum of each cell to reproduce §4. `numeric.sh` builds the `dot()` benchmark portable and with `-march=native`, alongside the hand loop and the C++/CPython references, to reproduce §4b.

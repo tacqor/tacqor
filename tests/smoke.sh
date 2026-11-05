@@ -26,7 +26,7 @@ test "$("$tool" run "$temp/total.tqb" -- "hello world")" = "$output"
 mkdir "$temp/isolated"
 mv "$temp/total" "$temp/isolated/total"
 test "$(cd "$temp/isolated"; /usr/bin/env -i PATH=/unavailable ./total "hello world")" = "$output"
-test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.4.0'
+test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.3.0'
 
 printf 'def main():\n    print(1 + True)\n' > "$temp/error.tq"
 if "$tool" diagnose "$temp/error.tq" > "$temp/findings.json"; then exit 1; fi
@@ -191,12 +191,12 @@ grep -q 'immutable' "$temp/repl.log"
 "$temp/f12" | cmp - tests/features_1_2.expected
 "$tool" tests/features_1_2.tq | cmp - tests/features_1_2.expected      # `tacqor FILE.tq` runs it
 
-# --- 1.4: wrapping arithmetic and SIMD-friendly bulk numeric ops (VM/bytecode/native parity) ---
-"$tool" run tests/features_1_4.tq | cmp - tests/features_1_4.expected
-"$tool" compile tests/features_1_4.tq -o "$temp/f14.tqb"
-"$tool" run "$temp/f14.tqb" | cmp - tests/features_1_4.expected
-"$tool" build tests/features_1_4.tq -o "$temp/f14"
-"$temp/f14" | cmp - tests/features_1_4.expected
+# --- 1.3: wrapping arithmetic and SIMD-friendly bulk numeric ops (VM/bytecode/native parity) ---
+"$tool" run tests/features_1_3.tq | cmp - tests/features_1_3.expected
+"$tool" compile tests/features_1_3.tq -o "$temp/f13.tqb"
+"$tool" run "$temp/f13.tqb" | cmp - tests/features_1_3.expected
+"$tool" build tests/features_1_3.tq -o "$temp/f13"
+"$temp/f13" | cmp - tests/features_1_3.expected
 # the i64 bulk ops stay overflow-checked, and mismatched lengths are a runtime error
 printf 'def main():\n    print(vadd([9223372036854775807], [1]))\n' > "$temp/ov.tq"
 if "$tool" run "$temp/ov.tq" 2>"$temp/ov.log"; then exit 1; fi

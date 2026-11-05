@@ -1064,7 +1064,7 @@ constexpr int builtin_arity[] = {
     1, 1, 2, 2, 2, 1, 1, 0, 1,
     // 1.3 — channel, channel_send, channel_recv, channel_try_recv, channel_close
     0, 2, 1, 1, 1,
-    // 1.4 — wrapping_add, wrapping_sub, wrapping_mul, dot, vadd, vmul, vscale
+    // 1.3 — wrapping_add, wrapping_sub, wrapping_mul, dot, vadd, vmul, vscale
     2, 2, 2, 2, 2, 2, 2,
 };
 
@@ -1696,7 +1696,7 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             for (std::size_t i = 0; i < count; ++i) target.push(source.get(i));
             return {};
         }
-        // 1.4 — opt-in unchecked arithmetic. Wraps modulo 2^64 (two's complement), like C/Rust
+        // 1.3 — opt-in unchecked arithmetic. Wraps modulo 2^64 (two's complement), like C/Rust
         // wrapping_*; no overflow trap. For hot loops where wraparound is intended and the
         // overflow check is pure cost.
         case Builtin::wrapping_add:
@@ -1705,7 +1705,7 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             return static_cast<Int>(static_cast<std::uint64_t>(int_of(args[0])) - static_cast<std::uint64_t>(int_of(args[1])));
         case Builtin::wrapping_mul:
             return static_cast<Int>(static_cast<std::uint64_t>(int_of(args[0])) * static_cast<std::uint64_t>(int_of(args[1])));
-        // 1.4 — SIMD-friendly bulk numeric ops over contiguous lists. The f64 paths run straight
+        // 1.3 — SIMD-friendly bulk numeric ops over contiguous lists. The f64 paths run straight
         // over the flat backing buffer so the system compiler auto-vectorizes them at -O3. The i64
         // paths stay overflow-checked (safe, exact) and so do not vectorize — use f64, or wrapping_*
         // in a hand loop, when you want raw integer throughput.

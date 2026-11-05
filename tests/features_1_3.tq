@@ -1,4 +1,4 @@
-# 1.4 — opt-in wrapping arithmetic and SIMD-friendly bulk numeric ops.
+# 1.3 — opt-in wrapping arithmetic and SIMD-friendly bulk numeric ops.
 # Output must be identical on the VM, bytecode, and native backends.
 def main():
     # Wrapping arithmetic: two's-complement wraparound, no overflow trap.
