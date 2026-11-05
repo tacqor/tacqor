@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tacqor — MANUAL</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+:root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
+html { font-size: 17px; }
+body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--fg); line-height: 1.55; max-width: 60rem; margin: 0 auto; padding: 1.5rem 1.2rem 4rem; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 1.6rem 0 0.6rem; border-bottom: 2px solid var(--rule); padding-bottom: .4rem; }
+h2 { font-size: 1.45rem; margin: 2.2rem 0 .6rem; border-bottom: 1px solid var(--rule); padding-bottom: .25rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .4rem; }
+p, li { max-width: 48rem; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { background: var(--code); padding: .1em .3em; border-radius: 4px; }
+pre { background: var(--code); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.4; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1rem 0; display: block; overflow-x: auto; font-size: .95em; }
+th, td { border: 1px solid var(--rule); padding: .35rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+img, svg { max-width: 100%; height: auto; display: block; margin: 1.2rem auto; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--muted); font-size: .9em; text-align: center; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+blockquote { border-left: 4px solid var(--rule); margin: 1rem 0; padding: .2rem 1rem; color: var(--muted); }
+nav#TOC { background: var(--code); padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; }
+nav#TOC ul { margin: 0; padding-left: 1.2rem; } nav#TOC > ul { padding-left: 0; list-style: none; }
+.title { margin-top: 0; } .subtitle, .author, .date { color: var(--muted); margin: .2rem 0; }
+@media print { body { max-width: none; } nav#TOC { display: none; } h2 { page-break-after: avoid; } pre, table, figure { page-break-inside: avoid; } }
+
+.fig { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; margin: 1.2rem 0; background: #fff; }
+.fig img { max-width: none; margin: 0 auto; display: block; }
+.fig figcaption { margin-top: .5rem; }
+.docnav { font-size: .9em; color: var(--muted); margin-bottom: 1rem; }
+
+</style>
+</head>
+<body>
+<div class="docnav"><a href="index.html">Tacqor documentation</a></div>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#the-tacqor-manual" id="toc-the-tacqor-manual">The Tacqor
+Manual</a>
+<ul>
+<li><a href="#contents" id="toc-contents">Contents</a></li>
+<li><a href="#1-overview" id="toc-1-overview">1. Overview</a></li>
+<li><a href="#2-the-toolchain-and-execution-modes"
+id="toc-2-the-toolchain-and-execution-modes">2. The toolchain and
+execution modes</a></li>
+<li><a href="#3-lexical-structure" id="toc-3-lexical-structure">3.
+Lexical structure</a></li>
+<li><a href="#4-types" id="toc-4-types">4. Types</a></li>
+<li><a href="#5-bindings-let-var-const"
+id="toc-5-bindings-let-var-const">5. Bindings: <code>let</code>,
+<code>var</code>, <code>const</code></a></li>
+<li><a href="#6-operators" id="toc-6-operators">6. Operators</a></li>
+<li><a href="#7-expressions" id="toc-7-expressions">7.
+Expressions</a></li>
+<li><a href="#8-statements" id="toc-8-statements">8. Statements</a></li>
+<li><a href="#9-functions-and-closures"
+id="toc-9-functions-and-closures">9. Functions and closures</a></li>
+<li><a href="#10-structs-and-methods"
+id="toc-10-structs-and-methods">10. Structs and methods</a></li>
+<li><a href="#11-traits" id="toc-11-traits">11. Traits</a></li>
+<li><a href="#12-generics" id="toc-12-generics">12. Generics</a></li>
+<li><a href="#13-pattern-matching" id="toc-13-pattern-matching">13.
+Pattern matching</a></li>
+<li><a href="#14-error-handling" id="toc-14-error-handling">14. Error
+handling</a></li>
+<li><a href="#15-modules-and-packages"
+id="toc-15-modules-and-packages">15. Modules and packages</a></li>
+<li><a href="#16-concurrency" id="toc-16-concurrency">16.
+Concurrency</a></li>
+<li><a href="#17-c-foreign-function-interface"
+id="toc-17-c-foreign-function-interface">17. C foreign function
+interface</a></li>
+<li><a href="#18-memory-model" id="toc-18-memory-model">18. Memory
+model</a></li>
+<li><a href="#19-built-in-function-reference"
+id="toc-19-built-in-function-reference">19. Built-in function
+reference</a></li>
+<li><a href="#20-standard-library-reference"
+id="toc-20-standard-library-reference">20. Standard library
+reference</a></li>
+<li><a href="#21-diagnostics" id="toc-21-diagnostics">21.
+Diagnostics</a></li>
+<li><a href="#22-limits" id="toc-22-limits">22. Limits</a></li>
+<li><a href="#23-appendix-keywords-and-operators"
+id="toc-23-appendix-keywords-and-operators">23. Appendix: keywords and
+operators</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="the-tacqor-manual">The Tacqor Manual</h1>
+<p>The complete reference for the Tacqor programming language and
+toolchain, version 1.3.0. Every language construct, every built-in
+function, every standard-library module, every command, and every limit
+is documented here, derived directly from the implementation. For the
+formal grammar see <a
+href="SPECIFICATION.html"><code>SPECIFICATION.md</code></a>; for the
+bytecode see <a href="BYTECODE.html"><code>BYTECODE.md</code></a>; for
+runnable programs see <a
+href="COOKBOOK.html"><code>COOKBOOK.md</code></a>.</p>
+<h2 id="contents">Contents</h2>
+<ol type="1">
+<li><a href="#1-overview">Overview</a></li>
+<li><a href="#2-the-toolchain-and-execution-modes">The toolchain and
+execution modes</a></li>
+<li><a href="#3-lexical-structure">Lexical structure</a></li>
+<li><a href="#4-types">Types</a></li>
+<li><a href="#5-bindings-let-var-const">Bindings: <code>let</code>,
+<code>var</code>, <code>const</code></a></li>
+<li><a href="#6-operators">Operators</a></li>
+<li><a href="#7-expressions">Expressions</a></li>
+<li><a href="#8-statements">Statements</a></li>
+<li><a href="#9-functions-and-closures">Functions and closures</a></li>
+<li><a href="#10-structs-and-methods">Structs and methods</a></li>
+<li><a href="#11-traits">Traits</a></li>
+<li><a href="#12-generics">Generics</a></li>
+<li><a href="#13-pattern-matching">Pattern matching</a></li>
+<li><a href="#14-error-handling">Error handling</a></li>
+<li><a href="#15-modules-and-packages">Modules and packages</a></li>
+<li><a href="#16-concurrency">Concurrency</a></li>
+<li><a href="#17-c-foreign-function-interface">C foreign function
+interface</a></li>
+<li><a href="#18-memory-model">Memory model</a></li>
+<li><a href="#19-built-in-function-reference">Built-in function
+reference</a></li>
+<li><a href="#20-standard-library-reference">Standard library
+reference</a></li>
+<li><a href="#21-diagnostics">Diagnostics</a></li>
+<li><a href="#22-limits">Limits</a></li>
+<li><a href="#23-appendix-keywords-and-operators">Appendix: keywords and
+operators</a></li>
+</ol>
+<hr />
+<h2 id="1-overview">1. Overview</h2>
+<p>Tacqor is a statically typed language with Python's syntax and Rust's
+error discipline. One source program can run two ways: on a bytecode
+virtual machine, or as native machine code generated through the system
+C++ compiler. A single executable checks, runs, compiles, tests,
+packages, and serves as a REPL and a language server.</p>
+<p>A minimal program:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Hello, world!&quot;</span>)</span></code></pre></div>
+<p>Every program's entry point is <code>def main():</code> — no
+parameters, no result. Top-level items are functions (<code>def</code>),
+foreign functions (<code>extern def</code>), structures
+(<code>struct</code>), traits (<code>trait</code>), constants
+(<code>const</code>), and imports (<code>import</code>). Statements may
+not appear at the top level; they live inside function bodies.</p>
+<p>The design is defined as much by what it omits as by what it
+includes. There is no inheritance (traits, generics and composition
+replace it), no exceptions (<code>Result</code>, <code>?</code> and
+<code>attempt</code>), no <code>null</code> (<code>Option</code>), no
+implicit numeric conversions, no operator overloading, no macros, and no
+ownership system. Each omission keeps reasoning local: you can
+understand a line without chasing non-local behavior.</p>
+<hr />
+<h2 id="2-the-toolchain-and-execution-modes">2. The toolchain and
+execution modes</h2>
+<p>The whole toolchain is the single <code>tacqor</code> executable.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>tacqor FILE.tq [ARG ...]</code></td>
+<td>Run a program (same as <code>run</code>).</td>
+</tr>
+<tr class="even">
+<td><code>tacqor run FILE.tq | FILE.tqb [-- ARG ...]</code></td>
+<td>Run a source file or compiled bytecode. Arguments after
+<code>--</code> reach <code>args()</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor check FILE.tq</code></td>
+<td>Type-check without running; prints <code>OK</code> or the first
+error.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor diagnose FILE.tq | --stdin [FILE.tq]</code></td>
+<td>Emit all diagnostics as JSON (for editors). <code>--stdin</code>
+reads the source from standard input.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor test FILE.tq</code></td>
+<td>Run every <code>def test_*()</code> in the file; report pass/fail
+counts.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor dump FILE.tq | FILE.tqb</code></td>
+<td>Disassemble to human-readable bytecode.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor compile FILE.tq -o FILE.tqb</code></td>
+<td>Compile to a portable bytecode file.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor build FILE.tq -o EXE</code></td>
+<td>Produce a standalone executable with the bytecode and an embedded
+VM.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor build --native FILE.tq -o EXE</code></td>
+<td>Produce native machine code via the system C++ compiler.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor emit FILE.tq -o FILE.cpp</code></td>
+<td>Emit the C++ that <code>build --native</code> would compile.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor new NAME</code></td>
+<td>Create a project folder (<code>main.tq</code>,
+<code>tests.tq</code>).</td>
+</tr>
+<tr class="even">
+<td><code>tacqor repl</code></td>
+<td>Interactive scratchpad.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor lsp</code></td>
+<td>Language server over stdio, for any LSP-capable editor.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor add SOURCE [NAME]</code></td>
+<td>Install a package from a folder or git URL into
+<code>packages/</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor install</code></td>
+<td>Restore every package listed in <code>tacqor.pkg</code>.</td>
+</tr>
+<tr class="even">
+<td><code>tacqor remove NAME</code></td>
+<td>Uninstall a package.</td>
+</tr>
+<tr class="odd">
+<td><code>tacqor --version</code> · <code>tacqor --help</code></td>
+<td>Version string; usage.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The four execution modes.</strong> <code>run</code> (and
+<code>FILE.tq</code>) interpret on the VM — the fastest edit/run loop.
+<code>compile</code> produces <code>.tqb</code> bytecode that
+<code>run</code> executes anywhere. <code>build</code> embeds that
+bytecode plus the VM into one executable that needs no
+<code>tacqor</code> present. <code>build --native</code> transpiles to
+C++ and compiles to machine code at <code>-O3</code> for production
+speed. All four produce identical observable behavior; the differential
+test suite checks this byte for byte.</p>
+<p><strong>Environment variables.</strong> <code>TACQOR_CXX</code> or
+<code>CXX</code> select the C++ compiler for native builds;
+<code>TACQOR_HOME</code> overrides where the standard library is found.
+<strong>Exit codes:</strong> <code>0</code> success; <code>1</code> a
+runtime error or a failed check/test; <code>2</code> a usage error;
+<code>3+</code> whatever <code>exit(n)</code> requested.</p>
+<hr />
+<h2 id="3-lexical-structure">3. Lexical structure</h2>
+<p><strong>Encoding and layout.</strong> Source is UTF-8. Indentation is
+significant, as in Python: a block is introduced by <code>:</code> and a
+newline, then an indented group of statements. A <code>#</code> begins a
+comment to end of line.</p>
+<p><strong>Identifiers</strong> are letters, digits and underscore, not
+starting with a digit. <strong>Reserved words</strong> may not be used
+as identifiers:</p>
+<pre><code>def  struct  let  var  if  elif  else  while  for  in  break  continue
+return  assert  and  or  not  True  False  None  range  fn  match  case
+import  as  const  Some  Ok  Err  Option  Result  trait  extern
+i64  f64  bool  str  list  dict</code></pre>
+<p><strong>Literals.</strong></p>
+<ul>
+<li><strong>Integer</strong> — decimal digits with optional
+<code>_</code> separators, e.g. <code>1_000_000</code>. No leading
+zeroes. Range is the signed 64-bit range;
+<code>-9223372036854775808</code> is accepted as a unary-minus
+literal.</li>
+<li><strong>Float</strong> — digits with a <code>.</code> and/or
+exponent, e.g. <code>3.14</code>, <code>6.022e23</code>.</li>
+<li><strong>Boolean</strong> — <code>True</code>,
+<code>False</code>.</li>
+<li><strong>String</strong> — <code>"..."</code> double-quoted, UTF-8
+bytes, with escapes <code>\n \t \r \\ \" \0</code> and others.</li>
+<li><strong>Interpolated string (f-string)</strong> —
+<code>f"text {expr} more"</code>. Each <code>{expr}</code> is evaluated
+and converted with <code>str()</code>, then concatenated.
+<code>{{</code> and <code>}}</code> are literal braces.</li>
+</ul>
+<hr />
+<h2 id="4-types">4. Types</h2>
+<p>Tacqor is statically typed with inference; annotations are needed
+only where inference cannot decide (an empty literal, a bare
+<code>None</code>).</p>
+<p><strong>Primitive types</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>i64</code></td>
+<td>Signed 64-bit integers. Arithmetic is overflow-checked (a runtime
+error on overflow).</td>
+</tr>
+<tr class="even">
+<td><code>f64</code></td>
+<td>IEEE-754 double-precision floats.</td>
+</tr>
+<tr class="odd">
+<td><code>bool</code></td>
+<td><code>True</code> / <code>False</code>.</td>
+</tr>
+<tr class="even">
+<td><code>str</code></td>
+<td>Immutable byte strings (UTF-8 by convention). <code>chars</code>,
+<code>char_count</code>, <code>chr</code>, <code>ord</code> are the
+code-point-aware operations; indexing and <code>len</code> are
+byte-based.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Composite types</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>list[T]</code></td>
+<td>A growable ordered sequence of <code>T</code>.</td>
+</tr>
+<tr class="even">
+<td><code>dict[K, V]</code></td>
+<td>A hash map; <code>K</code> must be <code>i64</code> or
+<code>str</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>Option[T]</code></td>
+<td><code>Some(T)</code> or <code>None</code> — a value that may be
+absent.</td>
+</tr>
+<tr class="even">
+<td><code>Result[T, E]</code></td>
+<td><code>Ok(T)</code> or <code>Err(E)</code> — a success or a
+failure.</td>
+</tr>
+<tr class="odd">
+<td><code>fn(A, B, ...) -&gt; R</code></td>
+<td>A function value; <code>-&gt; R</code> omitted means it returns
+nothing (unit).</td>
+</tr>
+<tr class="even">
+<td>a struct name</td>
+<td>A value of that structure.</td>
+</tr>
+<tr class="odd">
+<td>a trait name</td>
+<td>A trait object (dynamic dispatch) when used as a type.</td>
+</tr>
+</tbody>
+</table>
+<p>Numbers never convert implicitly: mixing <code>i64</code> and
+<code>f64</code> in one operation is an error; use <code>int(x)</code>
+or <code>float(x)</code>. <code>i64</code> divides with <code>//</code>;
+<code>f64</code> divides with <code>/</code>.</p>
+<hr />
+<h2 id="5-bindings-let-var-const">5. Bindings: <code>let</code>,
+<code>var</code>, <code>const</code></h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>let x <span class="op">=</span> <span class="dv">10</span>                     <span class="co"># immutable binding, type inferred</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>let y: f64 <span class="op">=</span> <span class="fl">2.0</span>               <span class="co"># with an annotation</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>var count <span class="op">=</span> <span class="dv">0</span>                  <span class="co"># mutable; may be reassigned and compound-assigned</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>count <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>const LIMIT <span class="op">=</span> <span class="dv">100</span>              <span class="co"># top-level compile-time constant</span></span></code></pre></div>
+<p><code>let</code> binds a value that cannot be reassigned;
+<code>var</code> binds one that can. <code>const</code> is a top-level
+constant initialized by a constant expression. A binding captured by a
+closure is read-only inside that closure — closures capture by value.
+Shadowing in the same scope is an error; so is redeclaring a captured
+name.</p>
+<hr />
+<h2 id="6-operators">6. Operators</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Operators</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Arithmetic (<code>i64</code>)</td>
+<td><code>+</code> <code>-</code> <code>*</code> <code>//</code>
+<code>%</code></td>
+<td>Overflow-checked; <code>//</code> is integer division,
+<code>%</code> is modulo.</td>
+</tr>
+<tr class="even">
+<td>Arithmetic (<code>f64</code>)</td>
+<td><code>+</code> <code>-</code> <code>*</code> <code>/</code>
+<code>%</code></td>
+<td><code>/</code> is float division.</td>
+</tr>
+<tr class="odd">
+<td>Comparison</td>
+<td><code>==</code> <code>!=</code> <code>&lt;</code> <code>&lt;=</code>
+<code>&gt;</code> <code>&gt;=</code></td>
+<td>Order comparisons apply to <code>i64</code>, <code>f64</code>,
+<code>str</code>.</td>
+</tr>
+<tr class="even">
+<td>Logical</td>
+<td><code>and</code> <code>or</code> <code>not</code></td>
+<td>Short-circuiting; operate on <code>bool</code>.</td>
+</tr>
+<tr class="odd">
+<td>Bitwise (<code>i64</code>)</td>
+<td><code>&amp;</code> <code>|</code> <code>^</code>
+<code>&lt;&lt;</code> <code>&gt;&gt;</code> <code>~</code></td>
+<td>Shift counts must be 0–63.</td>
+</tr>
+<tr class="even">
+<td>Membership</td>
+<td><code>in</code></td>
+<td>Tests a <code>list</code>, <code>dict</code> (keys), or
+<code>str</code> (substring).</td>
+</tr>
+<tr class="odd">
+<td>Concatenation</td>
+<td><code>+</code></td>
+<td>On <code>str</code>; <code>str</code> supports only
+<code>+</code>.</td>
+</tr>
+<tr class="even">
+<td>Compound assignment</td>
+<td><code>=</code> <code>+=</code> <code>-=</code> <code>*=</code>
+<code>/=</code> <code>//=</code> <code>%=</code> <code>&amp;=</code>
+<code>|=</code> <code>^=</code> <code>&lt;&lt;=</code>
+<code>&gt;&gt;=</code></td>
+<td>On a <code>var</code> binding or a list/dict element or a struct
+field.</td>
+</tr>
+</tbody>
+</table>
+<p>Comparisons do not chain (<code>a &lt; b &lt; c</code> is an error;
+use <code>a &lt; b and b &lt; c</code>). <code>not</code> must be
+parenthesized where precedence would be ambiguous.</p>
+<hr />
+<h2 id="7-expressions">7. Expressions</h2>
+<p><strong>Calls</strong> — <code>f(a, b)</code>.
+<strong>Indexing</strong> — <code>xs[i]</code> on a list, dict or string
+(returns a one-byte string for <code>str</code>).
+<strong>Slicing</strong> — <code>xs[a:b]</code>, <code>xs[a:]</code>,
+<code>xs[:b]</code> on lists and strings. <strong>Field access</strong>
+— <code>value.field</code> on a struct. <strong>Method calls</strong> —
+<code>value.method(args)</code>.</p>
+<p><strong>Lambdas.</strong> Expression-bodied:
+<code>fn(x: i64) =&gt; x * x</code>. Block-bodied (bound to a name or
+passed where a block is allowed):</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>let classify <span class="op">=</span> fn(n: i64) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">&quot;negative&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;non-negative&quot;</span></span></code></pre></div>
+<p>A lambda captures the surrounding bindings <strong>by value</strong>;
+captured names are read-only inside it.</p>
+<p><strong>f-strings</strong> — <code>f"{name} scored {score}"</code>;
+each hole is <code>str()</code>-converted.</p>
+<p><strong>The <code>?</code> operator</strong> — postfix on an
+<code>Option</code> or <code>Result</code>. <code>value?</code>
+evaluates to the inner value on <code>Some</code>/<code>Ok</code>, and
+otherwise returns <code>None</code>/<code>Err(e)</code> from the
+enclosing function, whose return type must match.</p>
+<hr />
+<h2 id="8-statements">8. Statements</h2>
+<p><strong>Assignment</strong> — <code>target = expr</code> and the
+compound forms, where <code>target</code> is a <code>var</code>, a
+list/dict element, or a struct field.</p>
+<p><strong>Conditionals</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> condition:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> other:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div>
+<p><strong>Loops</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):            <span class="co"># 0..9</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">5</span>):          <span class="co"># 2,3,4</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> item <span class="kw">in</span> collection:        <span class="co"># over a list</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> condition:</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div>
+<p><strong><code>match</code></strong> — on <code>Option</code>,
+<code>Result</code>, <code>i64</code>, <code>f64</code>,
+<code>bool</code>, or <code>str</code> (see §13).
+<strong><code>break</code></strong> and
+<strong><code>continue</code></strong> control the nearest loop.
+<strong><code>return [expr]</code></strong> leaves a function.
+<strong><code>assert condition</code></strong> raises a runtime error if
+the condition is false. A statement after a guaranteed
+<code>return</code> is a compile error (unreachable code).</p>
+<hr />
+<h2 id="9-functions-and-closures">9. Functions and closures</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add(a: i64, b: i64) <span class="op">-&gt;</span> i64:</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a <span class="op">+</span> b</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> greet(name: <span class="bu">str</span>):          <span class="co"># no -&gt; means it returns nothing</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;hi &quot;</span> <span class="op">+</span> name)</span></code></pre></div>
+<p>Every parameter is annotated; the result type follows
+<code>-&gt;</code> or is absent. A non-unit function must return on
+every path. Functions are values: a bare name is a function value, and
+lambdas create them inline. A closure is a function value that captured
+surrounding bindings by value. <code>main</code> cannot be called or
+used as a value.</p>
+<hr />
+<h2 id="10-structs-and-methods">10. Structs and methods</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>struct Account:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    owner: <span class="bu">str</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    balance: i64</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> withdraw(<span class="va">self</span>, amount: i64) <span class="op">-&gt;</span> Result[i64, <span class="bu">str</span>]:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> amount <span class="op">&gt;</span> <span class="va">self</span>.balance:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> Err(<span class="st">&quot;insufficient funds&quot;</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.balance <span class="op">-=</span> amount</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Ok(<span class="va">self</span>.balance)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>let a <span class="op">=</span> Account(<span class="st">&quot;Ada&quot;</span>, <span class="dv">100</span>)    <span class="co"># positional construction, fields in order</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.balance)</span></code></pre></div>
+<p>A method's first parameter is <code>self</code>. Fields are assigned
+with <code>self.field = ...</code> inside methods and
+<code>value.field = ...</code> elsewhere (on a <code>var</code>-held or
+mutable struct value). Construction is positional:
+<code>Name(field0, field1, ...)</code>.</p>
+<hr />
+<h2 id="11-traits">11. Traits</h2>
+<p>A trait is a set of method signatures a struct can implement, giving
+both static (generic bound) and dynamic (trait object) dispatch.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>trait Shape:</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> area(<span class="va">self</span>) <span class="op">-&gt;</span> f64</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>struct Circle(Shape):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    r: f64</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> area(<span class="va">self</span>) <span class="op">-&gt;</span> f64:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">3.14159</span> <span class="op">*</span> <span class="va">self</span>.r <span class="op">*</span> <span class="va">self</span>.r</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> total_area(shapes: <span class="bu">list</span>[Shape]) <span class="op">-&gt;</span> f64:   <span class="co"># trait object -&gt; dynamic dispatch</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    var <span class="bu">sum</span> <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> shapes:</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">sum</span> <span class="op">+=</span> s.area()</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span></span></code></pre></div>
+<p>A struct declares the traits it implements in parentheses after its
+name and must provide every method with the exact signature. Using the
+trait name as a type gives a trait object (dynamic dispatch); using it
+as a generic bound (<code>[T: Shape]</code>) gives static dispatch.</p>
+<hr />
+<h2 id="12-generics">12. Generics</h2>
+<p>Functions and structs may take type parameters in <code>[...]</code>;
+they are <strong>monomorphized</strong> (a specialized copy is generated
+per concrete type), so generics cost nothing at runtime.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> first[T](items: <span class="bu">list</span>[T]) <span class="op">-&gt;</span> Option[T]:</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(items) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Some(items[<span class="dv">0</span>])</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>struct Pair[A, B]:</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    left: A</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    right: B</span></code></pre></div>
+<p>Type parameters may carry a trait bound:
+<code>def largest[T: Ord](...)</code>. Type arguments are usually
+inferred from the call; where they cannot be, write them explicitly:
+<code>first[i64]([])</code>.</p>
+<hr />
+<h2 id="13-pattern-matching">13. Pattern matching</h2>
+<p><code>match</code> inspects a value and binds parts of it. The cases
+must cover the value.</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">match</span> result:</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> Ok(value):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(value)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> Err(problem):</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(problem)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="cf">match</span> option:</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> Some(x):</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        use(x)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="va">None</span>:</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="cf">match</span> code:                    <span class="co"># on i64/str/bool: literal cases + wildcard</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="dv">200</span>:</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;ok&quot;</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="dv">404</span>:</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;missing&quot;</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> _:</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;other&quot;</span>)</span></code></pre></div>
+<p>Case forms: <code>Some(name)</code> / <code>Some(_)</code>,
+<code>None</code>, <code>Ok(name)</code> / <code>Err(name)</code>, a
+literal (<code>i64</code>, <code>str</code>, <code>bool</code>), and
+<code>_</code> (wildcard). For <code>Option</code>/<code>Result</code>
+both arms are required; for scalar matches a <code>_</code> makes it
+exhaustive. A case after <code>case _</code> is unreachable (an
+error).</p>
+<hr />
+<h2 id="14-error-handling">14. Error handling</h2>
+<p>Tacqor has no exceptions. Absence is <code>Option[T]</code>; failure
+is <code>Result[T, E]</code>.</p>
+<ul>
+<li><strong>Construct</strong> — <code>Some(x)</code>,
+<code>None</code>, <code>Ok(x)</code>, <code>Err(e)</code>.</li>
+<li><strong>Inspect</strong> — <code>is_some</code>,
+<code>is_none</code>, <code>is_ok</code>, <code>is_err</code>; or
+<code>match</code>.</li>
+<li><strong>Extract</strong> — <code>unwrap(x)</code> (runtime error on
+<code>None</code>/<code>Err</code>), <code>unwrap_or(x, default)</code>,
+<code>expect(x, message)</code>.</li>
+<li><strong>Propagate</strong> — the <code>?</code> operator returns the
+failure from the enclosing function.</li>
+<li><strong>Boundaries</strong> — <code>attempt(fn() -&gt; T)</code>
+runs a no-argument function and turns any runtime error into
+<code>Result[T, str]</code>, so you can recover at a boundary.</li>
+<li><strong>Abort</strong> — <code>fail(message)</code> raises a runtime
+error; <code>exit(code)</code> ends the process.</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> parse_config(path: <span class="bu">str</span>) <span class="op">-&gt;</span> Result[i64, <span class="bu">str</span>]:</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    let text <span class="op">=</span> read_text(path)          <span class="co"># runtime error if missing -&gt; wrap at a boundary</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> parse_int(strip(text))?      <span class="co"># Option/Result short-circuit</span></span></code></pre></div>
+<p>A runtime error prints
+<code>FILE:LINE:COLUMN: runtime error: MESSAGE</code> with a traceback
+and exits non-zero — unless it happened inside <code>attempt</code>.</p>
+<hr />
+<h2 id="15-modules-and-packages">15. Modules and packages</h2>
+<p><strong>Modules.</strong> Every <code>.tq</code> file is a module.
+<code>import std.http</code> makes its public items available as
+<code>http.serve(...)</code>; <code>import mymod as m</code> renames it.
+The standard library modules are imported as <code>std.NAME</code>.
+Circular imports are rejected.</p>
+<p><strong>Packages.</strong> A package is a folder with a
+<code>lib.tq</code> (and optional submodules).
+<code>tacqor add SOURCE [NAME]</code> copies a local folder or
+<code>git clone</code>s a URL into <code>packages/NAME</code> and
+records it in <code>tacqor.pkg</code>; <code>import NAME</code> loads
+<code>packages/NAME/lib.tq</code>, <code>import NAME.module</code> loads
+<code>packages/NAME/module.tq</code>. <code>tacqor install</code>
+restores every manifest entry; <code>tacqor remove NAME</code> deletes
+one.</p>
+<hr />
+<h2 id="16-concurrency">16. Concurrency</h2>
+<p>Concurrency is <strong>share-nothing</strong>: a thread owns every
+object it allocates and no object on the heap is touched by two threads
+at once. That invariant is what lets the reference counting stay
+non-atomic, and it is enforced by the capture rules below.</p>
+<p><strong>Data-parallel reductions.</strong>
+<code>parallel_sum(count, workers, mapper)</code> evaluates
+<code>mapper(i)</code> for <code>0 ≤ i &lt; count</code> across up to 64
+threads and returns the exact <code>i64</code> sum;
+<code>parallel_map(count, workers, mapper)</code> returns the results as
+a <code>list[i64]</code> in order. The mapper is
+<code>fn(i64) -&gt; i64</code>; if it is a closure it may capture only
+<code>i64</code>, <code>f64</code> and <code>bool</code> values. The
+result never depends on the worker count.</p>
+<p><strong>Worker pools.</strong>
+<code>parallel_run(workers, task)</code> runs
+<code>task(worker_index)</code> on <code>workers</code> threads at once
+(1–64), each with its own VM, returning once every task returns (for a
+server loop, never). The task may capture only scalars and function
+values — checked at compile time for an inline lambda, and by a runtime
+check otherwise. Shared state goes through a channel, a file, or a
+database.</p>
+<p><strong>Channels.</strong> <code>channel()</code> returns an integer
+handle to a thread-safe queue of string messages (a scalar, so a task
+can capture it). <code>channel_send(ch, message)</code> enqueues a copy;
+<code>channel_recv(ch) -&gt; Option[str]</code> blocks until a message
+arrives (<code>Some</code>) or the channel is closed and drained
+(<code>None</code>); <code>channel_try_recv(ch) -&gt; Option[str]</code>
+never blocks; <code>channel_close(ch)</code> ends the stream. Messages
+cross as copies, so nothing on the heap is shared. The
+<code>std.channels</code> module wraps these as
+<code>make</code>/<code>send</code>/<code>recv</code>/<code>try_recv</code>/<code>close</code>.</p>
+<p><strong>Concurrent HTTP.</strong>
+<code>http.serve_concurrent(port, workers, handler)</code> serves on a
+worker pool so one slow handler does not block the rest; the handler
+must be a plain top-level function.</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> std.channels</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> worker(w: i64):</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    var running <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> running:</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">match</span> channels.recv(<span class="dv">0</span>):          <span class="co"># channel handle 0</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> Some(job): handle(job)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> <span class="va">None</span>: running <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    let jobs <span class="op">=</span> channels.make()</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>):</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        channels.send(jobs, <span class="st">&quot;job-&quot;</span> <span class="op">+</span> <span class="bu">str</span>(i))</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    channels.close(jobs)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    parallel_run(<span class="dv">4</span>, worker)</span></code></pre></div>
+<hr />
+<h2 id="17-c-foreign-function-interface">17. C foreign function
+interface</h2>
+<p>An <code>extern def</code> declaration names a C function; a native
+build (<code>tacqor build --native</code>) compiles a call to it into a
+direct C call.</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> sqrt(x: f64) <span class="op">-&gt;</span> f64 <span class="im">from</span> <span class="st">&quot;m&quot;</span>      <span class="co"># links libm, calls C&#39;s sqrt</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> llabs(n: i64) <span class="op">-&gt;</span> i64              <span class="co"># libc; no library to name</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> getenv(name: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>          <span class="co"># char* result -&gt; a Tacqor string</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> to_int(s: <span class="bu">str</span>) <span class="op">-&gt;</span> i64 <span class="op">=</span> <span class="st">&quot;atoll&quot;</span>   <span class="co"># = renames the C symbol</span></span></code></pre></div>
+<p><code>from "lib"</code> names a library to link (<code>-llib</code>,
+or <code>lib.lib</code> on MSVC); <code>= "symbol"</code> gives the C
+symbol when it differs from the declared name. Marshalling:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Tacqor</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>i64</code></td>
+<td><code>long long</code></td>
+</tr>
+<tr class="even">
+<td><code>f64</code></td>
+<td><code>double</code></td>
+</tr>
+<tr class="odd">
+<td><code>bool</code></td>
+<td><code>int</code> (0 or 1)</td>
+</tr>
+<tr class="even">
+<td><code>str</code> argument</td>
+<td><code>const char*</code> (NUL-terminated, valid only for the
+call)</td>
+</tr>
+<tr class="odd">
+<td><code>str</code> result</td>
+<td><code>char*</code>, copied into a new string (a null pointer becomes
+<code>""</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Only scalars and strings cross the boundary; any other parameter or
+result type is a compile-time error. The boundary is unchecked — a wrong
+declaration is undefined behavior, exactly as in C. Under the bytecode
+VM a foreign call reports that a native build is required.</p>
+<hr />
+<h2 id="18-memory-model">18. Memory model</h2>
+<p>Memory is managed by <strong>non-atomic reference counting</strong>
+with a <strong>cycle collector</strong> for the rare reference cycles.
+Destruction is deterministic: an object is freed as soon as its last
+reference goes away — no garbage-collector pauses.
+<code>gc_collect()</code> runs a cycle-collection pass on demand;
+<code>gc_count()</code> returns the number of tracked objects. String
+constants are immortal. The non-atomic counts are sound because the
+concurrency model never shares a mutable object between threads (§16).
+Call depth is bounded (native builds run on a 512 MB stack); deep
+recursion past the frame limit is a runtime error rather than a
+crash.</p>
+<hr />
+<h2 id="19-built-in-function-reference">19. Built-in function
+reference</h2>
+<p>Built-ins are always in scope (no import). Grouped by purpose;
+<code>T</code>/<code>U</code> denote any type, <code>K</code> a key
+type.</p>
+<p><strong>Output, input, process</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>print(value)</code> · <code>write(value)</code></td>
+<td>Write a value (with / without a trailing newline) to standard
+output.</td>
+</tr>
+<tr class="even">
+<td><code>eprint(value)</code></td>
+<td>Write to standard error.</td>
+</tr>
+<tr class="odd">
+<td><code>flush()</code></td>
+<td>Flush standard output.</td>
+</tr>
+<tr class="even">
+<td><code>input() -&gt; str</code></td>
+<td>Read a line from standard input.</td>
+</tr>
+<tr class="odd">
+<td><code>args() -&gt; list[str]</code> · <code>argc() -&gt; i64</code>
+· <code>arg(i) -&gt; str</code></td>
+<td>Program arguments after the name.</td>
+</tr>
+<tr class="even">
+<td><code>run(command: str) -&gt; i64</code></td>
+<td>Run a shell command; return its exit status.</td>
+</tr>
+<tr class="odd">
+<td><code>run_capture(command: str) -&gt; str</code></td>
+<td>Run a command; return its output.</td>
+</tr>
+<tr class="even">
+<td><code>exit(code: i64)</code></td>
+<td>End the process with an exit code.</td>
+</tr>
+<tr class="odd">
+<td><code>fail(message: str)</code></td>
+<td>Raise a runtime error.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conversion and formatting</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>str(value) -&gt; str</code></td>
+<td>Convert any value to its text form.</td>
+</tr>
+<tr class="even">
+<td><code>int(x) -&gt; i64</code></td>
+<td>Convert an <code>f64</code>, <code>str</code> or <code>bool</code>
+to <code>i64</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>float(x) -&gt; f64</code></td>
+<td>Convert an <code>i64</code>, <code>f64</code> or <code>str</code> to
+<code>f64</code>.</td>
+</tr>
+<tr class="even">
+<td><code>parse_int(s) -&gt; Option[i64]</code> ·
+<code>parse_float(s) -&gt; Option[f64]</code></td>
+<td>Parse, returning <code>None</code> on failure.</td>
+</tr>
+<tr class="odd">
+<td><code>chr(code: i64) -&gt; str</code> ·
+<code>ord(ch: str) -&gt; i64</code></td>
+<td>Code point ↔︎ character.</td>
+</tr>
+<tr class="even">
+<td><code>bytes(s: str) -&gt; list[i64]</code> ·
+<code>from_bytes(list[i64]) -&gt; str</code></td>
+<td>String ↔︎ byte values.</td>
+</tr>
+<tr class="odd">
+<td><code>to_hex(n: i64) -&gt; str</code> ·
+<code>from_hex(s) -&gt; Option[i64]</code></td>
+<td>Hexadecimal.</td>
+</tr>
+<tr class="even">
+<td><code>fixed(x: f64, places: i64) -&gt; str</code></td>
+<td>Fixed-point formatting.</td>
+</tr>
+<tr class="odd">
+<td><code>hash(s: str) -&gt; i64</code></td>
+<td>64-bit FNV-1a hash, folded non-negative.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Strings</strong> (byte-oriented unless noted)</p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>len(s)</code></td>
+<td>Length in bytes (also lists and dicts).</td>
+</tr>
+<tr class="even">
+<td><code>upper(s)</code> · <code>lower(s)</code> ·
+<code>strip(s)</code></td>
+<td>Case folding; trim whitespace.</td>
+</tr>
+<tr class="odd">
+<td><code>split(s, sep) -&gt; list[str]</code> ·
+<code>join(list[str], sep) -&gt; str</code></td>
+<td>Split / join.</td>
+</tr>
+<tr class="even">
+<td><code>find(s, part) -&gt; i64</code></td>
+<td>First byte index, or −1.</td>
+</tr>
+<tr class="odd">
+<td><code>replace(s, from, to) -&gt; str</code></td>
+<td>Replace all occurrences.</td>
+</tr>
+<tr class="even">
+<td><code>starts_with(s, p) -&gt; bool</code> ·
+<code>ends_with(s, p) -&gt; bool</code></td>
+<td>Prefix / suffix test.</td>
+</tr>
+<tr class="odd">
+<td><code>repeat(s, n) -&gt; str</code></td>
+<td>Repeat a string.</td>
+</tr>
+<tr class="even">
+<td><code>chars(s) -&gt; list[str]</code> ·
+<code>char_count(s) -&gt; i64</code></td>
+<td>Code-point-aware split / count.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lists</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>len(xs)</code></td>
+<td>Element count.</td>
+</tr>
+<tr class="even">
+<td><code>push(xs, x)</code> · <code>pop(xs) -&gt; T</code></td>
+<td>Append / remove the last (runtime error if empty).</td>
+</tr>
+<tr class="odd">
+<td><code>insert(xs, i, x)</code> · <code>remove_at(xs, i)</code></td>
+<td>Insert at / remove at an index.</td>
+</tr>
+<tr class="even">
+<td><code>index_of(xs, x) -&gt; i64</code></td>
+<td>First index of a value, or −1.</td>
+</tr>
+<tr class="odd">
+<td><code>sort(xs)</code> · <code>reverse(xs)</code> ·
+<code>clear(xs)</code></td>
+<td>In place; <code>sort</code> on
+<code>i64</code>/<code>f64</code>/<code>str</code>/<code>bool</code>.</td>
+</tr>
+<tr class="even">
+<td><code>fill(xs, x)</code> · <code>extend(xs, ys)</code></td>
+<td>Overwrite all / append another list.</td>
+</tr>
+<tr class="odd">
+<td><code>sum(xs)</code></td>
+<td>Sum of a list of <code>i64</code> or <code>f64</code>.</td>
+</tr>
+<tr class="even">
+<td><code>min_of(xs)</code> · <code>max_of(xs)</code></td>
+<td>Minimum / maximum of a list of
+<code>i64</code>/<code>f64</code>/<code>str</code> (empty is a runtime
+error).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dicts</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>len(d)</code></td>
+<td>Entry count.</td>
+</tr>
+<tr class="even">
+<td><code>keys(d) -&gt; list[K]</code> ·
+<code>values(d) -&gt; list[V]</code></td>
+<td>Keys / values.</td>
+</tr>
+<tr class="odd">
+<td><code>lookup(d, key) -&gt; Option[V]</code></td>
+<td>Value for a key, or <code>None</code>.</td>
+</tr>
+<tr class="even">
+<td><code>remove_key(d, key)</code></td>
+<td>Remove an entry.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Option and Result</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>is_some(o)</code> · <code>is_none(o)</code> ·
+<code>is_ok(r)</code> · <code>is_err(r)</code></td>
+<td>Predicates.</td>
+</tr>
+<tr class="even">
+<td><code>unwrap(x) -&gt; T</code></td>
+<td>Inner value; runtime error on
+<code>None</code>/<code>Err</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>unwrap_or(x, default) -&gt; T</code></td>
+<td>Inner value, or a default.</td>
+</tr>
+<tr class="even">
+<td><code>expect(x, message) -&gt; T</code></td>
+<td>Inner value, or fail with a message.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Math</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>abs(n)</code> · <code>min(a, b)</code> ·
+<code>max(a, b)</code></td>
+<td>On <code>i64</code>/<code>f64</code>
+(<code>min</code>/<code>max</code> also <code>str</code>).</td>
+</tr>
+<tr class="even">
+<td><code>sqrt(x)</code> · <code>pow(a, b)</code></td>
+<td>Square root; power (<code>f64</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>floor(x)</code> · <code>ceil(x)</code> ·
+<code>round(x)</code></td>
+<td>Rounding to <code>i64</code>.</td>
+</tr>
+<tr class="even">
+<td><code>sin cos tan asin acos atan</code> ·
+<code>atan2(y, x)</code></td>
+<td>Trigonometry (<code>f64</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>exp(x)</code> · <code>log(x)</code> · <code>log2(x)</code> ·
+<code>log10(x)</code></td>
+<td>Exponential and logarithms.</td>
+</tr>
+<tr class="even">
+<td><code>random_float() -&gt; f64</code></td>
+<td>A float in [0, 1).</td>
+</tr>
+<tr class="odd">
+<td><code>random_int(lo, hi) -&gt; i64</code></td>
+<td>An integer in [lo, hi], inclusive.</td>
+</tr>
+<tr class="even">
+<td><code>seed(n: i64)</code></td>
+<td>Seed the generator for a reproducible stream.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files, environment, time</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>read_text(path) -&gt; str</code> ·
+<code>write_text(path, text)</code> ·
+<code>append_text(path, text)</code></td>
+<td>Whole-file I/O.</td>
+</tr>
+<tr class="even">
+<td><code>read_lines(path) -&gt; list[str]</code></td>
+<td>Read a file as lines.</td>
+</tr>
+<tr class="odd">
+<td><code>file_exists(path) -&gt; bool</code> ·
+<code>delete_file(path)</code></td>
+<td>Existence; delete.</td>
+</tr>
+<tr class="even">
+<td><code>list_dir(path) -&gt; list[str]</code> ·
+<code>make_dir(path)</code></td>
+<td>Directory listing; create.</td>
+</tr>
+<tr class="odd">
+<td><code>env(name) -&gt; Option[str]</code></td>
+<td>Environment variable.</td>
+</tr>
+<tr class="even">
+<td><code>unix_time() -&gt; i64</code> ·
+<code>time_ms() -&gt; i64</code> ·
+<code>now_text() -&gt; str</code></td>
+<td>Epoch seconds; milliseconds; a timestamp string.</td>
+</tr>
+<tr class="odd">
+<td><code>sleep_ms(n: i64)</code></td>
+<td>Sleep.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Memory and concurrency</strong> — <code>gc_collect()</code>,
+<code>gc_count() -&gt; i64</code>; <code>parallel_sum</code>,
+<code>parallel_map</code>, <code>parallel_run</code>;
+<code>channel</code>, <code>channel_send</code>,
+<code>channel_recv</code>, <code>channel_try_recv</code>,
+<code>channel_close</code> (§16).</p>
+<p><strong>Networking</strong> —
+<code>tcp_listen(port) -&gt; Result[i64, str]</code>,
+<code>tcp_accept(server) -&gt; Result[i64, str]</code>,
+<code>tcp_connect(host, port) -&gt; Result[i64, str]</code>,
+<code>tcp_read(socket, limit) -&gt; Result[str, str]</code>,
+<code>tcp_write(socket, data) -&gt; Result[i64, str]</code>,
+<code>tcp_close(socket)</code>.</p>
+<hr />
+<h2 id="20-standard-library-reference">20. Standard library
+reference</h2>
+<p>Each module is <code>import std.NAME</code>.</p>
+<p><strong><code>std.lists</code></strong> — higher-order list tools:
+<code>map</code>, <code>filter</code>, <code>reduce</code>,
+<code>any</code>, <code>all</code>, <code>zip</code>,
+<code>find_first</code>, <code>position</code>, <code>count_if</code>,
+<code>take</code>, <code>drop</code>, <code>flatten</code>,
+<code>unique</code>, <code>range_list</code>, <code>sorted_by</code>,
+<code>max_by</code>, <code>each</code>, <code>enumerate</code>; the
+<code>Pair[A, B]</code> struct.</p>
+<p><strong><code>std.strings</code></strong> — <code>pad_left</code>,
+<code>pad_right</code>, <code>center</code>, <code>is_digit</code>,
+<code>is_alpha</code>, <code>is_space</code>, <code>lines</code>,
+<code>words</code>, <code>count</code>, <code>capitalize</code>,
+<code>reverse_text</code>, <code>strip_prefix</code>,
+<code>strip_suffix</code>.</p>
+<p><strong><code>std.math</code></strong> — constants <code>PI</code>,
+<code>TAU</code>, <code>E</code>, <code>INT_MAX</code>,
+<code>INT_MIN</code>; <code>clamp</code>, <code>clamp_f</code>,
+<code>gcd</code>, <code>lcm</code>, <code>is_prime</code>,
+<code>factorial</code>, <code>isqrt</code>, <code>lerp</code>,
+<code>to_degrees</code>, <code>to_radians</code>, <code>mean</code>.</p>
+<p><strong><code>std.collections</code></strong> —
+<code>Stack[T]</code>, <code>Queue[T]</code>, <code>Counter</code>, with
+<code>new_stack</code>, <code>new_queue</code>,
+<code>new_counter</code>.</p>
+<p><strong><code>std.json</code></strong> — a <code>Json</code> value
+with <code>null</code>, <code>boolean</code>, <code>number</code>,
+<code>integer</code>, <code>string</code>, <code>array</code>,
+<code>object</code>, <code>set</code>, <code>get</code>;
+<code>encode(doc) -&gt; str</code> and
+<code>parse(text) -&gt; Result[Json, str]</code>.</p>
+<p><strong><code>std.http</code></strong> — <code>Request</code> and
+<code>Response</code> structs; builders <code>response</code>,
+<code>text</code>, <code>html</code>, <code>json</code>,
+<code>not_found</code>; servers <code>serve</code>,
+<code>serve_count</code>, <code>serve_concurrent</code>; clients
+<code>get</code>, <code>post</code>, <code>request</code>. HTTP/1.1,
+plain <code>http://</code>, request bodies up to 8 MB.</p>
+<p><strong><code>std.testing</code></strong> — for
+<code>tacqor test</code>: <code>assert_eq</code>,
+<code>assert_ne</code>, <code>assert_true</code>,
+<code>assert_some</code>, <code>assert_ok</code>.</p>
+<p><strong><code>std.time</code></strong> — UTC dates on top of
+<code>unix_time()</code>: the <code>DateTime</code> record,
+<code>from_unix</code>, <code>now</code>, <code>to_unix</code>,
+<code>iso</code>, <code>date_string</code>, <code>time_string</code>,
+<code>weekday_name</code>, <code>month_name</code>,
+<code>is_leap</code>, <code>days_in_month</code>.</p>
+<p><strong><code>std.random</code></strong> — <code>fraction</code>,
+<code>integer</code>, <code>below</code>, <code>dice</code>,
+<code>boolean</code>, and on lists <code>choice</code> (→
+<code>Option</code>), <code>shuffle</code>, <code>sample</code>.</p>
+<p><strong><code>std.os</code></strong> — <code>env_or</code>, and path
+helpers <code>join</code>, <code>basename</code>, <code>dirname</code>,
+<code>extname</code>, <code>stem</code>.</p>
+<p><strong><code>std.channels</code></strong> — <code>make</code>,
+<code>send</code>, <code>recv</code>, <code>try_recv</code>,
+<code>close</code> (§16).</p>
+<p>Full signatures are in <a
+href="STDLIB.html"><code>STDLIB.md</code></a>.</p>
+<hr />
+<h2 id="21-diagnostics">21. Diagnostics</h2>
+<p><strong>Compile-time errors</strong> are reported with file, line and
+column and a caret under the offending text. They cover: type
+mismatches, mixing <code>i64</code> and <code>f64</code>, calling with
+the wrong arity, assigning to an immutable or captured binding,
+non-exhaustive or unreachable <code>match</code> cases, unreachable
+statements, a path that fails to return, an untyped empty literal or
+bare <code>None</code>, unknown bindings/fields/methods/modules, invalid
+<code>dict</code> key types, a trait a struct fails to implement, and
+invalid foreign-function signatures.</p>
+<p><strong>Warnings</strong> (from
+<code>tacqor check</code>/<code>diagnose</code>, non-fatal) carry a
+code: <code>zero-divisor</code>, <code>integer-overflow</code>,
+<code>invalid-shift</code>, <code>invalid-workers</code>,
+<code>index-out-of-bounds</code>, <code>empty-range</code>,
+<code>failing-assert</code>. See <a
+href="ERRORS.html"><code>ERRORS.md</code></a> for the full catalog with
+fixes.</p>
+<p><strong>Runtime errors</strong> terminate with status 1 (unless
+inside <code>attempt</code>), printing
+<code>FILE:LINE:COLUMN: runtime error: MESSAGE</code> and a traceback.
+They include: integer overflow, division or modulo by zero, invalid
+shift count, index out of bounds, missing dictionary key,
+<code>unwrap</code>/<code>expect</code> on
+<code>None</code>/<code>Err</code>,
+<code>pop</code>/<code>min_of</code>/<code>max_of</code> on an empty
+list, assertion failure, <code>fail(message)</code>, conversion
+failures, invalid worker count or parallel capture, an invalid channel
+handle, <code>channel_send</code> on a closed channel, function nesting
+beyond the limit, value nesting beyond the limit, resource-limit
+breaches, and I/O failures from builtins that do not return a
+<code>Result</code>.</p>
+<hr />
+<h2 id="22-limits">22. Limits</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Limit</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Source file size</td>
+<td>4 MB</td>
+</tr>
+<tr class="even">
+<td>Bytecode size</td>
+<td>64 MB</td>
+</tr>
+<tr class="odd">
+<td>Locals per function / list-literal size</td>
+<td>65,536</td>
+</tr>
+<tr class="even">
+<td>VM value stack</td>
+<td>4,000,000 values</td>
+</tr>
+<tr class="odd">
+<td>Call nesting</td>
+<td>100,000 frames</td>
+</tr>
+<tr class="even">
+<td>One string or file</td>
+<td>256 MB</td>
+</tr>
+<tr class="odd">
+<td>Parallel workers</td>
+<td>64</td>
+</tr>
+<tr class="even">
+<td>Value nesting (print/compare)</td>
+<td>2,000 levels</td>
+</tr>
+<tr class="odd">
+<td>Dictionary key types</td>
+<td><code>i64</code> or <code>str</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="23-appendix-keywords-and-operators">23. Appendix: keywords and
+operators</h2>
+<p><strong>Keywords</strong> —
+<code>def struct let var if elif else while for in break continue return assert and or not True False None range fn match case import as const Some Ok Err Option Result trait extern i64 f64 bool str list dict</code>.</p>
+<p><strong>Operators</strong> —
+<code>+ - * / // % == != &lt; &lt;= &gt; &gt;= and or not &amp; | ^ &lt;&lt; &gt;&gt; ~ in ? =</code>
+and the compound assignments
+<code>+= -= *= /= //= %= &amp;= |= ^= &lt;&lt;= &gt;&gt;=</code>.</p>
+<p><strong>Built-in constructors and constants</strong> —
+<code>Some Ok Err None True False</code>, and the type names usable in
+annotations:
+<code>i64 f64 bool str list dict Option Result fn</code>.</p>
+<hr />
+<p><em>This manual documents Tacqor 1.3.0. The language reference (<a
+href="LANGUAGE.html"><code>../LANGUAGE.md</code></a>), standard-library
+reference (<a href="STDLIB.html"><code>../STDLIB.md</code></a>), formal
+specification (<a
+href="SPECIFICATION.html"><code>SPECIFICATION.md</code></a>),
+diagnostics catalog (<a href="ERRORS.html"><code>ERRORS.md</code></a>)
+and tooling guide (<a href="TOOLING.html"><code>TOOLING.md</code></a>)
+go deeper on each area.</em></p>
+</body>
+</html>
