@@ -18,6 +18,7 @@ Everything in the distribution, by audience. Start with the first table if you a
 
 | Document | What it is |
 |---|---|
+| [`MANUAL.md`](MANUAL.md) | The complete manual: every language construct, built-in, standard-library module, command and limit, A to Z, in one document |
 | [`../LANGUAGE.md`](../LANGUAGE.md) | Language reference: every construct, with examples |
 | [`../STDLIB.md`](../STDLIB.md) | Every builtin and standard-library function, with signatures |
 | [`SPECIFICATION.md`](SPECIFICATION.md) | The formal specification: lexical structure, grammar (EBNF), scopes, types, evaluation rules, statements, runtime errors, limits, conformance |
