@@ -404,6 +404,8 @@ constexpr BuiltinSpec builtins[] = {
     {"run_capture", Builtin::run_capture, 1}, {"unix_time", Builtin::unix_time, 0}, {"hash", Builtin::hash, 1},
     {"channel", Builtin::channel, 0}, {"channel_send", Builtin::channel_send, 2}, {"channel_recv", Builtin::channel_recv, 1},
     {"channel_try_recv", Builtin::channel_try_recv, 1}, {"channel_close", Builtin::channel_close, 1},
+    {"wrapping_add", Builtin::wrapping_add, 2}, {"wrapping_sub", Builtin::wrapping_sub, 2}, {"wrapping_mul", Builtin::wrapping_mul, 2},
+    {"dot", Builtin::dot, 2}, {"vadd", Builtin::vadd, 2}, {"vmul", Builtin::vmul, 2}, {"vscale", Builtin::vscale, 2},
 };
 
 const BuiltinSpec* builtin_named(std::string_view name) {
@@ -1808,6 +1810,29 @@ class Compiler {
                 return done(list_of(value.type));
             }
             case Builtin::extend: { const auto first = list(0).type; arg(1, first); return done(type_unit); }
+            case Builtin::wrapping_add: case Builtin::wrapping_sub: case Builtin::wrapping_mul:
+                arg(0, type_int); arg(1, type_int); return done(type_int);
+            case Builtin::dot: {
+                const auto first = list(0).type;
+                const auto element = info(first).first;
+                if (element != type_int && element != type_float) throw Error(args[0]->token.at, "dot expects lists of i64 or f64");
+                arg(1, first);
+                return done(element);
+            }
+            case Builtin::vadd: case Builtin::vmul: {
+                const auto first = list(0).type;
+                const auto element = info(first).first;
+                if (element != type_int && element != type_float) throw Error(args[0]->token.at, name + " expects lists of i64 or f64");
+                arg(1, first);
+                return done(first);
+            }
+            case Builtin::vscale: {
+                const auto first = list(0).type;
+                const auto element = info(first).first;
+                if (element != type_int && element != type_float) throw Error(args[0]->token.at, "vscale expects a list of i64 or f64");
+                arg(1, element);
+                return done(first);
+            }
             case Builtin::fixed: arg(0, type_float); arg(1, type_int); return done(type_text);
             case Builtin::to_hex: arg(0, type_int); return done(type_text);
             case Builtin::from_hex: arg(0, type_text); return done(option_of(type_int));

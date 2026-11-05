@@ -26,7 +26,7 @@ test "$("$tool" run "$temp/total.tqb" -- "hello world")" = "$output"
 mkdir "$temp/isolated"
 mv "$temp/total" "$temp/isolated/total"
 test "$(cd "$temp/isolated"; /usr/bin/env -i PATH=/unavailable ./total "hello world")" = "$output"
-test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.3.0'
+test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.4.0'
 
 printf 'def main():\n    print(1 + True)\n' > "$temp/error.tq"
 if "$tool" diagnose "$temp/error.tq" > "$temp/findings.json"; then exit 1; fi
@@ -126,7 +126,7 @@ test "$("$tool" run "$temp/write.tq" -- "$temp/out.txt")" = "written"
 "$tool" run "$temp/f10.tqb" | cmp - tests/features_1_0.expected
 "$tool" build tests/features_1_0.tq -o "$temp/f10"
 "$temp/f10" | cmp - tests/features_1_0.expected
-"$tool" test tests/unit_tests.tq | grep -q '7 passed, 0 failed'
+"$tool" test tests/unit_tests.tq | grep -q '8 passed, 0 failed'
 printf 'def test_bad():\n    assert 1 == 2\ndef test_good():\n    assert True\n' > "$temp/t.tq"
 if "$tool" test "$temp/t.tq" > "$temp/t.log"; then exit 1; fi
 grep -q 'FAIL test_bad' "$temp/t.log"
@@ -190,6 +190,20 @@ grep -q 'immutable' "$temp/repl.log"
 "$tool" build tests/features_1_2.tq -o "$temp/f12"
 "$temp/f12" | cmp - tests/features_1_2.expected
 "$tool" tests/features_1_2.tq | cmp - tests/features_1_2.expected      # `tacqor FILE.tq` runs it
+
+# --- 1.4: wrapping arithmetic and SIMD-friendly bulk numeric ops (VM/bytecode/native parity) ---
+"$tool" run tests/features_1_4.tq | cmp - tests/features_1_4.expected
+"$tool" compile tests/features_1_4.tq -o "$temp/f14.tqb"
+"$tool" run "$temp/f14.tqb" | cmp - tests/features_1_4.expected
+"$tool" build tests/features_1_4.tq -o "$temp/f14"
+"$temp/f14" | cmp - tests/features_1_4.expected
+# the i64 bulk ops stay overflow-checked, and mismatched lengths are a runtime error
+printf 'def main():\n    print(vadd([9223372036854775807], [1]))\n' > "$temp/ov.tq"
+if "$tool" run "$temp/ov.tq" 2>"$temp/ov.log"; then exit 1; fi
+grep -q 'overflow' "$temp/ov.log"
+printf 'def main():\n    print(dot([1.0, 2.0], [1.0]))\n' > "$temp/dm.tq"
+if "$tool" run "$temp/dm.tq" 2>"$temp/dm.log"; then exit 1; fi
+grep -q 'equal length' "$temp/dm.log"
 test "$("$tool" run examples/total.tq hello world | tail -n 1)" = "Argument: hello"   # args without --
 printf '#!/usr/bin/env tacqor\ndef main():\n    print(args())\n' > "$temp/script.tq"
 test "$("$tool" "$temp/script.tq" a b)" = '["a", "b"]'

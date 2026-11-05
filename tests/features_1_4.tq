@@ -1,0 +1,28 @@
+# 1.4 — opt-in wrapping arithmetic and SIMD-friendly bulk numeric ops.
+# Output must be identical on the VM, bytecode, and native backends.
+def main():
+    # Wrapping arithmetic: two's-complement wraparound, no overflow trap.
+    print(str(wrapping_add(9223372036854775807, 1)))   # -> i64 min
+    print(str(wrapping_sub(0 - 9223372036854775807 - 1, 1)))  # min - 1 -> max
+    print(str(wrapping_mul(9223372036854775807, 2)))    # -> -2
+
+    # Float bulk ops (vectorized path).
+    let xs: list[f64] = [1.0, 2.0, 3.0, 4.0]
+    let ys: list[f64] = [10.0, 20.0, 30.0, 40.0]
+    print(str(dot(xs, ys)))
+    print(str(vadd(xs, ys)))
+    print(str(vmul(xs, ys)))
+    print(str(vscale(xs, 2.0)))
+
+    # Integer bulk ops (overflow-checked path).
+    let a: list[i64] = [1, 2, 3, 4, 5]
+    let b: list[i64] = [5, 4, 3, 2, 1]
+    print(str(dot(a, b)))
+    print(str(vadd(a, b)))
+    print(str(vscale(a, 10)))
+
+    # Flat-array fast paths for sum / min_of / max_of (results unchanged).
+    print(str(sum(a)) + " " + str(min_of(a)) + " " + str(max_of(a)))
+
+    # A blocked reduction that crosses the 8-wide tail stays exact.
+    print(str(dot(vscale(fill(10, 1.0), 2.0), fill(10, 3.0))))
