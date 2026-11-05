@@ -1,0 +1,30 @@
+import std.http
+import std.json
+
+# Concurrency test server. Every request allocates its own string/dict/JSON objects and echoes
+# back the token from its own path (/echo/<token>). Served on a four-worker pool: if the
+# share-nothing model ever let two workers touch the same heap object, a response would carry
+# the wrong token or the process would corrupt. Run as: tacqor run concurrent_server.tq -- PORT
+def echo(request: http.Request) -> http.Response:
+    let token = after_last(request.path, "/")
+    let doc = json.object()
+    json.set(doc, "token", json.string(token))
+    json.set(doc, "path", json.string(request.path))
+    json.set(doc, "len", json.integer(len(token)))
+    return http.json(200, json.encode(doc))
+
+def after_last(s: str, sep: str) -> str:
+    var result = s
+    for part in split(s, sep):
+        result = part
+    return result
+
+def main():
+    let port = int(arg(0))
+    print("serving on " + str(port) + " with 4 workers")
+    match http.serve_concurrent(port, 4, echo):
+        case Ok(_):
+            print("stopped")
+        case Err(problem):
+            eprint("serve failed: " + problem)
+            exit(1)

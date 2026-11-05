@@ -127,6 +127,45 @@ class VM {
         return holder;
     }
 
+    // Share-nothing worker pool. `workers` OS threads each build their own VM (their own value
+    // stack) and invoke task(worker_index) once. For a server the task never returns, so this
+    // blocks for the life of the process, exactly like serve(). The task closure and its
+    // function captures are made immortal first, so the non-atomic refcount on any shared
+    // closure is never touched across threads; everything a worker allocates lives on that
+    // worker's own VM and is freed there by reference counting. Collection is paused for the
+    // duration (gc runs only on the main thread, which is parked in join here anyway).
+    Value parallel_run(Int workers, const Value& task) {
+        if (workers < 1 || workers > 64) throw std::runtime_error("parallel_run needs 1 to 64 workers");
+        check_shareable(task);
+        immortalize_shared(task);
+        const auto target = closure_of(task).function;
+        const std::vector<Value> captures(closure_of(task).captures.begin(), closure_of(task).captures.end());
+        std::exception_ptr failure;
+        std::mutex failure_lock;
+        std::vector<std::thread> threads;
+        threads.reserve(static_cast<std::size_t>(workers));
+        gc_state().parallel = true;
+        for (Int k = 0; k < workers; ++k) {
+            threads.emplace_back([&, k]() {
+                try {
+                    VM worker(shared, stack_limit / 8);
+                    std::vector<Value> args;
+                    args.reserve(1 + captures.size());
+                    args.push_back(Value(k));
+                    for (const auto& captured : captures) args.push_back(captured);
+                    worker.invoke(target, std::move(args));
+                } catch (...) {
+                    std::lock_guard<std::mutex> guard(failure_lock);
+                    if (!failure) failure = std::current_exception();
+                }
+            });
+        }
+        for (auto& thread : threads) thread.join();
+        gc_state().parallel = false;
+        if (failure) std::rethrow_exception(failure);
+        return Value(workers);
+    }
+
 public:
     VM(Shared& context, std::size_t capacity)
         : shared(context), program(context.program), frames() {
@@ -560,6 +599,13 @@ void VM::execute(std::size_t stop_depth) {
                     DISPATCH();
                 }
                 CASE(parallel) {
+                    if (ins.operand == 2) {
+                        Value task = pop();
+                        const auto workers = int_of(pop());
+                        frames.back().ip = ip;
+                        push(parallel_run(workers, task));
+                        DISPATCH();
+                    }
                     Value mapper = pop();
                     const auto workers = int_of(pop());
                     const auto count = int_of(pop());

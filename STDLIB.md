@@ -63,6 +63,8 @@ Two layers: **built-in functions** (implemented in the runtime, available everyw
 ### Parallelism
 `parallel_sum(count, workers, mapper) -> i64` and `parallel_map(count, workers, mapper) -> list[i64]` — mapper is any `fn(i64) -> i64` (named function or closure capturing only numbers/bools); see the language reference.
 
+`parallel_run(workers, task) -> i64` — runs `task(worker_index)` on `workers` threads at once (1–64), each thread with its own VM, and returns once every task has returned (for a server loop, that is never). This is the share-nothing building block behind `http.serve_concurrent`: a worker owns everything it allocates, so the task may capture only scalars and function values (enforced at compile time for an inline task, at runtime otherwise), and any shared state goes through a file or a database. See the language reference.
+
 ### Memory
 `gc_collect() -> i64` runs the cycle collector and returns the number of objects freed; `gc_count() -> i64` is the number of tracked containers.
 
@@ -96,7 +98,7 @@ Constants `PI`, `TAU`, `E`, `INT_MAX`, `INT_MIN`; `clamp`, `clamp_f`, `gcd`, `lc
 A JSON parser and encoder written in Tacqor. `parse(text) -> Result[Json, str]`, `encode(doc) -> str`; build documents with `null()`, `boolean(b)`, `number(f)`, `integer(i)`, `string(s)`, `array(items)`, `object()` + `set(obj, key, value)`; read them with the `Json` methods `get(key) -> Option[Json]`, `at(index) -> Option[Json]`, `as_text()`, `as_number()`, `as_int()`, `as_bool()`, and the fields `kind`, `items`, `keys`.
 
 ### `std.http`
-An HTTP/1.1 server and client. Server: `serve(port, handler)` (forever) and `serve_count(port, n, handler)`, where `handler: fn(Request) -> Response`; a handler that fails answers 500 and the server continues. `Request` has `method`, `path`, `query`, `headers`, `body` and `header(name) -> Option[str]`; build responses with `text(status, body)`, `html`, `json`, `response(status, content_type, body)`, `not_found()`. Client: `get(url)`, `post(url, body)`, `request(method, url, body)` return `Result[Response, str]`; `Response` has `status`, `headers`, `body`, `header(name)`. Plain `http://` only, one connection at a time, request bodies up to 8 MB.
+An HTTP/1.1 server and client. Server: `serve(port, handler)` (forever, one connection at a time), `serve_count(port, n, handler)` (exactly `n`, then stop), and `serve_concurrent(port, workers, handler)` (a pool of `workers` threads serving at once), where `handler: fn(Request) -> Response`; a handler that fails answers 500 and the server continues. For `serve_concurrent` the handler must be a plain top-level function (no captures) and any state shared between requests lives in a file or a database — see the concurrency notes in the language reference. `Request` has `method`, `path`, `query`, `headers`, `body` and `header(name) -> Option[str]`; build responses with `text(status, body)`, `html`, `json`, `response(status, content_type, body)`, `not_found()`. Client: `get(url)`, `post(url, body)`, `request(method, url, body)` return `Result[Response, str]`; `Response` has `status`, `headers`, `body`, `header(name)`. Plain `http://` only, request bodies up to 8 MB.
 
 ### `std.testing`
 For `tacqor test`: `assert_eq(actual, expected)`, `assert_ne`, `assert_true(condition, message)`, `assert_some(option) -> T`, `assert_ok(result) -> T`. Failures report the values involved.

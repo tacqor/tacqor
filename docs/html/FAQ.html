@@ -130,11 +130,18 @@ code points. This matches what files and sockets deliver and avoids the
 index-is-not-a-character surprise of UTF-16 languages.</p>
 <h3 id="can-i-write-concurrent-programs">Can I write concurrent
 programs?</h3>
-<p>Data-parallel ones: <code>parallel_sum</code> and
-<code>parallel_map</code> run a function over an index range on up to 64
-threads and return deterministic results. There are no shared-memory
-threads, locks or async; the HTTP server handles one connection at a
-time. This keeps the memory model simple (refcounts are not atomic). See
+<p>Two kinds, both share-nothing. Data-parallel:
+<code>parallel_sum</code> and <code>parallel_map</code> run a function
+over an index range on up to 64 threads and return deterministic
+results. Request-parallel: <code>parallel_run</code> runs a task on a
+pool of worker threads (and <code>http.serve_concurrent</code> serves
+HTTP on such a pool), each worker with its own VM, so one slow handler
+no longer blocks the rest. There are still no shared-memory threads,
+locks or async: a worker owns everything it allocates and nothing on the
+heap is touched by two threads at once, which keeps the memory model
+simple (refcounts are not atomic). State shared between workers lives in
+a file or a database. <code>http.serve</code> still handles one
+connection at a time when that is all you need. See
 <code>ROADMAP.md</code> for what is planned.</p>
 <h3 id="how-do-i-handle-none">How do I handle <code>None</code>?</h3>
 <pre class="text"><code>match lookup(ages, &quot;ann&quot;):
@@ -178,7 +185,9 @@ and BSD sockets elsewhere.</p>
 modes, runs clean under AddressSanitizer and UndefinedBehaviorSanitizer,
 and survived 6,100 fuzz cases with no crashes. The language has no
 planned breaking changes. What it does not have yet: a large ecosystem,
-an LSP server, a debugger, and shared-memory concurrency. See
+an LSP server, a debugger, and shared-memory concurrency (the
+concurrency it does have is share-nothing by design —
+<code>parallel_run</code> and <code>http.serve_concurrent</code>). See
 <code>ROADMAP.md</code>.</p>
 <h3 id="can-i-call-c-code">Can I call C code?</h3>
 <p>Not directly. <code>run(command)</code> and

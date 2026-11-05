@@ -26,7 +26,7 @@ test "$("$tool" run "$temp/total.tqb" -- "hello world")" = "$output"
 mkdir "$temp/isolated"
 mv "$temp/total" "$temp/isolated/total"
 test "$(cd "$temp/isolated"; /usr/bin/env -i PATH=/unavailable ./total "hello world")" = "$output"
-test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.2.1'
+test "$(cd "$temp/isolated"; "$tool" --version)" = 'Tacqor 1.3.0'
 
 printf 'def main():\n    print(1 + True)\n' > "$temp/error.tq"
 if "$tool" diagnose "$temp/error.tq" > "$temp/findings.json"; then exit 1; fi
@@ -216,6 +216,21 @@ POST /items payload
 grep -q 'served' "$temp/http_server.log"
 grep -q 'handler failed: deliberate' "$temp/http_server.log"
 "$tool" check std/http.tq > /dev/null
+# concurrency: a four-worker serve_concurrent pool answering 160 requests fired at once by the
+# parallel_map client. Every response must carry its own token (share-nothing, no crossed heaps).
+cport=$((40000 + $$ % 10000))
+"$tool" run tests/concurrent_server.tq -- "$cport" > "$temp/cc_server.log" 2>&1 &
+cc_pid=$!
+sleep 1
+"$tool" run tests/concurrent_client.tq -- "$cport" > "$temp/cc_client.log" 2>&1 || { cat "$temp/cc_client.log"; kill "$cc_pid" 2>/dev/null; exit 1; }
+kill "$cc_pid" 2>/dev/null
+grep -q 'requests=160 correct=160' "$temp/cc_client.log"
+grep -q 'PASS' "$temp/cc_client.log"
+# a task that captures a non-shareable value (a heap list) is refused at runtime, even when
+# the task is bound to a name first (so the capture is not visible at the call site)
+printf 'def main():\n    let xs = [1, 2]\n    let task = fn(w: i64):\n        print(xs[0])\n    parallel_run(2, task)\n' > "$temp/badrun.tq"
+if "$tool" run "$temp/badrun.tq" 2>"$temp/badrun.log"; then exit 1; fi
+grep -q 'only capture scalars and functions' "$temp/badrun.log"
 
 # --- native backend (needs a C++17 compiler; skipped when none is installed) ------------
 "$tool" emit tests/features.tq -o "$temp/features.cpp"
@@ -259,6 +274,14 @@ if command -v "${CXX:-c++}" >/dev/null 2>&1; then
     "$tool" run tests/http_client.tq -- "$port" | grep -q 'POST /items payload'
     wait $native_pid
     grep -q 'served' "$temp/http_native.log"
+    # concurrency, compiled to machine code: the same pooled server, native this time
+    "$tool" build --native tests/concurrent_server.tq -o "$temp/cc_native"
+    cport=$((50000 + $$ % 10000))
+    "$temp/cc_native" "$cport" > "$temp/cc_native.log" 2>&1 &
+    cc_native_pid=$!
+    sleep 1
+    "$tool" run tests/concurrent_client.tq -- "$cport" | grep -q 'correct=160'
+    kill "$cc_native_pid" 2>/dev/null
     "$tool" build --native "$temp/cycles.tq" -o "$temp/cycles_native"
     test "$("$temp/cycles_native")" = "True"
     native_status="native backend, "

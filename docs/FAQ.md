@@ -46,7 +46,7 @@ Strings are immutable UTF-8 byte strings. `len` counts bytes and indexing yields
 
 ### Can I write concurrent programs?
 
-Data-parallel ones: `parallel_sum` and `parallel_map` run a function over an index range on up to 64 threads and return deterministic results. There are no shared-memory threads, locks or async; the HTTP server handles one connection at a time. This keeps the memory model simple (refcounts are not atomic). See `ROADMAP.md` for what is planned.
+Two kinds, both share-nothing. Data-parallel: `parallel_sum` and `parallel_map` run a function over an index range on up to 64 threads and return deterministic results. Request-parallel: `parallel_run` runs a task on a pool of worker threads (and `http.serve_concurrent` serves HTTP on such a pool), each worker with its own VM, so one slow handler no longer blocks the rest. There are still no shared-memory threads, locks or async: a worker owns everything it allocates and nothing on the heap is touched by two threads at once, which keeps the memory model simple (refcounts are not atomic). State shared between workers lives in a file or a database. `http.serve` still handles one connection at a time when that is all you need. See `ROADMAP.md` for what is planned.
 
 ### How do I handle `None`?
 
@@ -78,7 +78,7 @@ The toolchain is portable C++17: `build-windows.cmd` builds it with MSVC and `ma
 
 ### Is it production ready?
 
-The toolchain has a differential test suite across all four execution modes, runs clean under AddressSanitizer and UndefinedBehaviorSanitizer, and survived 6,100 fuzz cases with no crashes. The language has no planned breaking changes. What it does not have yet: a large ecosystem, an LSP server, a debugger, and shared-memory concurrency. See `ROADMAP.md`.
+The toolchain has a differential test suite across all four execution modes, runs clean under AddressSanitizer and UndefinedBehaviorSanitizer, and survived 6,100 fuzz cases with no crashes. The language has no planned breaking changes. What it does not have yet: a large ecosystem, an LSP server, a debugger, and shared-memory concurrency (the concurrency it does have is share-nothing by design — `parallel_run` and `http.serve_concurrent`). See `ROADMAP.md`.
 
 ### Can I call C code?
 

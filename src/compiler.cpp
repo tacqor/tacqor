@@ -2068,6 +2068,31 @@ class Compiler {
             emit(Op::parallel, token.at, name == "parallel_sum" ? 0 : 1);
             return name == "parallel_sum" ? Fact(type_int) : Fact(list_of(type_int));
         }
+        if (name == "parallel_run" && !user_defined) {
+            if (args.size() != 2) throw Error(token.at, "'parallel_run' expects 2 argument(s): (workers: i64, task: fn(i64))");
+            const auto workers = expression(args[0], report);
+            require(workers.type, type_int, args[0].token.at);
+            if (workers.interval && (workers.interval->high < 1 || workers.interval->low > 64)) {
+                warning(report, args[0].token.at, "invalid-workers", "the worker count must be between 1 and 64");
+            }
+            const auto task_type = function_of({type_int}, type_unit);
+            const auto task = expression(args[1], report, task_type);
+            if (task.type != task_type) {
+                throw Error(args[1].token.at, "parallel_run task must be a fn(i64) that returns nothing, found " + name_of(task.type));
+            }
+            // The task closure is shared, read-only, by every worker thread, so its captures
+            // must need no cross-thread reference counting: scalars, or function values (which
+            // parallel_run makes immortal). Any other shared state goes through files or a database.
+            if (args[1].form == Form::lambda) {
+                for (const auto captured : last_lambda_captures) {
+                    if (captured != type_int && captured != type_float && captured != type_bool && kind(captured) != Kind::function) {
+                        throw Error(args[1].token.at, "a parallel_run task may only capture i64, f64, bool, or function values (captured " + name_of(captured) + "); share other state through files or a database");
+                    }
+                }
+            }
+            emit(Op::parallel, token.at, 2);
+            return Fact(type_int);
+        }
         return call_named(unit(), token, node.type_args, pointers(args), report, false);
     }
 

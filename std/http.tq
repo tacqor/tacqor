@@ -191,6 +191,28 @@ def serve_count(port: i64, count: i64, handler: fn(Request) -> Response) -> Resu
     tcp_close(server)
     return Ok(True)
 
+# Serves forever on `workers` threads at once. The connections are spread across the pool,
+# so one slow handler no longer blocks every other caller the way serve() does.
+#
+# The model is share-nothing: each worker runs on its own VM and owns every object it
+# allocates for a request, so nothing on the heap is touched by two threads at once. That is
+# what keeps it safe under Tacqor's non-atomic reference counting. Two rules follow from it:
+#   * `handler` must be a plain top-level function (no captured variables).
+#   * State shared between requests lives in a file or a database, never in a value you
+#     capture and mutate. Reads and writes to that store are yours to coordinate.
+# `workers` is clamped to 1..64. Returns only if the listening socket itself fails.
+def serve_concurrent(port: i64, workers: i64, handler: fn(Request) -> Response) -> Result[bool, str]:
+    let server = tcp_listen(port)?
+    let crew = fn(worker: i64):
+        while True:
+            match tcp_accept(server):
+                case Ok(client):
+                    handle(client, handler)
+                case Err(problem):
+                    eprint("accept failed: " + problem)
+    parallel_run(workers, crew)
+    return Ok(True)
+
 # --- client ------------------------------------------------------------------
 
 struct Url:

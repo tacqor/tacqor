@@ -305,6 +305,15 @@ function.</td>
 <code>parallel_map(count, workers, mapper) -&gt; list[i64]</code> —
 mapper is any <code>fn(i64) -&gt; i64</code> (named function or closure
 capturing only numbers/bools); see the language reference.</p>
+<p><code>parallel_run(workers, task) -&gt; i64</code> — runs
+<code>task(worker_index)</code> on <code>workers</code> threads at once
+(1–64), each thread with its own VM, and returns once every task has
+returned (for a server loop, that is never). This is the share-nothing
+building block behind <code>http.serve_concurrent</code>: a worker owns
+everything it allocates, so the task may capture only scalars and
+function values (enforced at compile time for an inline task, at runtime
+otherwise), and any shared state goes through a file or a database. See
+the language reference.</p>
 <h3 id="memory">Memory</h3>
 <p><code>gc_collect() -&gt; i64</code> runs the cycle collector and
 returns the number of objects freed; <code>gc_count() -&gt; i64</code>
@@ -402,10 +411,15 @@ and the fields <code>kind</code>, <code>items</code>,
 <code>keys</code>.</p>
 <h3 id="stdhttp"><code>std.http</code></h3>
 <p>An HTTP/1.1 server and client. Server:
-<code>serve(port, handler)</code> (forever) and
-<code>serve_count(port, n, handler)</code>, where
+<code>serve(port, handler)</code> (forever, one connection at a time),
+<code>serve_count(port, n, handler)</code> (exactly <code>n</code>, then
+stop), and <code>serve_concurrent(port, workers, handler)</code> (a pool
+of <code>workers</code> threads serving at once), where
 <code>handler: fn(Request) -&gt; Response</code>; a handler that fails
-answers 500 and the server continues. <code>Request</code> has
+answers 500 and the server continues. For <code>serve_concurrent</code>
+the handler must be a plain top-level function (no captures) and any
+state shared between requests lives in a file or a database — see the
+concurrency notes in the language reference. <code>Request</code> has
 <code>method</code>, <code>path</code>, <code>query</code>,
 <code>headers</code>, <code>body</code> and
 <code>header(name) -&gt; Option[str]</code>; build responses with
@@ -415,8 +429,8 @@ answers 500 and the server continues. <code>Request</code> has
 <code>post(url, body)</code>, <code>request(method, url, body)</code>
 return <code>Result[Response, str]</code>; <code>Response</code> has
 <code>status</code>, <code>headers</code>, <code>body</code>,
-<code>header(name)</code>. Plain <code>http://</code> only, one
-connection at a time, request bodies up to 8 MB.</p>
+<code>header(name)</code>. Plain <code>http://</code> only, request
+bodies up to 8 MB.</p>
 <h3 id="stdtesting"><code>std.testing</code></h3>
 <p>For <code>tacqor test</code>:
 <code>assert_eq(actual, expected)</code>, <code>assert_ne</code>,

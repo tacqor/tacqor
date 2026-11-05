@@ -150,15 +150,21 @@ library.</li>
 and tested in CI; ARM64 Linux.</li>
 </ul>
 <h2 id="20--concurrency">2.0 — concurrency</h2>
+<p>Request-level concurrency landed in 1.3: <code>parallel_run</code>
+runs a share-nothing worker pool, and <code>http.serve_concurrent</code>
+serves HTTP on one. What is left for 2.0 is the richer model.</p>
 <ul>
 <li><strong>Structured concurrency</strong>: tasks with scoped lifetimes
 and channels for message passing, with the type system ensuring values
 sent between tasks are either immutable or transferred. This keeps the
 non-atomic refcount design by never sharing a mutable object across
-threads — the same rule <code>parallel_map</code> enforces today,
-generalized.</li>
-<li>A <strong>concurrent HTTP server</strong> in <code>std.http</code>
-built on it.</li>
+threads — the same rule <code>parallel_run</code> and
+<code>parallel_map</code> enforce today, generalized so workers can hand
+values to one another without going through a file.</li>
+<li><strong>A sharded allocator</strong> so the per-thread object lock
+stops being the one point of serialization under heavy allocation.</li>
+<li><strong>Non-blocking I/O</strong> so a worker can hold many
+connections at once rather than one at a time.</li>
 </ul>
 <h2 id="not-planned">Not planned</h2>
 <ul>

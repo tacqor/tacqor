@@ -21,6 +21,70 @@
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <style>
 :root { --fg:#1b1f23; --muted:#57606a; --rule:#d0d7de; --code:#f6f8fa; --accent:#0b5fa5; }
@@ -471,6 +535,32 @@ Because workers run truly in parallel, a closure mapper may only capture
 at compile time for lambdas and at runtime for other function values);
 read any larger data through the index, e.g. by computing it from
 <code>i</code> or by capturing a constant.</p>
+<p><code>parallel_run(workers, task)</code> runs
+<code>task(worker_index)</code> on <code>workers</code> threads at once
+(1–64), each thread with its own VM and value stack, and returns once
+every task has returned — for a server accept-loop, that is never, so it
+blocks like a server should. It is the share-nothing counterpart to the
+two reductions above. The model is what Tacqor's non-atomic reference
+counting allows and no more: <strong>each worker owns every object it
+allocates, and no object on the heap is ever touched by two threads at
+once.</strong> Two rules follow and are enforced. The task may capture
+only scalars and function values — the compiler checks an inline
+<code>fn(...)</code> task, and a runtime check backs it up for a task
+bound to a name first; anything else is refused. And state shared
+<em>between</em> workers does not live in a captured value: it lives in
+a file, a database, or another process, where each worker coordinates
+its own reads and writes. Within those rules the speed-up is close to
+linear in the worker count for work that is not allocation-bound (object
+allocation and freeing share one lock). This is the primitive behind
+<code>http.serve_concurrent</code>:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> std.http</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> handle(request: http.Request) <span class="op">-&gt;</span> http.Response:    <span class="co"># a plain function: no captures</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> http.text(<span class="dv">200</span>, <span class="st">&quot;hello &quot;</span> <span class="op">+</span> request.path)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    http.serve_concurrent(<span class="dv">8080</span>, <span class="dv">8</span>, handle)              <span class="co"># eight workers, share-nothing</span></span></code></pre></div>
 <h2 id="7-errors-and-checking">7. Errors and checking</h2>
 <h3 id="recovering-from-runtime-errors">Recovering from runtime
 errors</h3>
@@ -620,12 +710,15 @@ new output is shown; side effects such as file writes therefore repeat.
 ground without an object hierarchy. No
 <code>try</code>/<code>except</code>: use <code>Result</code> and
 <code>?</code>, and <code>attempt</code> at boundaries. Parallelism is
-data-parallel (<code>parallel_sum</code>, <code>parallel_map</code>)
-rather than shared-memory threads; the HTTP server handles one
-connection at a time. Strings are bytes; only <code>chars</code>,
-<code>char_count</code>, <code>chr</code>, <code>ord</code> are
-code-point aware. Call depth is limited to 100,000 frames (in native
-builds too, with a 512 MB stack); value nesting (lists inside lists...)
-is limited to 2,000 levels for printing and comparison.</p>
+share-nothing rather than shared-memory:
+<code>parallel_sum</code>/<code>parallel_map</code> for data-parallel
+work, <code>parallel_run</code> (and <code>http.serve_concurrent</code>
+on top of it) for request-parallel work, with state shared between
+threads through a file or a database, never a mutable value on the heap.
+Strings are bytes; only <code>chars</code>, <code>char_count</code>,
+<code>chr</code>, <code>ord</code> are code-point aware. Call depth is
+limited to 100,000 frames (in native builds too, with a 512 MB stack);
+value nesting (lists inside lists...) is limited to 2,000 levels for
+printing and comparison.</p>
 </body>
 </html>

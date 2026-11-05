@@ -9,7 +9,7 @@ R"tacqor_runtime(
 
 namespace tacqor {
 
-constexpr std::string_view version = "1.2.1";
+constexpr std::string_view version = "1.3.0";
 constexpr std::size_t source_limit = 4'000'000;
 constexpr std::size_t bytecode_limit = 64'000'000;
 constexpr std::size_t value_limit = 65'536;        // locals per function, list literal size
@@ -617,6 +617,33 @@ inline Value make_closure(std::uint32_t function, std::vector<Value> captures) {
     return {Tag::function, closure};
 }
 
+// A parallel_run task is shared, read-only, by every worker thread, so it may capture only
+// values that need no cross-thread reference counting: scalars (never counted) and function
+// values (made immortal before the pool starts). Any other heap capture — a list, dict,
+// object, string, or variant — would have its non-atomic refcount touched by two threads at
+// once, so it is refused here. Share that kind of state through a file or a database instead.
+// The compiler enforces this for an inline lambda; this is the backstop for a task bound to a
+// name first (where the lambda's captures are no longer visible at the call site).
+inline void check_shareable(const Value& value) {
+    if (!value.heap()) return;
+    if (value.tag != Tag::function) {
+        throw std::runtime_error("a parallel_run task may only capture scalars and functions; share other state through a file or a database");
+    }
+    for (const auto& captured : static_cast<ClosureObj*>(value.o)->captures) check_shareable(captured);
+}
+
+// Mark a function value, and any function values it captures, immortal — so copies made on
+// other threads never touch a non-atomic refcount. parallel_run uses this after check_shareable
+// has confirmed the only heap captures are functions. Immortal objects are never freed, which
+// is the intended trade for a pool that lives for the life of the process.
+inline void immortalize_shared(const Value& value) {
+    if (!value.heap() || value.o->immortal) return;
+    value.o->immortal = true;
+    if (value.tag == Tag::function) {
+        for (const auto& captured : static_cast<ClosureObj*>(value.o)->captures) immortalize_shared(captured);
+    }
+}
+
 struct KeyHash {
     std::size_t operator()(const Value& v) const {
         if (v.tag == Tag::text) return static_cast<TextObj*>(v.o)->hash();
@@ -860,7 +887,8 @@ inline void ListObj::sort() {
     }
 }
 
-inline std::string format_float(double value) {
+inline std::string format_float(doub)tacqor_runtime",
+R"tacqor_runtime(le value) {
     if (std::isnan(value)) return "nan";
     if (std::isinf(value)) return value < 0 ? "-inf" : "inf";
     char buffer[64];
@@ -899,8 +927,7 @@ inline void format(std::string& out, const Value& value, const std::vector<Struc
             out += '[';
             bool first = true;
             const auto& list = list_of(value);
-            for (std::size_t i = 0; i < list.size()tacqor_runtime",
-R"tacqor_runtime(); ++i) {
+            for (std::size_t i = 0; i < list.size(); ++i) {
                 if (!first) out += ", ";
                 first = false;
                 format(out, list.get(i), structs, true, depth + 1);
@@ -1144,7 +1171,8 @@ inline bool contains_value(const Value& item, const Value& container) {
     if (container.tag == Tag::list) {
         const auto& items = list_of(container);
         if (items.elem == ListObj::Elem::integer) return std::find(items.ints.begin(), items.ints.end(), item.i) != items.ints.end();
-        for (std::size_t i = 0; i < items.size(); ++i) if (equal(items.get(i), item)) return true;
+       )tacqor_runtime",
+R"tacqor_runtime( for (std::size_t i = 0; i < items.size(); ++i) if (equal(items.get(i), item)) return true;
         return false;
     }
     if (container.tag == Tag::text) return text_of(container).find(text_of(item)) != std::string::npos;
@@ -1198,8 +1226,7 @@ constexpr int builtin_arity[] = {
     1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
     1, 1, 1, 2, 2,
     // 1.1
-    2, 1, 1,)tacqor_runtime",
-R"tacqor_runtime( 0, 0,
+    2, 1, 1, 0, 0,
     // 1.2
     1, 1, 2, 2, 2, 1, 1, 0, 1,
 };
@@ -1427,7 +1454,8 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
         case Builtin::insert: {
             auto& list = list_of(args[0]);
             list.insert(checked_index(int_of(args[1]), list.size() + 1, "list"), std::move(args[2]));
-            return {};
+            return )tacqor_runtime",
+R"tacqor_runtime({};
         }
         case Builtin::remove_at: {
             auto& list = list_of(args[0]);
@@ -1466,8 +1494,7 @@ inline Value call_builtin(Builtin which, Value* args, Context& ctx) {
             std::vector<Value> parts;
             std::size_t start = 0;
             for (;;) {
-                const auto)tacqor_runtime",
-R"tacqor_runtime( found = text.find(separator, start);
+                const auto found = text.find(separator, start);
                 parts.push_back(make_text(text.substr(start, found == std::string::npos ? std::string::npos : found - start)));
                 if (found == std::string::npos) break;
                 start = found + separator.size();
@@ -1674,7 +1701,8 @@ R"tacqor_runtime( found = text.find(separator, start);
         }
         case Builtin::char_count: return checked_size(utf8_chars(text_of(args[0])).size());
         case Builtin::repeat: {
-            const auto& text = text_of(args[0]);
+            const au)tacqor_runtime",
+R"tacqor_runtime(to& text = text_of(args[0]);
             const auto count = int_of(args[1]);
             if (count < 0) throw std::runtime_error("repeat expects a non-negative count");
             if (static_cast<std::uint64_t>(count) * text.size() > text_limit) throw std::runtime_error("text exceeds the size limit");
@@ -1704,8 +1732,7 @@ R"tacqor_runtime( found = text.find(separator, start);
         case Builtin::asin: return std::asin(float_of(args[0]));
         case Builtin::acos: return std::acos(float_of(args[0]));
         case Builtin::atan: return std::atan(float_of(args[0]));
-        case Builtin::atan2: return std::atan2(float_of(args)tacqor_runtime",
-R"tacqor_runtime([0]), float_of(args[1]));
+        case Builtin::atan2: return std::atan2(float_of(args[0]), float_of(args[1]));
         case Builtin::exp: return std::exp(float_of(args[0]));
         case Builtin::log: return std::log(float_of(args[0]));
         case Builtin::log2: return std::log2(float_of(args[0]));

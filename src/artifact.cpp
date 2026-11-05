@@ -226,7 +226,8 @@ void verify(const Program& program) {
                     valid &= operand >= 0 && trait < program.traits.size() && slot < program.traits[trait].method_names.size();
                     break;
                 }
-                case Op::parallel: case Op::try_call: valid &= operand == 0 || operand == 1; break;
+                case Op::parallel: valid &= operand == 0 || operand == 1 || operand == 2; break;
+                case Op::try_call: valid &= operand == 0 || operand == 1; break;
                 case Op::push_integer: case Op::push_float: break;
                 default: valid &= operand == 0; break;
             }

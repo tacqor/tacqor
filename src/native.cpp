@@ -709,6 +709,26 @@ class Generator {
                     break;
                 }
                 case Op::parallel: {
+                    if (operand == 2) {
+                        // parallel_run(workers, task): share-nothing worker pool. Each thread
+                        // runs the task on its own C++ stack; the task closure is made immortal
+                        // so its non-atomic refcount is never touched across threads.
+                        const auto base = depth - 2;
+                        const auto task = "v" + std::to_string(depth - 1);
+                        body << "check_shareable(" << task << "); immortalize_shared(" << task << "); "
+                             << "{ const Value sharedtask = " << task << "; const std::int64_t crew = i" << base << "; "
+                             << "if (crew < 1 || crew > 64) throw std::runtime_error(\"parallel_run needs 1 to 64 workers\"); "
+                             << "std::vector<std::thread> crewpool; std::exception_ptr crewfail; std::mutex crewlock; "
+                             << "gc_state().parallel = true; "
+                             << "for (std::int64_t k = 0; k < crew; ++k) crewpool.emplace_back([&, k]() { "
+                             << "try { Value a[1] = {Value(k)}; call_closure(sharedtask, a, 1); } "
+                             << "catch (...) { std::lock_guard<std::mutex> g(crewlock); if (!crewfail) crewfail = std::current_exception(); } }); "
+                             << "for (auto& t : crewpool) t.join(); gc_state().parallel = false; "
+                             << "if (crewfail) std::rethrow_exception(crewfail); i" << base << " = crew; }\n";
+                        pop(2);
+                        push(type_int);
+                        break;
+                    }
                     const auto base = depth - 3;
                     body << "parallel_check(v" << depth - 1 << "); ";
                     const auto mapper = "[&](std::int64_t index) { Value a[1] = {Value(index)}; return call_closure(v" + std::to_string(depth - 1) + ", a, 1).i; }";
