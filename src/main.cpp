@@ -420,6 +420,7 @@ void usage(std::ostream& stream) {
            << "  tacqor test FILE.tq                           (run every def test_*() in the file)\n"
            << "  tacqor new NAME                               (create a project folder)\n"
            << "  tacqor repl                                   (interactive scratchpad)\n"
+           << "  tacqor lsp                                    (language server over stdio, for editors)\n"
            << "  tacqor add SOURCE [NAME]                      (install a package from a folder or git URL into packages/)\n"
            << "  tacqor install | remove NAME                  (restore packages from tacqor.pkg / uninstall)\n";
 }
@@ -469,6 +470,7 @@ int cli(int argc, char** argv, const fs::path& executable, std::string& label, b
         return 0;
     }
     if (command == "repl" && argc == 2) return repl(executable);
+    if (command == "lsp" && argc == 2) return tacqor::run_lsp(std_search(executable));
     if (command == "add" || command == "install" || command == "remove") return packages(std::string(command), argc, argv);
     const bool emits = command == "compile" || command == "build";
     const bool emit_source = native && std::string_view(argv[1]) == "emit";

@@ -17,6 +17,9 @@ Concurrency release. Tacqor can now use more than one core for request handling,
 - `std.random`: typed conveniences over the built-in generator — `fraction`, `integer`, `below`, `dice`, `boolean`, and `choice`/`shuffle`/`sample` on lists.
 - `std.os`: `env_or` plus `/`-path helpers `join`, `basename`, `dirname`, `extname`, `stem`.
 
+**Tooling**
+- `tacqor lsp` runs a Language Server over stdio, publishing live diagnostics (errors and warnings) to any editor with an LSP client — not just the VS Code extension. It handles `initialize`, `textDocument/didOpen`/`didChange` (full sync) → `publishDiagnostics`, and `didClose`. Hover and go-to-definition are future work. See `docs/TOOLING.md` §2.
+
 **C FFI**
 - `extern def` declarations call C functions from native builds: `extern def sqrt(x: f64) -> f64 from "m"` links libm and calls `sqrt`. An optional `= "c_symbol"` renames the C symbol, and `from "library"` names a library to link. Arguments and results marshal as scalars (`i64`→`long long`, `f64`→`double`, `bool`→`int`) and strings (`str`↔`const char*`, copied; a NULL return becomes `""`); other types are rejected at compile time. Under the bytecode VM a foreign call reports that a native build is required. See `docs/SPECIFICATION.md` §12 and `LANGUAGE.md`.
 

@@ -83,10 +83,11 @@ not planned. Nothing here changes the meaning of a program that compiles
 today. Items move to <code>CHANGELOG.md</code> when they ship.</p>
 <h2 id="13--developer-experience">1.3 — developer experience</h2>
 <ul>
-<li><strong>Language server (LSP).</strong> <code>tacqor diagnose</code>
-already provides diagnostics; an LSP server would add go-to-definition,
-hover types, completion and rename, reusing the compiler's symbol
-tables. Editors other than VS Code would get full support for free.</li>
+<li><strong>Language server (LSP).</strong> Shipped in 1.3:
+<code>tacqor lsp</code> speaks LSP over stdio and publishes live
+diagnostics (errors and warnings) to any editor with an LSP client, not
+just VS Code. Still to add, reusing the compiler's symbol tables:
+go-to-definition, hover types, completion and rename.</li>
 <li><strong>Formatter.</strong> <code>tacqor fmt</code> implementing
 <code>docs/STYLE.md</code>, round-tripping comments.</li>
 <li><strong>Debugger.</strong> Breakpoints, stepping and variable

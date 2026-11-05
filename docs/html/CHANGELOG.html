@@ -124,6 +124,17 @@ lists.</li>
 helpers <code>join</code>, <code>basename</code>, <code>dirname</code>,
 <code>extname</code>, <code>stem</code>.</li>
 </ul>
+<p><strong>Tooling</strong></p>
+<ul>
+<li><code>tacqor lsp</code> runs a Language Server over stdio,
+publishing live diagnostics (errors and warnings) to any editor with an
+LSP client — not just the VS Code extension. It handles
+<code>initialize</code>,
+<code>textDocument/didOpen</code>/<code>didChange</code> (full sync) →
+<code>publishDiagnostics</code>, and <code>didClose</code>. Hover and
+go-to-definition are future work. See <code>docs/TOOLING.md</code>
+§2.</li>
+</ul>
 <p><strong>C FFI</strong></p>
 <ul>
 <li><code>extern def</code> declarations call C functions from native
