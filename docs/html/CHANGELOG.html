@@ -110,6 +110,22 @@ plain top-level function (no captures); shared state lives in a file or
 a database. <code>http.serve</code> and <code>http.serve_count</code>
 are unchanged for the single-threaded case.</li>
 </ul>
+<p><strong>C FFI</strong></p>
+<ul>
+<li><code>extern def</code> declarations call C functions from native
+builds: <code>extern def sqrt(x: f64) -&gt; f64 from "m"</code> links
+libm and calls <code>sqrt</code>. An optional <code>= "c_symbol"</code>
+renames the C symbol, and <code>from "library"</code> names a library to
+link. Arguments and results marshal as scalars
+(<code>i64</code>→<code>long long</code>,
+<code>f64</code>→<code>double</code>,
+<code>bool</code>→<code>int</code>) and strings
+(<code>str</code>↔︎<code>const char*</code>, copied; a NULL return
+becomes <code>""</code>); other types are rejected at compile time.
+Under the bytecode VM a foreign call reports that a native build is
+required. See <code>docs/SPECIFICATION.md</code> §12 and
+<code>LANGUAGE.md</code>.</li>
+</ul>
 <p><strong>Infrastructure</strong></p>
 <ul>
 <li>The macOS build moves to its own workflow (<code>macos.yml</code>)

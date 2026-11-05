@@ -14,6 +14,9 @@ Concurrency release. Tacqor can now use more than one core for request handling,
 **Standard library**
 - `http.serve_concurrent(port, workers, handler)` serves on a pool of worker threads, so one slow handler no longer blocks every other caller the way `http.serve` does. The handler must be a plain top-level function (no captures); shared state lives in a file or a database. `http.serve` and `http.serve_count` are unchanged for the single-threaded case.
 
+**C FFI**
+- `extern def` declarations call C functions from native builds: `extern def sqrt(x: f64) -> f64 from "m"` links libm and calls `sqrt`. An optional `= "c_symbol"` renames the C symbol, and `from "library"` names a library to link. Arguments and results marshal as scalars (`i64`→`long long`, `f64`→`double`, `bool`→`int`) and strings (`str`↔`const char*`, copied; a NULL return becomes `""`); other types are rejected at compile time. Under the bytecode VM a foreign call reports that a native build is required. See `docs/SPECIFICATION.md` §12 and `LANGUAGE.md`.
+
 **Infrastructure**
 - The macOS build moves to its own workflow (`macos.yml`) so GitHub's refused macOS runners no longer mark CI or Release runs as failed; it still attaches a macOS binary to tagged releases when a runner is available.
 

@@ -131,11 +131,15 @@ objects are not rescanned each cycle.</li>
 substrings for slicing.</li>
 </ul>
 <h2 id="16--ecosystem">1.6 — ecosystem</h2>
+<p>The <strong>foreign function interface</strong> landed in 1.3:
+<code>extern def</code> declarations call C from native builds,
+marshalling scalar (<code>i64</code>, <code>f64</code>,
+<code>bool</code>) and string arguments and results, with
+<code>from "lib"</code> naming a library to link. Still to come: a VM
+path through <code>dlopen</code> for the same declarations (today a
+foreign call under the bytecode VM reports that a native build is
+required), and pointer/struct arguments.</p>
 <ul>
-<li><strong>Foreign function interface</strong> for calling C from
-native builds (<code>extern def</code> declarations, scalar and string
-arguments), and a VM path through <code>dlopen</code> for the same
-declarations.</li>
 <li><strong>Package index.</strong> A simple registry file format
 (<code>name → git URL + commit</code>) that <code>tacqor add</code> can
 resolve, with lockfile semantics (<code>tacqor.lock</code>) and checksum
@@ -176,8 +180,9 @@ the use cases; see <code>docs/FAQ.md</code>.</li>
 Each adds non-local reasoning to every line of code that uses it.</li>
 <li><strong>Null.</strong> <code>Option</code> is the only
 representation of absence.</li>
-<li><strong>Unsafe blocks or raw pointers.</strong> The FFI will be the
-only unchecked boundary and will be explicit at the declaration.</li>
+<li><strong>Unsafe blocks or raw pointers.</strong> The FFI is the only
+unchecked boundary, and it is explicit at the <code>extern def</code>
+declaration.</li>
 <li><strong>A garbage collector that replaces reference
 counting.</strong> Deterministic destruction is a feature.</li>
 </ul>

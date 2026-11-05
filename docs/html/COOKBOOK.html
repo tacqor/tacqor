@@ -144,10 +144,12 @@ Structs and traits</a></li>
 <li><a href="#9-http" id="toc-9-http">9. HTTP</a></li>
 <li><a href="#10-parallelism" id="toc-10-parallelism">10.
 Parallelism</a></li>
-<li><a href="#11-testing" id="toc-11-testing">11. Testing</a></li>
-<li><a href="#12-timing-and-profiling"
-id="toc-12-timing-and-profiling">12. Timing and profiling</a></li>
-<li><a href="#13-deployment" id="toc-13-deployment">13.
+<li><a href="#11-calling-c-libraries"
+id="toc-11-calling-c-libraries">11. Calling C libraries</a></li>
+<li><a href="#12-testing" id="toc-12-testing">12. Testing</a></li>
+<li><a href="#13-timing-and-profiling"
+id="toc-13-timing-and-profiling">13. Timing and profiling</a></li>
+<li><a href="#14-deployment" id="toc-14-deployment">14.
 Deployment</a></li>
 </ul></li>
 </ul>
@@ -558,7 +560,24 @@ closure (captures must be numbers)</h3>
 <p>To use a list inside a parallel mapper, index a module-level
 computation instead of capturing the list, or compute the elements from
 <code>i</code>.</p>
-<h2 id="11-testing">11. Testing</h2>
+<h2 id="11-calling-c-libraries">11. Calling C libraries</h2>
+<p>Declare the C function with <code>extern def</code>, then build
+native. <code>from "..."</code> names a library to link; libc and libm
+need no <code>from</code>.</p>
+<pre class="text"><code>extern def sqrt(x: f64) -&gt; f64 from &quot;m&quot;
+extern def getenv(name: str) -&gt; str
+
+def main():
+    print(sqrt(2.0))
+    print(&quot;HOME is &quot; + getenv(&quot;HOME&quot;))</code></pre>
+<pre class="text"><code>tacqor build --native app.tq -o app &amp;&amp; ./app</code></pre>
+<p>Scalars (<code>i64</code>, <code>f64</code>, <code>bool</code>) and
+strings cross the boundary; pointers and structs do not. Use
+<code>= "symbol"</code> when the C name differs from the Tacqor name
+(<code>extern def c_abs(n: i64) -&gt; i64 = "llabs"</code>). A foreign
+call only runs in a native build — under <code>tacqor run</code> it
+reports that a native build is required.</p>
+<h2 id="12-testing">12. Testing</h2>
 <p><code>tests.tq</code>:</p>
 <pre class="text"><code>import std.testing
 import main                       # the module under test (its main() is ignored)
@@ -571,7 +590,7 @@ def test_rejects_garbage():
 <p>Run <code>tacqor test tests.tq</code>; every <code>test_*</code>
 procedure runs, failures are reported with line and message, and the
 exit status is 1 if any failed.</p>
-<h2 id="12-timing-and-profiling">12. Timing and profiling</h2>
+<h2 id="13-timing-and-profiling">13. Timing and profiling</h2>
 <pre class="text"><code>def main():
     let started = time_ms()
     var total = 0
@@ -582,11 +601,11 @@ exit status is 1 if any failed.</p>
 development, native builds for anything hot.
 <code>tacqor dump file.tq</code> shows the bytecode of a hot loop; fewer
 instructions per iteration means faster.</p>
-<h2 id="13-deployment">13. Deployment</h2>
-<div class="sourceCode" id="cb30"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build app.tq <span class="at">-o</span> app              <span class="co"># self-contained, VM embedded, no dependencies</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build <span class="at">--native</span> app.tq <span class="at">-o</span> app     <span class="co"># machine code (needs c++ when building)</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> app server:/opt/app/ <span class="kw">&amp;&amp;</span> <span class="fu">ssh</span> server /opt/app/app</span></code></pre></div>
+<h2 id="14-deployment">14. Deployment</h2>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build app.tq <span class="at">-o</span> app              <span class="co"># self-contained, VM embedded, no dependencies</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tacqor</span> build <span class="at">--native</span> app.tq <span class="at">-o</span> app     <span class="co"># machine code (needs c++ when building)</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> app server:/opt/app/ <span class="kw">&amp;&amp;</span> <span class="fu">ssh</span> server /opt/app/app</span></code></pre></div>
 <p>Set <code>PORT</code>-style configuration through
 <code>env(...)</code>, log with <code>eprint</code>, return non-zero
 through <code>exit(n)</code>, and keep handlers failure-tolerant with
