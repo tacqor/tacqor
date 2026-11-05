@@ -109,6 +109,20 @@ other caller the way <code>http.serve</code> does. The handler must be a
 plain top-level function (no captures); shared state lives in a file or
 a database. <code>http.serve</code> and <code>http.serve_count</code>
 are unchanged for the single-threaded case.</li>
+<li><code>std.time</code>: UTC dates and times on top of
+<code>unix_time()</code> —
+<code>from_unix</code>/<code>now</code>/<code>to_unix</code>, a
+<code>DateTime</code> record,
+<code>iso</code>/<code>date_string</code>/<code>time_string</code>/<code>weekday_name</code>/<code>month_name</code>,
+and <code>is_leap</code>/<code>days_in_month</code>.</li>
+<li><code>std.random</code>: typed conveniences over the built-in
+generator — <code>fraction</code>, <code>integer</code>,
+<code>below</code>, <code>dice</code>, <code>boolean</code>, and
+<code>choice</code>/<code>shuffle</code>/<code>sample</code> on
+lists.</li>
+<li><code>std.os</code>: <code>env_or</code> plus <code>/</code>-path
+helpers <code>join</code>, <code>basename</code>, <code>dirname</code>,
+<code>extname</code>, <code>stem</code>.</li>
 </ul>
 <p><strong>C FFI</strong></p>
 <ul>

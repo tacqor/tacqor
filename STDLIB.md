@@ -103,4 +103,13 @@ An HTTP/1.1 server and client. Server: `serve(port, handler)` (forever, one conn
 ### `std.testing`
 For `tacqor test`: `assert_eq(actual, expected)`, `assert_ne`, `assert_true(condition, message)`, `assert_some(option) -> T`, `assert_ok(result) -> T`. Failures report the values involved.
 
+### `std.time`
+Dates and times in UTC, built on `unix_time()`. `from_unix(seconds) -> DateTime` and `now() -> DateTime` convert an epoch time to a `DateTime { year, month, day, hour, minute, second, weekday }` (weekday 0=Sunday); `to_unix(dt)` is the inverse. Formatting: `iso(dt)` (`"2026-11-04T20:27:05Z"`), `date_string(dt)`, `time_string(dt)`, `weekday_name(dt)`, `month_name(dt)`. Calendar helpers: `is_leap(year)`, `days_in_month(year, month)`, `days_from_civil(year, month, day)`. No time-zone database — everything is UTC.
+
+### `std.random`
+Typed conveniences over the built-in generator (call `seed(n)` first for a reproducible stream). `fraction() -> f64` in [0, 1); `integer(lo, hi)` inclusive; `below(n)` in [0, n-1]; `dice(sides)` in [1, sides]; `boolean(p)` true with probability `p`. On lists: `choice(items) -> Option[T]` (None if empty), `shuffle(items) -> list[T]` (a new list, Fisher-Yates), `sample(items, k) -> list[T]` (k distinct elements).
+
+### `std.os`
+The environment and path names (file and process I/O is already in the built-ins). `env_or(name, fallback)` reads an environment variable with a default. Path helpers treat `/`-separated strings: `join(a, b)` (absolute `b` wins), `basename(path)`, `dirname(path)`, `extname(path)` (e.g. `".gz"`, `""` when none, and a leading dot is not an extension), `stem(path)` (basename without extension).
+
 \* `capitalize` lives in `std.strings`.

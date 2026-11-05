@@ -126,7 +126,7 @@ test "$("$tool" run "$temp/write.tq" -- "$temp/out.txt")" = "written"
 "$tool" run "$temp/f10.tqb" | cmp - tests/features_1_0.expected
 "$tool" build tests/features_1_0.tq -o "$temp/f10"
 "$temp/f10" | cmp - tests/features_1_0.expected
-"$tool" test tests/unit_tests.tq | grep -q '3 passed, 0 failed'
+"$tool" test tests/unit_tests.tq | grep -q '6 passed, 0 failed'
 printf 'def test_bad():\n    assert 1 == 2\ndef test_good():\n    assert True\n' > "$temp/t.tq"
 if "$tool" test "$temp/t.tq" > "$temp/t.log"; then exit 1; fi
 grep -q 'FAIL test_bad' "$temp/t.log"
@@ -134,7 +134,7 @@ grep -q 'PASS test_good' "$temp/t.log"
 rm -rf "$temp/proj" && (cd "$temp" && "$tool" new proj > /dev/null)
 (cd "$temp/proj" && "$tool" run main.tq | grep -q 'Hello, proj!')
 (cd "$temp/proj" && "$tool" test tests.tq | grep -q '1 passed')
-for module in lists strings math testing collections json; do "$tool" check "std/$module.tq" > /dev/null; done
+for module in lists strings math testing collections json time random os; do "$tool" check "std/$module.tq" > /dev/null; done
 
 check_error 'import nowhere\ndef main():\n    print(1)\n' 'not found'
 check_error 'def main():\n    let x = None\n' 'add an annotation'

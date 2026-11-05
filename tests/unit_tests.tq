@@ -2,6 +2,9 @@
 import std.testing
 import std.lists
 import std.math
+import std.time
+import std.random
+import std.os
 
 def test_lists():
     testing.assert_eq(lists.map([1, 2, 3], fn(x: i64) => x * x), [1, 4, 9])
@@ -14,3 +17,51 @@ def test_math():
 def test_option():
     let found = lists.find_first([5, 8], fn(x: i64) => x > 6)
     testing.assert_eq(testing.assert_some(found), 8)
+
+def test_time():
+    # 2021-01-01T00:00:00Z is 1609459200 seconds since the epoch.
+    let dt = time.from_unix(1609459200)
+    testing.assert_eq(dt.year, 2021)
+    testing.assert_eq(dt.month, 1)
+    testing.assert_eq(dt.day, 1)
+    testing.assert_eq(time.iso(dt), "2021-01-01T00:00:00Z")
+    testing.assert_eq(time.weekday_name(dt), "Friday")
+    testing.assert_eq(time.to_unix(dt), 1609459200)          # round trip
+    testing.assert_true(time.is_leap(2024), "2024 is a leap year")
+    testing.assert_true(not time.is_leap(2100), "2100 is not a leap year")
+    testing.assert_eq(time.days_in_month(2024, 2), 29)
+
+def test_random():
+    seed(7)
+    # below(n) stays in [0, n-1]
+    for i in range(500):
+        let v = random.below(6)
+        testing.assert_true(v >= 0 and v < 6, "below(6) in range")
+    # shuffle is a permutation: same length, same sum
+    let xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    let sh = random.shuffle(xs)
+    testing.assert_eq(len(sh), 10)
+    testing.assert_eq(lists.reduce(sh, 0, fn(a: i64, b: i64) => a + b), 55)
+    testing.assert_eq(len(random.sample(xs, 4)), 4)
+    match random.choice([42]):
+        case Some(v):
+            testing.assert_eq(v, 42)
+        case None:
+            testing.assert_true(False, "choice of a singleton should be Some")
+    let empty: list[i64] = []
+    match random.choice(empty):
+        case None:
+            testing.assert_true(True, "choice of empty is None")
+        case Some(v):
+            testing.assert_true(False, "choice of empty should be None")
+
+def test_os():
+    testing.assert_eq(os.basename("/etc/hosts"), "hosts")
+    testing.assert_eq(os.dirname("/etc/hosts"), "/etc")
+    testing.assert_eq(os.dirname("/usr"), "/")
+    testing.assert_eq(os.extname("/a/photo.tar.gz"), ".gz")
+    testing.assert_eq(os.stem("/a/photo.tar.gz"), "photo.tar")
+    testing.assert_eq(os.extname(".bashrc"), "")             # a leading dot is not an extension
+    testing.assert_eq(os.join("/a/b", "c.txt"), "/a/b/c.txt")
+    testing.assert_eq(os.join("/a", "/x"), "/x")             # absolute second part wins
+    testing.assert_eq(os.env_or("TACQOR_DEFINITELY_UNSET", "fallback"), "fallback")

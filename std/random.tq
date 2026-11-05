@@ -1,0 +1,63 @@
+# Standard library: randomness. Import with `import std.random`.
+#
+# Thin, typed conveniences over the built-in generator (`random_int`, `random_float`,
+# `seed`). Call `seed(n)` first for a reproducible sequence; otherwise the stream is
+# seeded from the environment. `random_int(lo, hi)` is inclusive at both ends.
+
+# A float in [0, 1).
+def fraction() -> f64:
+    return random_float()
+
+# An integer in [lo, hi], inclusive (a direct name for the builtin).
+def integer(lo: i64, hi: i64) -> i64:
+    return random_int(lo, hi)
+
+# An integer in [0, n-1]. Useful as a list index.
+def below(n: i64) -> i64:
+    if n <= 0:
+        return 0
+    return random_int(0, n - 1)
+
+# A die roll in [1, sides].
+def dice(sides: i64) -> i64:
+    if sides < 1:
+        return 1
+    return random_int(1, sides)
+
+# True with probability p (clamped to [0, 1]).
+def boolean(p: f64) -> bool:
+    return random_float() < p
+
+# A uniformly chosen element, or None if the list is empty.
+def choice[T](items: list[T]) -> Option[T]:
+    if len(items) == 0:
+        return None
+    return Some(items[random_int(0, len(items) - 1)])
+
+# A new list with the same elements in a uniformly random order (Fisher-Yates).
+def shuffle[T](items: list[T]) -> list[T]:
+    var out: list[T] = []
+    for x in items:
+        push(out, x)
+    let n = len(out)
+    for i in range(n):
+        let j = random_int(i, n - 1)
+        let tmp = out[i]
+        out[i] = out[j]
+        out[j] = tmp
+    return out
+
+# k distinct elements chosen uniformly without replacement. If k >= len(items) the
+# whole list is returned shuffled; k <= 0 returns an empty list.
+def sample[T](items: list[T], k: i64) -> list[T]:
+    let shuffled = shuffle(items)
+    var out: list[T] = []
+    if k <= 0:
+        return out
+    var taken = 0
+    for x in shuffled:
+        if taken >= k:
+            return out
+        push(out, x)
+        taken = taken + 1
+    return out
