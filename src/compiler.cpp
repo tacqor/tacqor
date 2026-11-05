@@ -307,6 +307,9 @@ struct FunctionDecl {
     std::optional<TypeExpr> result;
     std::vector<Statement> body;
     bool method = false;             // first parameter is `self`
+    bool foreign = false;            // `extern def`: body calls into a C symbol
+    std::string foreign_symbol;      // C symbol to call (defaults to the function's name)
+    std::string foreign_library;     // library to link (-l<name>); empty means none needed
 };
 
 struct StructDecl {
@@ -410,7 +413,7 @@ const std::unordered_set<std::string>& reserved_words() {
     static const std::unordered_set<std::string> words = {
         "def", "struct", "let", "var", "if", "elif", "else", "while", "for", "in", "break", "continue",
         "return", "assert", "and", "or", "not", "True", "False", "None", "range", "fn", "match", "case",
-        "import", "as", "const", "Some", "Ok", "Err", "Option", "Result", "trait",
+        "import", "as", "const", "Some", "Ok", "Err", "Option", "Result", "trait", "extern",
         "i64", "f64", "bool", "str", "list", "dict",
     };
     return words;
@@ -925,7 +928,7 @@ class Parser {
     FunctionDecl function(bool method, bool signature_only = false) {
         expect("def");
         auto id = name();
-        FunctionDecl decl{std::move(id), {}, {}, {}, {}, method};
+        FunctionDecl decl{std::move(id), {}, {}, {}, {}, method, false, "", ""};
         decl.type_params = type_params();
         expect("(");
         if (method) {
@@ -950,6 +953,38 @@ class Parser {
         decl.body = block();
         return decl;
     }
+    // extern def name(p: T, ...) -> T [= "c_symbol"] [from "library"]
+    // A foreign function has no Tacqor body; the native backend calls the C symbol directly.
+    FunctionDecl foreign_function() {
+        expect("extern");
+        const auto at = current().at;
+        expect("def");
+        auto id = name();
+        FunctionDecl decl{std::move(id), {}, {}, {}, {}, false, true, "", ""};
+        decl.foreign_symbol = decl.name.text;
+        expect("(");
+        while (!matches(")")) {
+            auto parameter = name();
+            expect(":");
+            decl.params.emplace_back(std::move(parameter), type());
+            if (!accept(",")) break;
+        }
+        expect(")");
+        if (accept("->")) decl.result = type();
+        if (accept("=")) decl.foreign_symbol = expect(Tag::text, "a C symbol name in quotes").text;
+        if (accept("from")) decl.foreign_library = expect(Tag::text, "a library name in quotes").text;
+        expect(Tag::newline, "a newline");
+        // Synthesise a body so every path (VM, embedded VM, type checker) has something valid to run:
+        // a call to fail(...) that reports the function needs a native build. The native backend
+        // recognises the function as foreign and emits the real C call instead of this body.
+        Expr message{Form::text, Token{Tag::text,
+            "foreign function '" + decl.name.text + "' needs a native build (tacqor build --native)", at}, {}};
+        Expr call{Form::call, Token{Tag::name, "fail", at}, {std::move(message)}};
+        Statement stmt{FormStmt::expression, Token{Tag::name, "fail", at}, std::move(call), {}, {}, "", {}, {}, {}};
+        decl.body.push_back(std::move(stmt));
+        return decl;
+    }
+
     TraitDecl trait() {
         expect("trait");
         auto id = name();
@@ -1003,6 +1038,7 @@ public:
         while (current().tag != Tag::end) {
             if (matches("struct")) result.structs.push_back(structure());
             else if (matches("trait")) result.traits.push_back(trait());
+            else if (matches("extern")) result.functions.push_back(foreign_function());
             else if (matches("def")) result.functions.push_back(function(false));
             else if (accept("import")) {
                 ImportDecl decl;
@@ -3183,9 +3219,21 @@ public:
                 if (name.text == "main" && (!header.params.empty() || header.result != type_unit)) {
                     throw Error(name.at, "entry point must be def main():", u.file);
                 }
+                if (decl.foreign) {
+                    const auto marshalable = [](TypeId t) { return t == type_int || t == type_float || t == type_bool || t == type_text; };
+                    for (std::size_t p = 0; p < header.params.size(); ++p) {
+                        if (!marshalable(header.params[p])) {
+                            throw Error(decl.params[p].first.at, "an extern function parameter must be i64, f64, bool, or str, found " + type_name(program, header.params[p]), u.file);
+                        }
+                    }
+                    if (header.result != type_unit && !marshalable(header.result)) {
+                        throw Error(name.at, "an extern function must return i64, f64, bool, str, or nothing, found " + type_name(program, header.result), u.file);
+                    }
+                }
                 const auto id = static_cast<std::uint32_t>(program.functions.size());
                 program.functions.push_back(std::move(header));
                 u.functions[name.text] = id;
+                if (decl.foreign) program.foreign.push_back({id, decl.foreign_symbol, decl.foreign_library});
             }
             for (const auto& decl : u.ast.structs) {
                 if (!decl.type_params.empty()) continue;

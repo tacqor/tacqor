@@ -145,8 +145,10 @@ Errors and checking</a></li>
 <li><a href="#12-networking-and-processes"
 id="toc-12-networking-and-processes">12. Networking and
 processes</a></li>
-<li><a href="#13-limits-and-non-features"
-id="toc-13-limits-and-non-features">13. Limits and non-features</a></li>
+<li><a href="#13-calling-c-ffi" id="toc-13-calling-c-ffi">13. Calling C
+(FFI)</a></li>
+<li><a href="#14-limits-and-non-features"
+id="toc-14-limits-and-non-features">14. Limits and non-features</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -705,7 +707,36 @@ new output is shown; side effects such as file writes therefore repeat.
 <code>unix_time()</code> is seconds since the epoch;
 <code>hash(text)</code> is a 64-bit FNV-1a hash folded to a non-negative
 <code>i64</code>.</p>
-<h2 id="13-limits-and-non-features">13. Limits and non-features</h2>
+<h2 id="13-calling-c-ffi">13. Calling C (FFI)</h2>
+<p>An <code>extern def</code> declaration names a C function. In a
+native build (<code>tacqor build --native</code>) a call to it compiles
+to a direct C call; the declaration says how the arguments and the
+result cross the boundary.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> sqrt(x: f64) <span class="op">-&gt;</span> f64 <span class="im">from</span> <span class="st">&quot;m&quot;</span>            <span class="co"># links libm, calls C&#39;s sqrt</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> llabs(n: i64) <span class="op">-&gt;</span> i64                     <span class="co"># libc; no library to name</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> getenv(name: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>                 <span class="co"># str crosses as const char*</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>extern <span class="kw">def</span> to_int(s: <span class="bu">str</span>) <span class="op">-&gt;</span> i64 <span class="op">=</span> <span class="st">&quot;atoll&quot;</span>          <span class="co"># = renames the C symbol</span></span></code></pre></div>
+<p><code>from "name"</code> names a library to link
+(<code>-lname</code>, or <code>name.lib</code> on MSVC); omit it for
+libc and libm symbols that link by default. <code>= "symbol"</code>
+gives the C symbol when it differs from the Tacqor name. Only scalars
+and strings cross the boundary: <code>i64</code> as
+<code>long long</code>, <code>f64</code> as <code>double</code>,
+<code>bool</code> as <code>int</code> (0 or 1), and <code>str</code> as
+a NUL-terminated <code>const char*</code> — a string argument is passed
+by pointer into the C function, and a <code>const char*</code> result is
+copied into a Tacqor string (a NULL result becomes <code>""</code>). A
+parameter or result of any other type is a compile-time error. Pointers
+and structs are not supported yet.</p>
+<p>The boundary is unchecked: Tacqor cannot verify that the C signature
+you declared matches the real one, and a wrong declaration is undefined
+behaviour, exactly as in C. This is the one place the language trades
+its guarantees for reach, and it is explicit at the declaration. Under
+the bytecode VM (<code>tacqor run</code>, or a <code>tacqor build</code>
+embedded-VM binary) a foreign call reports that a native build is
+required, so develop foreign code with <code>build --native</code>.</p>
+<h2 id="14-limits-and-non-features">14. Limits and non-features</h2>
 <p>No inheritance: traits plus generics and closures cover the same
 ground without an object hierarchy. No
 <code>try</code>/<code>except</code>: use <code>Result</code> and

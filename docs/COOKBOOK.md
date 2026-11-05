@@ -497,7 +497,26 @@ def main():
 
 To use a list inside a parallel mapper, index a module-level computation instead of capturing the list, or compute the elements from `i`.
 
-## 11. Testing
+## 11. Calling C libraries
+
+Declare the C function with `extern def`, then build native. `from "..."` names a library to link; libc and libm need no `from`.
+
+```text
+extern def sqrt(x: f64) -> f64 from "m"
+extern def getenv(name: str) -> str
+
+def main():
+    print(sqrt(2.0))
+    print("HOME is " + getenv("HOME"))
+```
+
+```text
+tacqor build --native app.tq -o app && ./app
+```
+
+Scalars (`i64`, `f64`, `bool`) and strings cross the boundary; pointers and structs do not. Use `= "symbol"` when the C name differs from the Tacqor name (`extern def c_abs(n: i64) -> i64 = "llabs"`). A foreign call only runs in a native build — under `tacqor run` it reports that a native build is required.
+
+## 12. Testing
 
 `tests.tq`:
 
@@ -514,7 +533,7 @@ def test_rejects_garbage():
 
 Run `tacqor test tests.tq`; every `test_*` procedure runs, failures are reported with line and message, and the exit status is 1 if any failed.
 
-## 12. Timing and profiling
+## 13. Timing and profiling
 
 ```text
 def main():
@@ -527,7 +546,7 @@ def main():
 
 Build with `--native` and compare: the VM is good for development, native builds for anything hot. `tacqor dump file.tq` shows the bytecode of a hot loop; fewer instructions per iteration means faster.
 
-## 13. Deployment
+## 14. Deployment
 
 ```sh
 tacqor build app.tq -o app              # self-contained, VM embedded, no dependencies

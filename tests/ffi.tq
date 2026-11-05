@@ -1,0 +1,15 @@
+# C FFI: call libm and libc directly. Built with `tacqor build --native`.
+# Each declared signature matches the real C function exactly, so the generated
+# extern "C" prototype never conflicts with the system headers on any compiler.
+extern def sqrt(x: f64) -> f64 from "m"
+extern def pow(base: f64, exp: f64) -> f64 from "m"
+extern def llabs(n: i64) -> i64
+extern def atoll(s: str) -> i64                 # str argument -> const char*
+extern def getenv(name: str) -> str             # char* result -> Tacqor string
+
+def main():
+    print(sqrt(144.0))                      # 12.0
+    print(pow(3.0, 4.0))                     # 81.0
+    print(llabs(-7))                         # 7
+    print(atoll("1234"))                     # 1234
+    print("env:" + getenv("TACQOR_FFI_SMOKE"))

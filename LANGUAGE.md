@@ -272,6 +272,21 @@ Values are reference counted, so most objects are freed the moment they become u
 
 `tcp_listen`, `tcp_accept`, `tcp_connect`, `tcp_read`, `tcp_write`, `tcp_close` are blocking TCP primitives that return `Result`s; `std.http` builds an HTTP/1.1 server (`serve`, `serve_count`) and client (`get`, `post`) on them in Tacqor. `run(command)` runs a shell command and returns its status; `run_capture(command)` returns its output. `unix_time()` is seconds since the epoch; `hash(text)` is a 64-bit FNV-1a hash folded to a non-negative `i64`.
 
-## 13. Limits and non-features
+## 13. Calling C (FFI)
+
+An `extern def` declaration names a C function. In a native build (`tacqor build --native`) a call to it compiles to a direct C call; the declaration says how the arguments and the result cross the boundary.
+
+```python
+extern def sqrt(x: f64) -> f64 from "m"            # links libm, calls C's sqrt
+extern def llabs(n: i64) -> i64                     # libc; no library to name
+extern def getenv(name: str) -> str                 # str crosses as const char*
+extern def to_int(s: str) -> i64 = "atoll"          # = renames the C symbol
+```
+
+`from "name"` names a library to link (`-lname`, or `name.lib` on MSVC); omit it for libc and libm symbols that link by default. `= "symbol"` gives the C symbol when it differs from the Tacqor name. Only scalars and strings cross the boundary: `i64` as `long long`, `f64` as `double`, `bool` as `int` (0 or 1), and `str` as a NUL-terminated `const char*` — a string argument is passed by pointer into the C function, and a `const char*` result is copied into a Tacqor string (a NULL result becomes `""`). A parameter or result of any other type is a compile-time error. Pointers and structs are not supported yet.
+
+The boundary is unchecked: Tacqor cannot verify that the C signature you declared matches the real one, and a wrong declaration is undefined behaviour, exactly as in C. This is the one place the language trades its guarantees for reach, and it is explicit at the declaration. Under the bytecode VM (`tacqor run`, or a `tacqor build` embedded-VM binary) a foreign call reports that a native build is required, so develop foreign code with `build --native`.
+
+## 14. Limits and non-features
 
 No inheritance: traits plus generics and closures cover the same ground without an object hierarchy. No `try`/`except`: use `Result` and `?`, and `attempt` at boundaries. Parallelism is share-nothing rather than shared-memory: `parallel_sum`/`parallel_map` for data-parallel work, `parallel_run` (and `http.serve_concurrent` on top of it) for request-parallel work, with state shared between threads through a file or a database, never a mutable value on the heap. Strings are bytes; only `chars`, `char_count`, `chr`, `ord` are code-point aware. Call depth is limited to 100,000 frames (in native builds too, with a 512 MB stack); value nesting (lists inside lists...) is limited to 2,000 levels for printing and comparison.

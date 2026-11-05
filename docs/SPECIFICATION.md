@@ -291,6 +291,18 @@ The entry point is `main`. `args()` returns the arguments after the program name
 
 ---
 
-## 12. Conformance
+## 12. Foreign functions
+
+`extern def f(p: T, ...) -> R [= "symbol"] [from "library"]` declares a function implemented in C. Each parameter type and the result type `R` must be `i64`, `f64`, `bool` or `str`; `R` may also be absent (no result). Any other type is a compile-time error. A call to `f` type-checks exactly as a call to a Tacqor function of the same signature.
+
+`symbol` is the C identifier called (default: the declared name). `library` names a library the implementation links (`-l<library>` on Unix). The boundary is unchecked: the implementation calls the symbol with the declared signature, and a declaration that does not match the C function's real signature is undefined behaviour.
+
+Argument and result marshalling: `i64` ↔ a C `long long`, `f64` ↔ `double`, `bool` ↔ a C `int` (sent as 0 or 1; any non-zero return is `True`), and `str` → a NUL-terminated `const char*` for an argument, with a `const char*` result copied into a new string (a null pointer result yields `""`). A `str` argument's pointer is valid only for the duration of the call.
+
+A conforming implementation may restrict foreign calls to native (compiled) execution. The reference implementation supports them under `build --native`; under the bytecode VM a foreign call raises a runtime error reporting that a native build is required.
+
+---
+
+## 13. Conformance
 
 An implementation conforms if, for every valid program, it produces the same output and exit status as this specification defines, and for every invalid program it reports a diagnostic. The reference implementation's differential test suite (`tests/smoke.sh`) is the executable form of this requirement: all four execution paths must agree byte for byte.
